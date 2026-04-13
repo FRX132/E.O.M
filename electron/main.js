@@ -1,0 +1,85 @@
+import { app, BrowserWindow, ipcMain } from 'electron';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { exec } from 'child_process';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Very simple flag to detect dev mode vs production mode
+// Defaulting to dev for our `concurrently` script, production otherwise
+const isDev = !app.isPackaged;
+
+let mainWindow;
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    minWidth: 900,
+    minHeight: 600,
+    titleBarStyle: 'hiddenInset', // Native traffic lights without hard OSX title bar
+    backgroundColor: '#0a0a0c', // Dark mode fallback background
+    icon: path.join(__dirname, '../build/icon.png'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.cjs'),
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: false // Required for some native modules if we add them later
+    },
+  });
+
+  if (isDev) {
+    // Load Vite Dev Server
+    mainWindow.loadURL('http://localhost:5173');
+    // Open DevTools
+    // mainWindow.webContents.openDevTools();
+  } else {
+    // Load built React assets
+    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+  }
+}
+
+app.whenReady().then(() => {
+  
+  // Set up native IPC bindings before creating the window
+  ipcMain.handle('get-apple-reminders', () => {
+    return new Promise((resolve) => {
+      const script = `
+        var app = Application("Reminders");
+        var results = [];
+        var lists = app.lists();
+        for(var i=0; i<lists.length; i++) {
+          var list = lists[i];
+          var listName = list.name();
+          var reminders = list.reminders.whose({completed: false})();
+          for(var j=0; j<reminders.length; j++) {
+            results.push({
+              id: j + "-" + Date.now(),
+              list: listName, 
+              name: reminders[j].name()
+            });
+          }
+        }
+        JSON.stringify(results);
+      `;
+      exec(`osascript -l JavaScript -e '${script}'`, (error, stdout, stderr) => {
+        if (error) {
+          resolve(JSON.stringify({ error: "permission_denied", details: error.message }));
+          return;
+        }
+        resolve(stdout);
+      });
+    });
+  });
+
+  createWindow();
+
+  app.on('activate', function () {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
+
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') app.quit();
+});

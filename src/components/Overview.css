@@ -1,0 +1,425 @@
+.overview-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.overview-header {
+  margin-bottom: 40px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.overview-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.overview-header .highlight {
+  color: var(--blue-text);
+  text-shadow: 0 0 20px rgba(0, 120, 255, 0.3);
+}
+
+.overview-header .subtitle {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.year-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.day-count {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.year-pct {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--blue-text);
+  line-height: 1;
+}
+
+.year-progress-container {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.dots-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
+  transition: all 0.3s;
+}
+
+.dot.active {
+  background: #fff;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+.overview-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.overview-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--blue-text);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.card-icon {
+  font-size: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.card-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Habit Circle */
+.progress-circle-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.progress-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: conic-gradient(var(--blue-text) var(--progress), transparent 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.progress-circle::after {
+  content: '';
+  position: absolute;
+  width: 85px;
+  height: 85px;
+  background: var(--bg-main);
+  border-radius: 50%;
+}
+
+.progress-value {
+  position: relative;
+  z-index: 1;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.card-status {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Expense Card */
+.expense-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.total-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--orange-text);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mini-expense {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  padding: 8px 0;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Lists */
+.mini-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mini-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mini-list li:last-child {
+  border-bottom: none;
+}
+
+.bullet {
+  color: var(--blue-text);
+  font-weight: bold;
+}
+
+.low-stock .bullet {
+  color: var(--red-text);
+}
+
+.empty-msg {
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+}
+
+/* Common Action Button */
+.card-action {
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.card-action:hover {
+  background: var(--blue-text);
+  color: white;
+  border-color: var(--blue-text);
+}
+
+/* Footer Grid */
+.overview-footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 25px;
+}
+
+.objective-text {
+  font-size: 1.2rem;
+  color: var(--blue-text);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Time & Date Row */
+.time-date-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+/* Clock Card */
+.clock-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(0, 120, 255, 0.08), rgba(0, 0, 0, 0.2));
+  border-color: rgba(0, 120, 255, 0.3);
+  box-shadow: inset 0 0 40px rgba(0, 120, 255, 0.05);
+  min-height: 250px;
+}
+
+.time-display {
+  font-size: 4.5rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 2px;
+  text-shadow: 0 0 30px rgba(0, 120, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.time-display .colon {
+  opacity: 0.8;
+  animation: blink 1s infinite alternate;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+.date-display {
+  font-size: 1.1rem;
+  color: var(--blue-text);
+  margin-top: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Calendar Card */
+.calendar-card {
+  padding: 20px 30px;
+  min-height: 250px;
+}
+
+.calendar-widget {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.cal-header h4 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  color: #fff;
+}
+
+.cal-nav {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1.2rem;
+}
+
+.cal-nav:hover {
+  background: var(--blue-text);
+  border-color: var(--blue-text);
+}
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  flex: 1;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-main);
+  transition: all 0.2s;
+  cursor: default;
+}
+
+.cal-day.empty {
+  background: transparent;
+}
+
+.cal-day:not(.empty):hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.cal-day.today {
+  background: var(--blue-text);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 0 15px rgba(0, 120, 255, 0.4);
+}
+

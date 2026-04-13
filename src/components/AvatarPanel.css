@@ -1,0 +1,153 @@
+.avatar-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.avatar-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar-image-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(138, 43, 226, 0.2));
+  border: 2px solid var(--neon-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+}
+
+.level-badge {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  background-color: var(--bg-dark);
+  border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.avatar-info h2 {
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+  color: var(--text-main);
+}
+
+.rank {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.xp-section {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.xp-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.xp-title {
+  color: var(--text-muted);
+}
+
+.xp-bar-container {
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
+  box-shadow: 0 0 10px var(--neon-cyan);
+  border-radius: 4px;
+  transition: width 1s ease-out;
+}
+
+.xp-numbers {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.vitals-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.vital-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.vital-label {
+  width: 65px;
+}
+
+.vital-bar {
+  flex: 1;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.vital-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.health-fill {
+  background-color: var(--neon-cyan);
+  box-shadow: 0 0 8px var(--neon-cyan);
+}
+
+.energy-fill {
+  background-color: var(--neon-pink);
+  box-shadow: 0 0 8px var(--neon-pink);
+}
+
+.vital-value {
+  width: 35px;
+  text-align: right;
+}
+
+.rank-display {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.rank-name {
+  color: var(--text-main);
+}

@@ -1,0 +1,202 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-main: #111111;
+  --bg-card: #1a1a1a;
+  --bg-header: #422918;
+  --border-color: #333333;
+  --border-light: #2a2a2a;
+  
+  --text-main: #f0f0f0;
+  --text-muted: #888888;
+  
+  --primary: #d48f48;
+  --blue-bg: #1e3a5f;
+  --blue-text: #66b3ff;
+  --green-bg: #1c3d28;
+  --green-text: #4cc77b;
+  --red-bg: #4a1c1c;
+  --red-text: #ff6b6b;
+  --orange-bg: #5f3e1f;
+  --orange-text: #ffb366;
+  --yellow-bg: #4f461e;
+  --yellow-text: #e6c555;
+  --purple-bg: #3d234d;
+  --purple-text: #c08ae6;
+
+  --font-main: 'Inter', system-ui, sans-serif;
+  --transition-fast: 0.15s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+/* Notion-like Utilities */
+.notion-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.notion-header {
+  background: var(--bg-header);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #fff;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.notion-tabs {
+  display: flex;
+  gap: 20px;
+  padding: 20px 20px 0 20px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 20px;
+}
+
+.notion-tab {
+  padding-bottom: 12px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.notion-tab:hover {
+  color: var(--text-main);
+}
+
+.notion-tab.active {
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+}
+
+.notion-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.notion-table th {
+  text-align: left;
+  padding: 10px 20px;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.notion-table td {
+  padding: 12px 20px;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.notion-table tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.pill.green { background: var(--green-bg); color: var(--green-text); }
+.pill.red { background: var(--red-bg); color: var(--red-text); }
+.pill.blue { background: var(--blue-bg); color: var(--blue-text); }
+.pill.orange { background: var(--orange-bg); color: var(--orange-text); }
+.pill.yellow { background: var(--yellow-bg); color: var(--yellow-text); }
+.pill.purple { background: var(--purple-bg); color: var(--purple-text); }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Form Styles */
+.notion-input, .notion-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: border var(--transition-fast);
+  outline: none;
+}
+
+.notion-input:focus, .notion-textarea:focus {
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.notion-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.notion-button {
+  padding: 10px 20px;
+  background: var(--blue-bg);
+  color: var(--blue-text);
+  font-weight: 600;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: opacity var(--transition-fast);
+}
+
+.notion-button:hover {
+  opacity: 0.8;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
