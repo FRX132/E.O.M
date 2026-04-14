@@ -16,18 +16,7 @@ const PILL_COLORS = {
   'Beverages': 'blue'
 };
 
-const initialFood = [
-  { id: 1, name: 'Eggs', status: 'In stock', category: 'Dairy & Eggs', cal: 74.0, price: 41.36 },
-  { id: 2, name: 'Milk', status: 'Not in stock', category: 'Dairy & Eggs', cal: 264.0, price: 42.55 },
-  { id: 3, name: 'Tomato', status: 'Not in stock', category: 'Vegetables', cal: 22.0, price: 41.35 },
-  { id: 4, name: 'Banana', status: 'In stock', category: 'Fruits', cal: 84.0, price: 41.53 },
-  { id: 5, name: 'Greek Yogurt', status: 'In stock', category: 'Dairy & Eggs', cal: 100.0, price: 40.79 },
-  { id: 6, name: 'Cookies', status: 'In stock', category: 'Snacks', cal: 80.0, price: 42.40 },
-  { id: 7, name: 'Green tea', status: 'In stock', category: 'Beverages', cal: 1.0, price: 41.73 },
-  { id: 8, name: 'Apple', status: 'Not in stock', category: 'Fruits', cal: 90.0, price: 40.90 },
-  { id: 9, name: 'Carrot', status: 'In stock', category: 'Vegetables', cal: 60.0, price: 41.30 },
-  { id: 10, name: 'White bread', status: 'In stock', category: 'Bakery', cal: 80.0, price: 41.80 }
-];
+
 
 export default function FridgeStock() {
   const food = useStore(state => state.fridge);

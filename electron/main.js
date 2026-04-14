@@ -43,35 +43,7 @@ function createWindow() {
 app.whenReady().then(() => {
   
   // Set up native IPC bindings before creating the window
-  ipcMain.handle('get-apple-reminders', () => {
-    return new Promise((resolve) => {
-      const script = `
-        var app = Application("Reminders");
-        var results = [];
-        var lists = app.lists();
-        for(var i=0; i<lists.length; i++) {
-          var list = lists[i];
-          var listName = list.name();
-          var reminders = list.reminders.whose({completed: false})();
-          for(var j=0; j<reminders.length; j++) {
-            results.push({
-              id: j + "-" + Date.now(),
-              list: listName, 
-              name: reminders[j].name()
-            });
-          }
-        }
-        JSON.stringify(results);
-      `;
-      exec(`osascript -l JavaScript -e '${script}'`, (error, stdout, stderr) => {
-        if (error) {
-          resolve(JSON.stringify({ error: "permission_denied", details: error.message }));
-          return;
-        }
-        resolve(stdout);
-      });
-    });
-  });
+
 
   createWindow();
 

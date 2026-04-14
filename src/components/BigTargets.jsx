@@ -1,40 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../store';
 
-const initialProjects = [
-  { 
-    id: 1, 
-    title: 'Buy all template products to be organized', 
-    category: 'Personal', 
-    date: 'January 15, 2026', 
-    status: 'In progress',
-    img: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=400&h=300&fit=crop'
-  },
-  { 
-    id: 2, 
-    title: 'Make a contract with Jack', 
-    category: 'Work', 
-    date: 'January 30, 2026', 
-    status: 'Not started',
-    img: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&h=300&fit=crop'
-  },
-  { 
-    id: 3, 
-    title: 'Update finance services for family', 
-    category: 'Financial', 
-    date: 'February 10, 2026', 
-    status: 'In progress',
-    img: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&h=300&fit=crop'
-  },
-  { 
-    id: 4, 
-    title: 'Find a new apartment', 
-    category: 'Personal', 
-    date: 'February 25, 2026', 
-    status: 'Not started',
-    img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop'
-  }
-];
+
 
 const PILL_COLORS = {
   'Personal': 'purple',

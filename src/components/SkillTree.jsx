@@ -1,128 +1,356 @@
-import React from 'react';
+import React, { useMemo, useEffect } from 'react';
+import { ReactFlow, Background, Controls, Handle, Position, useNodesState, useEdgesState } from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 import { useStore } from '../store';
+import dagre from 'dagre';
 
 const SKILL_DEF = [
-  { id: 'fit1', name: 'Athletics Base', desc: 'Consistency in physical activity', icon: '🏃', reqs: [], category: 'Physical' },
-  { id: 'fit2', name: 'Marathoner', desc: 'Endurance training', icon: '👟', reqs: ['fit1'], category: 'Physical' },
-  { id: 'fit3', name: 'Iron Body', desc: 'Heavy strength training', icon: '💪', reqs: ['fit1'], category: 'Physical' },
-  
-  { id: 'mind1', name: 'Mindfulness', desc: 'Daily 10min meditation', icon: '🧘', reqs: [], category: 'Mental' },
-  { id: 'mind2', name: 'Unbreakable Focus', desc: 'Deep work for 2+ hours', icon: '🧠', reqs: ['mind1'], category: 'Mental' },
-  
-  { id: 'tech1', name: 'Code Initiate', desc: 'Understand basics of JS/React', icon: '💻', reqs: [], category: 'Career' },
-  { id: 'tech2', name: 'System Architect', desc: 'Build complex fullstack apps', icon: '⚙️', reqs: ['tech1', 'mind2'], category: 'Career' }
+  // Core
+  { id: 'core', name: 'Life Tree', habit: 'Daily Tracker Check', icon: '🌳', reqs: [], category: 'Core' },
+
+  // --- HEALTH --- RL (Left)
+  { id: 'health', name: 'Health', habit: 'Drink 2L Water', icon: '❤️', reqs: ['core'], category: 'Health' },
+  { id: 'sports', name: 'Sports', habit: '30m Activity', icon: '🏃‍♂️', reqs: ['health'], category: 'Health' },
+  { id: 'gym', name: 'Gym', habit: 'Lift Weights', icon: '🏋️‍♂️', reqs: ['sports'], category: 'Health' },
+  { id: 'mma', name: 'Mixed Martial Arts', habit: 'Shadowbox / Drill', icon: '🥊', reqs: ['sports'], category: 'Health' },
+  { id: 'challenges', name: 'Challenges & Competition', habit: 'Push Limits', icon: '🏆', reqs: ['sports'], category: 'Health' },
+  { id: 'eating', name: 'Eating Habits', habit: 'Track Macros', icon: '🥗', reqs: ['health'], category: 'Health' },
+  { id: 'eat_natural', name: 'Natural', habit: 'Eat 1 Fruit', icon: '🥑', reqs: ['eating'], category: 'Health' },
+  { id: 'eat_self', name: 'Self Cooked', habit: 'Cook 1 Meal', icon: '🍳', reqs: ['eating'], category: 'Health' },
+  { id: 'eat_fast', name: 'Fast food', habit: 'Zero Junk Food', icon: '🍔', reqs: ['eating'], category: 'Health' },
+  { id: 'resting', name: 'Resting Habits', habit: 'No Screen before bed', icon: '🔋', reqs: ['health'], category: 'Health' },
+  { id: 'sleep', name: 'Sleep Schedule', habit: '8 Hours Sleep', icon: '🛌', reqs: ['resting'], category: 'Health' },
+
+  // --- INTELLIGENCE --- TB (Bottom)
+  { id: 'intel', name: 'Intelligence', habit: 'Learn 1 New Fact', icon: '🧠', reqs: ['core'], category: 'Mental' },
+  { id: 'languages', name: 'Languages', habit: '15m Dualingo', icon: '🗣️', reqs: ['intel'], category: 'Mental' },
+  { id: 'comm', name: 'Communication', habit: 'Active Listening', icon: '💬', reqs: ['languages'], category: 'Mental' },
+  { id: 'read', name: 'Reading', habit: 'Read 10 Pages', icon: '📚', reqs: ['intel'], category: 'Mental' },
+  { id: 'education', name: 'Education', habit: 'Study 30m', icon: '🎓', reqs: ['intel'], category: 'Mental' },
+  { id: 'studies', name: 'Studies', habit: 'Review Notes', icon: '🖊️', reqs: ['education'], category: 'Mental' },
+
+  // --- SPIRITUALITY --- BT (Top)
+  { id: 'spirit', name: 'Spirituality', habit: '10m Meditation', icon: '✨', reqs: ['core'], category: 'Spirit' },
+  { id: 'religion', name: 'Religion', habit: 'Read Scripture', icon: '⛪', reqs: ['spirit'], category: 'Spirit' },
+  { id: 'rel_prac', name: 'Practices', habit: 'Daily Prayer', icon: '🙏', reqs: ['religion'], category: 'Spirit' },
+  { id: 'prayers', name: 'Prayers', habit: 'Morning Prayer', icon: '📿', reqs: ['spirit'], category: 'Spirit' },
+  { id: 'thankful', name: 'Thankfulness', habit: 'Gratitude Journal', icon: '🙌', reqs: ['prayers'], category: 'Spirit' },
+  { id: 'holyscripts', name: 'Holy Scripts', habit: 'Study Texts', icon: '📖', reqs: ['spirit'], category: 'Spirit' },
+
+  // --- RELATIONSHIPS --- LR (Right)
+  { id: 'rel', name: 'Relationships', habit: 'Text 1 Person', icon: '🤝', reqs: ['core'], category: 'Social' },
+  { id: 'friends', name: 'Friends', habit: 'Call a friend', icon: '🍻', reqs: ['rel'], category: 'Social' },
+  { id: 'women', name: 'Women', habit: 'Approach / Compliment', icon: '💕', reqs: ['rel'], category: 'Social' },
+  { id: 'family', name: 'Family', habit: 'Call parents', icon: '👨‍👩‍👧‍👦', reqs: ['rel'], category: 'Social' },
+
+  // --- AGENCY --- LR offset (Right Offset)
+  { id: 'agency', name: 'Agency', habit: 'Plan the Day', icon: '♟️', reqs: ['core'], category: 'Career' },
+  { id: 'resources', name: 'Resources', habit: 'Save $10', icon: '📦', reqs: ['agency'], category: 'Career' },
+  { id: 'res_people', name: 'People', habit: 'Networking message', icon: '👥', reqs: ['resources'], category: 'Career' },
+  { id: 'res_db', name: 'Databases', habit: 'Organize Files', icon: '🗄️', reqs: ['resources'], category: 'Career' },
+  { id: 'res_money', name: 'Money', habit: 'Track Expenses', icon: '💰', reqs: ['resources'], category: 'Career' },
+  { id: 'res_books', name: 'Books', habit: 'Organize Library', icon: '📙', reqs: ['resources'], category: 'Career' },
+  { id: 'res_media', name: 'Media', habit: 'Consume 1 Pod', icon: '🎬', reqs: ['resources'], category: 'Career' },
+  { id: 'media_series', name: 'Series', habit: 'Watch 1 Ep', icon: '📺', reqs: ['res_media'], category: 'Career' },
+  { id: 'media_movies', name: 'Movies', habit: 'Watch Movie', icon: '🍿', reqs: ['res_media'], category: 'Career' }
 ];
 
-export default function SkillTree() {
-  const unlocked = useStore(state => state.skills);
-  const setUnlocked = useStore(state => state.setSkills);
+const CATEGORY_COLORS = {
+  Core: '#ffffff',
+  Health: '#B8B062',
+  Spirit: '#6B5B95',
+  Social: '#9B4444',
+  Career: '#2E5C3A',
+  Mental: '#3B7A85'
+};
 
-  const isUnlocked = (id) => unlocked.includes(id);
+const CustomSkillNode = ({ data }) => {
+  const { node, isUnlocked, canUnlock, handleNodeClick } = data;
+  
+  const unlockedState = isUnlocked(node.id);
+  const availableState = canUnlock(node) || unlockedState;
+  const color = CATEGORY_COLORS[node.category] || '#777';
 
-  const canUnlock = (node) => {
-    if (isUnlocked(node.id)) return false;
-    // Check if ALL requirements are unlocked
-    return node.reqs.every(reqId => isUnlocked(reqId));
-  };
-
-  const handleNodeClick = (node) => {
-    if (isUnlocked(node.id)) {
-      // Opt to lock node and children - complex logic, skipping for simple mockup.
-      alert('This skill is already unlocked!');
-      return;
-    }
-    if (canUnlock(node)) {
-      setUnlocked([...unlocked, node.id]);
-    } else {
-      alert('You have not met the prerequisites to unlock this skill.');
-    }
-  };
-
-  const renderNode = (node) => {
-    const unlockedState = isUnlocked(node.id);
-    const availableState = canUnlock(node);
-    
-    let borderCol = 'var(--border-color)';
-    let bg = 'var(--bg-card)';
-    let textOpacity = 1;
-
-    if (unlockedState) {
-      borderCol = 'var(--primary)';
-      bg = 'rgba(212, 143, 72, 0.1)';
-    } else if (availableState) {
-      borderCol = 'var(--text-muted)';
-      bg = 'rgba(255,255,255,0.05)';
-    } else {
-      borderCol = 'var(--bg-main)';
-      textOpacity = 0.4;
-    }
-
-    return (
-      <div 
-        key={node.id}
+  if (node.id === 'core') {
+     return (
+      <div
         onClick={() => handleNodeClick(node)}
         style={{
-          border: `2px solid ${borderCol}`,
-          background: bg,
-          padding: '16px',
-          borderRadius: '8px',
-          cursor: availableState ? 'pointer' : (unlockedState ? 'default' : 'not-allowed'),
-          opacity: textOpacity,
-          transition: 'all var(--transition-fast)',
-          width: '240px',
-          boxShadow: unlockedState ? '0 0 15px rgba(212, 143, 72, 0.15)' : 'none',
-          position: 'relative'
+          border: `2px solid ${color}`, background: 'rgba(20,20,20,0.9)', padding: '12px 24px', borderRadius: '8px',
+          cursor: 'pointer', color: 'var(--text-main)', fontSize: '1rem', fontWeight: 'bold', boxShadow: `0 0 20px ${color}60`
         }}
-        onMouseOver={e => availableState && (e.currentTarget.style.transform = 'translateY(-2px)')}
-        onMouseOut={e => availableState && (e.currentTarget.style.transform = 'translateY(0)')}
+        title="Life Tree - Your core"
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-          <div style={{ fontSize: '1.5rem', background: 'rgba(0,0,0,0.3)', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
-            {node.icon}
-          </div>
-          <div style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.9rem', lineHeight: 1.2 }}>{node.name}</div>
-        </div>
-        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{node.desc}</div>
-        
-        {/* Requirements Tag */}
-        {node.reqs.length > 0 && !unlockedState && (
-           <div style={{ marginTop: '12px', fontSize: '0.7rem', color: availableState ? 'var(--blue-text)' : 'var(--red-text)' }}>
-             Reqs: {node.reqs.map(rId => SKILL_DEF.find(s => s.id === rId).name).join(', ')}
-           </div>
-        )}
+        <Handle type="source" position={Position.Top} id="s-top" style={{visibility: 'hidden'}} />
+        <Handle type="source" position={Position.Right} id="s-right" style={{visibility: 'hidden'}} />
+        <Handle type="source" position={Position.Bottom} id="s-bottom" style={{visibility: 'hidden'}} />
+        <Handle type="source" position={Position.Left} id="s-left" style={{visibility: 'hidden'}} />
+        <span>{node.icon} {node.name}</span>
       </div>
-    );
-  };
-
-  const tiers = [[], [], []];
-  SKILL_DEF.forEach(node => {
-     if (node.reqs.length === 0) tiers[0].push(node);
-     else if (node.reqs.length === 1 && SKILL_DEF.find(n => n.id === node.reqs[0]).reqs.length === 0) tiers[1].push(node);
-     else tiers[2].push(node);
-  });
+     );
+  }
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+    <div
+      onClick={() => handleNodeClick(node)}
+      style={{
+        border: `1px solid ${unlockedState ? color : 'var(--border-color)'}`,
+        background: unlockedState ? 'rgba(20,20,20,0.95)' : 'var(--bg-main)',
+        padding: '6px 14px',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        opacity: unlockedState ? 1 : (availableState ? 0.7 : 0.3),
+        color: unlockedState ? 'var(--text-main)' : 'var(--text-muted)',
+        fontSize: '0.8rem',
+        whiteSpace: 'nowrap',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        boxShadow: unlockedState ? `0 0 10px ${color}40` : 'none',
+        transition: 'all 0.2s',
+      }}
+      title="View Details"
+      className="custom-node-hover"
+    >
+      <Handle type="target" position={data.targetPos} style={{ visibility: 'hidden' }} />
+      <span style={{ fontSize: '1rem' }}>{node.icon}</span>
+      <span>{node.name}</span>
+      <Handle type="source" position={data.sourcePos} style={{ visibility: 'hidden' }} />
+    </div>
+  );
+};
+
+const nodeTypes = { customSkill: CustomSkillNode };
+
+export default function SkillTree() {
+  const [selectedNode, setSelectedNode] = React.useState(null);
+
+  const unlocked = useStore(state => state.skills);
+  const setUnlocked = useStore(state => state.setSkills);
+  
+  const habitsDays = useStore(state => state.habits);
+  const setHabitsDays = useStore(state => state.setHabits);
+
+  const isUnlocked = React.useCallback((id) => unlocked.includes(id), [unlocked]);
+  const canUnlock = React.useCallback((node) => {
+    if (isUnlocked(node.id)) return false;
+    return node.reqs.every(reqId => isUnlocked(reqId));
+  }, [isUnlocked]);
+
+  const handleNodeClick = (node) => {
+    setSelectedNode(node);
+  };
+
+  const handleUnlockSkill = (node) => {
+    if (isUnlocked(node.id)) return;
+    if (canUnlock(node)) {
+      setUnlocked([...unlocked, node.id]);
+      
+      if (node.habit) {
+         const newHabit = { id: `h-${node.id}`, name: node.habit, done: false };
+         const updatedDays = habitsDays.map(day => {
+            if (day.habits.find(h => h.id === newHabit.id)) return day;
+            return { ...day, habits: [...day.habits, newHabit] };
+         });
+         setHabitsDays(updatedDays);
+      }
+      setSelectedNode(null);
+    }
+  };
+
+  // 1. Calculate static layout in useMemo
+  const { layoutedNodes, layoutedEdges } = useMemo(() => {
+    const branches = {
+      Health: { dir: 'RL', targetPos: Position.Right, sourcePos: Position.Left, nodes: [], edges: [] },
+      Spirit: { dir: 'BT', targetPos: Position.Bottom, sourcePos: Position.Top, nodes: [], edges: [] },
+      Social: { dir: 'LR', targetPos: Position.Left, sourcePos: Position.Right, nodes: [], edges: [] },
+      Career: { dir: 'LR', targetPos: Position.Left, sourcePos: Position.Right, nodes: [], edges: [] },
+      Mental: { dir: 'TB', targetPos: Position.Top, sourcePos: Position.Bottom, nodes: [], edges: [] },
+    };
+
+    const finalNodes = [];
+    const finalEdges = [];
+
+    const coreNode = SKILL_DEF.find(n => n.id === 'core');
+    finalNodes.push({
+      id: 'core',
+      type: 'customSkill',
+      data: { node: coreNode, isUnlocked, canUnlock, handleNodeClick },
+      position: { x: 0, y: 0 }
+    });
+
+    SKILL_DEF.forEach(node => {
+      if (node.id === 'core') return;
+      
+      const branch = branches[node.category];
+      if (branch) branch.nodes.push(node);
+      
+      node.reqs.forEach(reqId => {
+        const isCompleted = isUnlocked(node.id);
+        const isAvailable = canUnlock(node) || isCompleted;
+        const edge = {
+          id: `e-${reqId}-${node.id}`,
+          source: reqId,
+          target: node.id,
+          animated: !isCompleted && isAvailable,
+          style: {
+            stroke: isCompleted ? CATEGORY_COLORS[node.category] : 'var(--text-muted)',
+            strokeWidth: isCompleted ? 2.5 : 1.5,
+            opacity: isCompleted || isAvailable ? 1 : 0.2
+          }
+        };
+
+        if (reqId === 'core') {
+          if (node.category === 'Health') edge.sourceHandle = 's-left';
+          else if (node.category === 'Spirit') edge.sourceHandle = 's-top';
+          else if (node.category === 'Social') edge.sourceHandle = 's-right';
+          else if (node.category === 'Career') edge.sourceHandle = 's-right';
+          else if (node.category === 'Mental') edge.sourceHandle = 's-bottom';
+          finalEdges.push(edge);
+        } else {
+          if (branch) branch.edges.push(edge);
+        }
+      });
+    });
+
+    Object.keys(branches).forEach(cat => {
+      const branch = branches[cat];
+      const g = new dagre.graphlib.Graph();
+      g.setDefaultEdgeLabel(() => ({}));
+      g.setGraph({ rankdir: branch.dir, ranksep: 100, nodesep: 20 }); 
+
+      branch.nodes.forEach(n => g.setNode(n.id, { width: 140, height: 35 }));
+      branch.edges.forEach(e => g.setEdge(e.source, e.target));
+      dagre.layout(g);
+
+      let minX = 0, minY = 0, maxX = 0, maxY = 0;
+      branch.nodes.forEach((n, i) => {
+        const pos = g.node(n.id);
+        if (i === 0) { minX = pos.x; minY = pos.y; maxX = pos.x; maxY = pos.y; }
+        minX = Math.min(minX, pos.x); minY = Math.min(minY, pos.y);
+        maxX = Math.max(maxX, pos.x); maxY = Math.max(maxY, pos.y);
+      });
+
+      branch.nodes.forEach(n => {
+        const pos = g.node(n.id);
+        let finalX = pos.x;
+        let finalY = pos.y;
+        const offsetDist = 130;
+        
+        if (branch.dir === 'LR') {
+           finalX = pos.x - minX + offsetDist; 
+           finalY = pos.y - (minY + maxY)/2;
+           if (cat === 'Career') finalY += 120;
+           if (cat === 'Social') finalY -= 120;
+        } else if (branch.dir === 'RL') {
+           finalX = pos.x - maxX - offsetDist;
+           finalY = pos.y - (minY + maxY)/2;
+        } else if (branch.dir === 'BT') {
+           finalY = pos.y - maxY - offsetDist;
+           finalX = pos.x - (minX + maxX)/2;
+        } else if (branch.dir === 'TB') {
+           finalY = pos.y - minY + offsetDist;
+           finalX = pos.x - (minX + maxX)/2;
+        }
+        
+        finalNodes.push({
+          id: n.id,
+          type: 'customSkill',
+          data: { node: n, isUnlocked, canUnlock, handleNodeClick, targetPos: branch.targetPos, sourcePos: branch.sourcePos },
+          position: { x: finalX, y: finalY }
+        });
+      });
+      branch.edges.forEach(e => finalEdges.push(e));
+    });
+
+    return { layoutedNodes: finalNodes, layoutedEdges: finalEdges };
+  }, [isUnlocked, canUnlock]); // Dependency tracks unlocked for data sync
+
+  // 2. Map Layout into ReactFlow state hooks to allow dragging
+  const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
+
+  // 3. Keep data (colors, borders, clicks) synced without resetting X/Y positions
+  useEffect(() => {
+    setNodes((nds) => nds.map((n) => {
+      const freshNode = layoutedNodes.find((ln) => ln.id === n.id);
+      return freshNode ? { ...n, data: freshNode.data } : n;
+    }));
+
+    setEdges((eds) => eds.map((e) => {
+      const freshEdge = layoutedEdges.find((le) => le.id === e.id);
+      return freshEdge ? { ...freshEdge } : e;
+    }));
+  }, [layoutedNodes, layoutedEdges, setNodes, setEdges]);
+
+  return (
+    <div style={{ maxWidth: '1200px', margin: '0 auto', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
         <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Skill Progression</h1>
         <p style={{ color: 'var(--text-muted)' }}>Unlock your potential. Prerequisites must be completed first.</p>
       </div>
 
-      <div className="notion-block" style={{ overflowX: 'auto', padding: '40px' }}>
-        <div style={{ display: 'flex', gap: '60px', minWidth: '800px' }}>
-          
-          {/* Column Tiers */}
-          {tiers.map((tierNodes, idx) => (
-             <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '30px', alignItems: 'center', position: 'relative' }}>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '20px' }}>
-                  Hierarchy Level {idx + 1}
-                </div>
-                {tierNodes.map(node => renderNode(node))}
-             </div>
-          ))}
-
-        </div>
+      <div className="notion-block" style={{ flex: 1, padding: 0, height: '80vh', width: '100%', overflow: 'hidden' }}>
+        <ReactFlow 
+          nodes={nodes} 
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          nodeTypes={nodeTypes}
+          fitView
+          fitViewOptions={{ padding: 0.15 }}
+          minZoom={0.2}
+          maxZoom={2}
+          proOptions={{ hideAttribution: true }}
+        >
+          <Background color="rgba(255,255,255,0.05)" gap={30} size={2} />
+          <Controls style={{ display: 'flex', flexDirection: 'row' }} />
+        </ReactFlow>
       </div>
+
+      {selectedNode && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+        }} onClick={() => setSelectedNode(null)}>
+          <div style={{
+            background: 'var(--bg-card)', border: `1px solid ${CATEGORY_COLORS[selectedNode.category] || 'var(--border-color)'}`,
+            padding: '30px', borderRadius: '12px', maxWidth: '400px', width: '90%',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+            display: 'flex', flexDirection: 'column', gap: '16px'
+          }} onClick={e => e.stopPropagation()}>
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+               <div style={{ fontSize: '2rem' }}>{selectedNode.icon}</div>
+               <div style={{ fontSize: '0.8rem', color: CATEGORY_COLORS[selectedNode.category] || 'var(--text-main)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>{selectedNode.category}</div>
+             </div>
+             <div>
+               <h2 style={{ fontSize: '1.5rem', marginBottom: '8px' }}>{selectedNode.name}</h2>
+               <p style={{ color: 'var(--text-muted)', lineHeight: 1.5, fontSize: '0.9rem' }}>{selectedNode.desc}</p>
+             </div>
+             
+             {selectedNode.habit && (
+               <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', marginTop: '8px' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>Daily Routine Needed</div>
+                  <div style={{ fontWeight: 600 }}>{selectedNode.habit}</div>
+               </div>
+             )}
+
+             <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+               {isUnlocked(selectedNode.id) ? (
+                 <button className="notion-btn" disabled style={{ flex: 1, opacity: 0.5 }}>Already Unlocked</button>
+               ) : canUnlock(selectedNode) ? (
+                 <button className="notion-btn" style={{ flex: 1, background: CATEGORY_COLORS[selectedNode.category] || 'var(--primary)', color: '#fff', border: 'none', boxShadow: `0 0 10px ${CATEGORY_COLORS[selectedNode.category]}40` }} onClick={() => handleUnlockSkill(selectedNode)}>
+                   Unlock Skill
+                 </button>
+               ) : (
+                 <button className="notion-btn" disabled style={{ flex: 1, opacity: 0.5 }}>Prerequisites not met</button>
+               )}
+               <button className="notion-btn secondary" onClick={() => setSelectedNode(null)}>Close</button>
+             </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

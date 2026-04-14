@@ -1,28 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useStore } from '../store';
 
-const defaultHabitList = [
-  { id: 'h1', name: 'Book 10 pages', done: false },
-  { id: 'h2', name: 'Day analysis', done: false },
-  { id: 'h3', name: 'Meditation 10 min', done: false },
-  { id: 'h4', name: 'Walk 5 km', done: false },
-  { id: 'h5', name: 'Water 2L', done: false },
-];
-
-const generateDays = () => {
-  const days = [];
-  const start = new Date();
-  for (let i = 0; i < 10; i++) {
-    const d = new Date(start);
-    d.setDate(start.getDate() - i);
-    days.push({
-      id: d.toISOString().split('T')[0],
-      date: d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
-      habits: [...defaultHabitList.map(h => ({...h}))]
-    });
-  }
-  return days;
-};
+// Data is now entirely driven by the Zustand store (store.js), seeded by the SkillTree Core habit.
 
 export default function HabitTracker() {
   const days = useStore(state => state.habits);

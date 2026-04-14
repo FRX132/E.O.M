@@ -1,5 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  getAppleReminders: () => ipcRenderer.invoke('get-apple-reminders')
+  // Add IPC methods here as needed
 });

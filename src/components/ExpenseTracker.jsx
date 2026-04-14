@@ -14,17 +14,6 @@ const PILL_COLORS = {
   'Investments': 'orange'
 };
 
-const initialExpenses = [
-  { id: 1, name: 'Park ticket', amount: 5.79, category: 'Utilities', account: 'Personal', date: 'January 14, 2026 3:31 PM' },
-  { id: 2, name: 'New book', amount: 25.00, category: 'Development', account: 'Development', date: 'January 14, 2026 3:31 PM' },
-  { id: 3, name: 'Fuel', amount: 80.00, category: 'Home', account: 'Personal', date: 'January 14, 2026 3:30 PM' },
-];
-
-const initialAssets = [
-  { id: 1, name: 'Main Bank Account', type: 'Cash', amount: 5420.00, change: 0 },
-  { id: 2, name: 'Crypto Bank Account', type: 'Crypto', amount: 21500.25, change: 4.2 },
-  { id: 3, name: 'Trade Republic Account', type: 'Stock', amount: 12400.00, change: -1.5 },
-];
 
 const ASSET_TYPES = ['Cash', 'Stock', 'Crypto', 'Investment', 'Other'];
 

@@ -14,29 +14,55 @@ const migrateLegacyData = (key, defaultVal) => {
   return defaultVal;
 };
 
-// Initial App State
-const initialState = {
-  profile: migrateLegacyData('os_profile', {
-    username: '@operator_j',
+const generateEmptyHabitDays = () => {
+  const days = [];
+  const start = new Date();
+  for (let i = 0; i < 10; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() - i);
+    days.push({
+      id: d.toISOString().split('T')[0],
+      date: d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+      habits: [{ id: 'h-core', name: 'Daily Tracker Check', done: false }] // Only the core skill habit
+    });
+  }
+  return days;
+};
+
+const EMPTY_STATE = {
+  profile: {
+    username: '',
     password: '',
-    height: 180,
-    weight: 75,
-    goals: '1. Build a successful startup\n2. Run a marathon\n3. Read 20 books this year',
+    height: 0,
+    weight: 0,
+    goals: '',
     profilePicture: '',
     backgroundImage: ''
-  }),
-  expenses: migrateLegacyData('os_expenses', []),
-  assets: migrateLegacyData('os_assets', []),
-  habits: migrateLegacyData('os_habits', []),
-  goals: migrateLegacyData('os_goals', { week: [], month: [], year: [] }),
-  fridge: migrateLegacyData('os_fridge', []),
-  targets: migrateLegacyData('os_bigtargets', []),
-  skills: migrateLegacyData('os_skills', []),
+  },
+  expenses: [],
+  assets: [],
+  habits: generateEmptyHabitDays(),
+  goals: { week: [], month: [], year: [] },
+  fridge: [],
+  targets: [],
+  skills: ['core'], // Core skill is unlocked by default!
+};
+
+// Initial App State (tries to load legacy localstorage if present)
+const initialState = {
+  profile: migrateLegacyData('os_profile', EMPTY_STATE.profile),
+  expenses: migrateLegacyData('os_expenses', EMPTY_STATE.expenses),
+  assets: migrateLegacyData('os_assets', EMPTY_STATE.assets),
+  habits: migrateLegacyData('os_habits', EMPTY_STATE.habits),
+  goals: migrateLegacyData('os_goals', EMPTY_STATE.goals),
+  fridge: migrateLegacyData('os_fridge', EMPTY_STATE.fridge),
+  targets: migrateLegacyData('os_bigtargets', EMPTY_STATE.targets),
+  skills: migrateLegacyData('os_skills', EMPTY_STATE.skills),
 };
 
 export const useStore = create(
   persist(
-    (set, get) => ({
+    (set) => ({
       ...initialState,
 
       // Actions
@@ -49,8 +75,8 @@ export const useStore = create(
       setTargets: (updater) => set((state) => ({ targets: typeof updater === 'function' ? updater(state.targets) : updater })),
       setSkills: (updater) => set((state) => ({ skills: typeof updater === 'function' ? updater(state.skills) : updater })),
       
-      // Cleanup helper: call this if you want to perform a hard reset in the future
-      resetAllData: () => set(initialState)
+      // Cleanup helper: Resets completely to EMPTY_STATE
+      resetAllData: () => set(EMPTY_STATE)
     }),
     {
       name: 'life_os_storage', // The singular key in localStorage

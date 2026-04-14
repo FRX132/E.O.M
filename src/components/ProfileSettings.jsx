@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../store';
 
-const initialProfile = {
-  username: '@operator_j',
-  password: '',
-  height: 180,
-  weight: 75,
-  goals: '1. Build a successful startup\n2. Run a marathon\n3. Read 20 books this year',
-  profilePicture: '',
-  backgroundImage: ''
-};
 
 export default function ProfileSettings() {
   const profile = useStore(state => state.profile);
@@ -42,6 +33,15 @@ export default function ProfileSettings() {
     // We keep the button just for user satisfaction/feedback.
     setSaveStatus('Saved successfully!');
     setTimeout(() => setSaveStatus(''), 2000);
+  };
+
+  const resetAllData = useStore(state => state.resetAllData);
+
+  const handleReset = () => {
+    if (window.confirm("⚠️ WARNING: This will permanently delete ALL your databases, skills, habits, and profile data from your computer. This action cannot be undone. Are you sure you want to proceed?")) {
+      resetAllData();
+      alert("System has been restored to factory defaults.");
+    }
   };
 
   return (
@@ -164,11 +164,28 @@ export default function ProfileSettings() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginTop: '30px' }}>
-          <button className="notion-button" onClick={handleSave}>
-            Save Configuration
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '30px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <button className="notion-button" onClick={handleSave}>
+              Save Configuration
+            </button>
+            {saveStatus && <span style={{ color: 'var(--green-text)', fontSize: '0.85rem', fontWeight: 600 }}>✓ {saveStatus}</span>}
+          </div>
+          
+          <button 
+            onClick={handleReset}
+            style={{ 
+              background: 'rgba(255,50,50,0.1)', 
+              color: 'var(--red-text)', 
+              border: '1px solid var(--red-text)', 
+              padding: '8px 16px', 
+              borderRadius: '6px', 
+              cursor: 'pointer', 
+              fontWeight: 600,
+              fontSize: '0.8rem'
+            }}>
+            Factory Reset OS
           </button>
-          {saveStatus && <span style={{ color: 'var(--green-text)', fontSize: '0.85rem', fontWeight: 600 }}>✓ {saveStatus}</span>}
         </div>
 
       </div>

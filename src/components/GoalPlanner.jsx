@@ -1,22 +1,7 @@
 import React from 'react';
 import { useStore } from '../store';
 
-const initialGoals = {
-  week: [
-    { id: 1, text: 'Transfer thoughts to tasks', done: true },
-    { id: 2, text: 'Check next week\'s calendar', done: false }
-  ],
-  month: [
-    { id: 3, text: 'Read a book', done: true },
-    { id: 4, text: 'Complete 20 tasks', done: false },
-    { id: 5, text: 'Attend 10 trainings', done: false }
-  ],
-  year: [
-    { id: 6, text: 'Get a job', done: false },
-    { id: 7, text: 'Make research in physics', done: false },
-    { id: 8, text: 'Make a new learning habit', done: false }
-  ]
-};
+
 
 export default function GoalPlanner() {
   const goals = useStore(state => state.goals);
@@ -30,7 +15,7 @@ export default function GoalPlanner() {
   const addGoal = (col) => {
     const text = prompt('New goal description:');
     if (!text) return;
-    const newGoal = { id: Date.now(), text, done: false };
+    const newGoal = { id: window.crypto.randomUUID(), text, done: false };
     setGoals({ ...goals, [col]: [...goals[col], newGoal] });
   };
 
