@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Overview.css';
 import { useStore } from '../store';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 export default function Overview({ navigate }) {
   const habits = useStore(state => state.habits) || [];
@@ -35,6 +36,21 @@ export default function Overview({ navigate }) {
   // Calculate total wealth / assets
   const totalWealth = assets.reduce((sum, a) => sum + (a.amount || 0), 0);
   const netWorth = totalWealth - monthlyTotal; // Simplified net worth logic
+
+  // Calculate expenses by category for the chart
+  const expensesByCategory = expenses.reduce((acc, exp) => {
+    if (exp.amount && exp.amount > 0) {
+      acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
+    }
+    return acc;
+  }, {});
+
+  const chartData = Object.keys(expensesByCategory).map(key => ({
+    name: key,
+    value: expensesByCategory[key]
+  }));
+
+  const COLORS = ['#3b82f6', '#f97316', '#eab308', '#ec4899', '#8b5cf6', '#10b981'];
 
   // Get top goals
   const activeGoals = goals.week.filter(g => !g.done).slice(0, 3);
@@ -166,23 +182,58 @@ export default function Overview({ navigate }) {
             <span className="card-icon">💸</span>
             <h3>Finances & Wallet</h3>
           </div>
-          <div className="card-content">
-            <div className="expense-stat">
-              <span className="total-amount">€{totalWealth.toLocaleString()}</span>
-              <span className="stat-label">Total Assets</span>
-            </div>
-            <div className="recent-expenses">
-              <div className="mini-expense">
-                <span>Net Worth</span>
-                <span className="mini-amount" style={{ color: netWorth >= 0 ? 'var(--green-text)' : 'var(--red-text)' }}>
-                  €{netWorth.toLocaleString()}
-                </span>
+          <div className="card-content finance-content">
+            <div className="finance-stats">
+              <div className="expense-stat">
+                <span className="total-amount">€{totalWealth.toLocaleString()}</span>
+                <span className="stat-label">Total Assets</span>
               </div>
-              <div className="mini-expense">
-                <span>Total Expenses</span>
-                <span className="mini-amount" style={{ color: 'var(--red-text)' }}>-€{monthlyTotal.toLocaleString()}</span>
+              <div className="recent-expenses">
+                <div className="mini-expense">
+                  <span>Net Worth</span>
+                  <span className="mini-amount" style={{ color: netWorth >= 0 ? 'var(--green-text)' : 'var(--red-text)' }}>
+                    €{netWorth.toLocaleString()}
+                  </span>
+                </div>
+                <div className="mini-expense">
+                  <span>Total Expenses</span>
+                  <span className="mini-amount" style={{ color: 'var(--red-text)' }}>-€{monthlyTotal.toLocaleString()}</span>
+                </div>
               </div>
             </div>
+            {chartData.length > 0 && (
+              <div className="finance-chart-container">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={chartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius="60%"
+                      outerRadius="90%"
+                      paddingAngle={5}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value) => `€${value.toLocaleString()}`}
+                      contentStyle={{ 
+                        backgroundColor: 'rgba(20,20,20,0.8)', 
+                        border: '1px solid rgba(255,255,255,0.1)', 
+                        borderRadius: '8px', 
+                        color: '#fff',
+                        backdropFilter: 'blur(10px)'
+                      }} 
+                      itemStyle={{ color: '#fff', fontWeight: 'bold' }} 
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </div>
           <button className="card-action" onClick={() => navigate('/expenses')}>Manage Finances</button>
         </div>
