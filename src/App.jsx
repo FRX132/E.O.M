@@ -12,6 +12,7 @@ import BigTargets from './components/BigTargets';
 import ProfileSettings from './components/ProfileSettings';
 import SkillTree from './components/SkillTree';
 import Overview from './components/Overview';
+import Auth from './components/Auth';
 
 // Icon for Skill Tree
 const BeakerIcon = () => (
@@ -34,6 +35,7 @@ function App() {
 
   // Connect to Zustand Global Store
   const profile = useStore((state) => state.profile);
+  const isAuthenticated = useStore((state) => state.isAuthenticated);
 
   const getActiveTabProps = (path) => {
     // Treat "/" as overview, otherwise match exactly
@@ -64,6 +66,14 @@ function App() {
       backgroundAttachment: 'fixed'
     }
     : {};
+
+  if (!isAuthenticated) {
+    return (
+      <div className="app-container" style={backgroundStyle}>
+        <Auth />
+      </div>
+    );
+  }
 
   return (
     <div className="app-container" style={backgroundStyle}>

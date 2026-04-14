@@ -15,8 +15,10 @@
   },
   "dependencies": {
     "@xyflow/react": "^12.10.2",
+    "bootstrap": "^5.3.8",
     "dagre": "^0.8.5",
     "react": "^19.2.4",
+    "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.14.0",
     "recharts": "^3.8.1",

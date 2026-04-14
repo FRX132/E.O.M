@@ -33,8 +33,10 @@ const EMPTY_STATE = {
   profile: {
     username: '',
     password: '',
-    height: 0,
-    weight: 0,
+    age: '',
+    education: '',
+    height: '',
+    weight: '',
     goals: '',
     profilePicture: '',
     backgroundImage: ''
@@ -46,6 +48,7 @@ const EMPTY_STATE = {
   fridge: [],
   targets: [],
   skills: ['core'], // Core skill is unlocked by default!
+  isAuthenticated: false,
 };
 
 // Initial App State (tries to load legacy localstorage if present)
@@ -58,6 +61,7 @@ const initialState = {
   fridge: migrateLegacyData('os_fridge', EMPTY_STATE.fridge),
   targets: migrateLegacyData('os_bigtargets', EMPTY_STATE.targets),
   skills: migrateLegacyData('os_skills', EMPTY_STATE.skills),
+  isAuthenticated: migrateLegacyData('os_is_authenticated', false),
 };
 
 export const useStore = create(
@@ -75,6 +79,19 @@ export const useStore = create(
       setTargets: (updater) => set((state) => ({ targets: typeof updater === 'function' ? updater(state.targets) : updater })),
       setSkills: (updater) => set((state) => ({ skills: typeof updater === 'function' ? updater(state.skills) : updater })),
       
+      // Auth Actions
+      login: (username, password) => set((state) => {
+        if (state.profile.username === username && state.profile.password === password) {
+          return { isAuthenticated: true };
+        }
+        return {}; 
+      }),
+      register: (userData) => set((state) => ({
+        profile: { ...state.profile, ...userData },
+        isAuthenticated: true
+      })),
+      logout: () => set({ isAuthenticated: false }),
+
       // Cleanup helper: Resets completely to EMPTY_STATE
       resetAllData: () => set(EMPTY_STATE)
     }),

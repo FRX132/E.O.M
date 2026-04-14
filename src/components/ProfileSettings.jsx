@@ -5,6 +5,7 @@ import { useStore } from '../store';
 export default function ProfileSettings() {
   const profile = useStore(state => state.profile);
   const setProfile = useStore(state => state.setProfile);
+  const logout = useStore(state => state.logout);
   const [saveStatus, setSaveStatus] = useState('');
 
   const handleChange = (e) => {
@@ -73,6 +74,18 @@ export default function ProfileSettings() {
             </div>
 
             <div className="form-group">
+              <label className="form-label">Education</label>
+              <input 
+                name="education"
+                type="text"
+                className="notion-input" 
+                value={profile.education || ''}
+                onChange={handleChange}
+                placeholder="e.g. BSc Computer Science"
+              />
+            </div>
+
+            <div className="form-group">
               <label className="form-label">Vault Password</label>
               <input 
                 name="password"
@@ -115,8 +128,19 @@ export default function ProfileSettings() {
           {/* Column 2: Physical Metrics */}
           <div>
              <h3 style={{ fontSize: '1rem', marginBottom: '20px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              ⚖️ Physical Metrics
+              ⚖️ Physical Metrics & Demographics
             </h3>
+
+            <div className="form-group">
+              <label className="form-label">Age</label>
+              <input 
+                name="age"
+                type="number"
+                className="notion-input" 
+                value={profile.age || ''}
+                onChange={handleChange}
+              />
+            </div>
 
             <div className="form-group">
               <label className="form-label">Height (cm)</label>
@@ -171,21 +195,36 @@ export default function ProfileSettings() {
             </button>
             {saveStatus && <span style={{ color: 'var(--green-text)', fontSize: '0.85rem', fontWeight: 600 }}>✓ {saveStatus}</span>}
           </div>
-          
-          <button 
-            onClick={handleReset}
-            style={{ 
-              background: 'rgba(255,50,50,0.1)', 
-              color: 'var(--red-text)', 
-              border: '1px solid var(--red-text)', 
-              padding: '8px 16px', 
-              borderRadius: '6px', 
-              cursor: 'pointer', 
-              fontWeight: 600,
-              fontSize: '0.8rem'
-            }}>
-            Factory Reset OS
-          </button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button 
+              onClick={logout}
+              style={{ 
+                background: 'rgba(255,255,255,0.1)', 
+                color: 'var(--text-main)', 
+                border: '1px solid var(--border-color)', 
+                padding: '8px 16px', 
+                borderRadius: '6px', 
+                cursor: 'pointer', 
+                fontWeight: 600,
+                fontSize: '0.8rem'
+              }}>
+              Log Out
+            </button>
+            <button 
+              onClick={handleReset}
+              style={{ 
+                background: 'rgba(255,50,50,0.1)', 
+                color: 'var(--red-text)', 
+                border: '1px solid var(--red-text)', 
+                padding: '8px 16px', 
+                borderRadius: '6px', 
+                cursor: 'pointer', 
+                fontWeight: 600,
+                fontSize: '0.8rem'
+              }}>
+              Factory Reset OS
+            </button>
+          </div>
         </div>
 
       </div>
