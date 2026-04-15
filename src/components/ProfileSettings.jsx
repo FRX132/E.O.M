@@ -4,6 +4,8 @@ import { useStore } from '../store';
 
 export default function ProfileSettings() {
   const profile = useStore(state => state.profile);
+  const theme = useStore(state => state.theme);
+  const toggleTheme = useStore(state => state.toggleTheme);
   const setProfile = useStore(state => state.setProfile);
   const logout = useStore(state => state.logout);
   const [saveStatus, setSaveStatus] = useState('');
@@ -196,6 +198,20 @@ export default function ProfileSettings() {
             {saveStatus && <span style={{ color: 'var(--green-text)', fontSize: '0.85rem', fontWeight: 600 }}>✓ {saveStatus}</span>}
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
+            <button 
+              onClick={toggleTheme}
+              style={{ 
+                background: 'rgba(255,255,255,0.1)', 
+                color: 'var(--text-main)', 
+                border: '1px solid var(--border-color)', 
+                padding: '8px 16px', 
+                borderRadius: '6px', 
+                cursor: 'pointer', 
+                fontWeight: 600,
+                fontSize: '0.8rem'
+              }}>
+              Switch to {theme === 'dark' ? 'Light' : 'Dark'} Mode
+            </button>
             <button 
               onClick={logout}
               style={{ 

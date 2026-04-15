@@ -49,6 +49,7 @@ const EMPTY_STATE = {
   targets: [],
   skills: ['core'], // Core skill is unlocked by default!
   isAuthenticated: false,
+  theme: 'dark'
 };
 
 // Initial App State (tries to load legacy localstorage if present)
@@ -62,6 +63,7 @@ const initialState = {
   targets: migrateLegacyData('os_bigtargets', EMPTY_STATE.targets),
   skills: migrateLegacyData('os_skills', EMPTY_STATE.skills),
   isAuthenticated: migrateLegacyData('os_is_authenticated', false),
+  theme: migrateLegacyData('os_theme', EMPTY_STATE.theme),
 };
 
 export const useStore = create(
@@ -78,6 +80,7 @@ export const useStore = create(
       setFridge: (updater) => set((state) => ({ fridge: typeof updater === 'function' ? updater(state.fridge) : updater })),
       setTargets: (updater) => set((state) => ({ targets: typeof updater === 'function' ? updater(state.targets) : updater })),
       setSkills: (updater) => set((state) => ({ skills: typeof updater === 'function' ? updater(state.skills) : updater })),
+      toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
       
       // Auth Actions
       login: (username, password) => set((state) => {

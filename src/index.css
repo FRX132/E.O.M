@@ -26,6 +26,45 @@
 
   --font-main: 'Inter', system-ui, sans-serif;
   --transition-fast: 0.15s ease;
+  
+  /* Bootstrap Overrides */
+  --bs-body-color: var(--text-main);
+  --bs-heading-color: var(--text-main);
+  --bs-body-bg: var(--bg-main);
+  --bs-link-color: var(--blue-text);
+  --bs-link-hover-color: var(--blue-text);
+}
+
+:root[data-theme="light"] {
+  --bg-main: #f0f2f5;
+  --bg-card: #ffffff;
+  --bg-header: #e0e0e0;
+  --border-color: #d1d5db;
+  --border-light: #e5e7eb;
+  
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+
+  --primary: #c27832;
+  --blue-bg: #e0f2fe;
+  --blue-text: #0284c7;
+  --green-bg: #dcfce7;
+  --green-text: #16a34a;
+  --red-bg: #fee2e2;
+  --red-text: #dc2626;
+  --orange-bg: #ffedd5;
+  --orange-text: #ea580c;
+  --yellow-bg: #fef9c3;
+  --yellow-text: #ca8a04;
+  --purple-bg: #f3e8ff;
+  --purple-text: #9333ea;
+  
+  /* Bootstrap Overrides */
+  --bs-body-color: var(--text-main);
+  --bs-heading-color: var(--text-main);
+  --bs-body-bg: var(--bg-main);
+  --bs-link-color: var(--blue-text);
+  --bs-link-hover-color: var(--blue-text);
 }
 
 * {
@@ -40,6 +79,10 @@ body {
   color: var(--text-main);
   line-height: 1.5;
   min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-main);
 }
 
 button {

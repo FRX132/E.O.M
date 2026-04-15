@@ -4,11 +4,14 @@
   align-items: center;
   min-height: 100vh;
   width: 100vw;
-  background: var(--bg-color, #0a0a0c); /* fallback to app bg */
+  background: var(--bg-color, #0a0a0c);
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2rem 0;
 }
 
 .auth-card {
@@ -17,14 +20,11 @@
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
-  padding: 3rem;
   width: 100%;
   max-width: 420px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
   animation: authFadeIn 0.5s ease-out;
+  margin: auto; /* Ensures centering when scrolling */
 }
 
 @keyframes authFadeIn {
@@ -71,7 +71,7 @@
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .auth-error {
@@ -101,9 +101,9 @@
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   color: white;
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: all 0.2s ease;
   outline: none;
 }

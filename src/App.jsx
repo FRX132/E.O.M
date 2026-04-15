@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from './store';
 import './App.css';
@@ -36,6 +36,11 @@ function App() {
   // Connect to Zustand Global Store
   const profile = useStore((state) => state.profile);
   const isAuthenticated = useStore((state) => state.isAuthenticated);
+  const theme = useStore((state) => state.theme);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   const getActiveTabProps = (path) => {
     // Treat "/" as overview, otherwise match exactly
@@ -77,7 +82,7 @@ function App() {
 
   return (
     <div className="app-container" style={backgroundStyle}>
-      <div className={`sidebar ${!isSidebarOpen ? 'collapsed' : ''}`} style={profile.backgroundImage ? { backdropFilter: 'blur(20px)', background: 'rgba(10,10,12,0.85)' } : {}}>
+      <div className={`sidebar ${!isSidebarOpen ? 'collapsed' : ''}`} style={profile.backgroundImage ? { backdropFilter: 'blur(20px)', background: theme === 'dark' ? 'rgba(10,10,12,0.85)' : 'rgba(255,255,255,0.85)' } : {}}>
         <div className="app-title">
           <div className="app-logo" style={{ background: 'transparent', color: 'var(--text-main)', padding: 0 }}>
             <BarChartIcon />
@@ -136,7 +141,7 @@ function App() {
             position: 'absolute',
             top: '20px',
             left: '20px',
-            background: 'rgba(255,255,255,0.08)',
+            background: theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
             border: 'none',
             color: 'var(--text-main)',
             padding: '8px',

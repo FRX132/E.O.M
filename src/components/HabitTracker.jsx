@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useStore } from '../store';
+import { SKILL_DEF } from '../constants';
 
 // Data is now entirely driven by the Zustand store (store.js), seeded by the SkillTree Core habit.
 
@@ -15,6 +16,37 @@ export default function HabitTracker() {
         habits: d.habits.map(h => h.id === habitId ? { ...h, done: !h.done } : h)
       };
     }));
+  };
+
+  const unlockedSkills = useStore(state => state.skills);
+
+  // Sync all unlocked skill habits into all 10 days
+  useEffect(() => {
+    if (!days || days.length === 0) return;
+
+    // Build the set of habits that should exist based on unlocked skills
+    const habitsThatShouldExist = SKILL_DEF
+      .filter(skill => unlockedSkills.includes(skill.id) && skill.habit)
+      .map(skill => ({ id: `h-${skill.id}`, name: skill.habit }));
+
+    let needsUpdate = false;
+    const updatedDays = days.map(day => {
+      const existingIds = new Set(day.habits.map(h => h.id));
+      const missingHabits = habitsThatShouldExist.filter(h => !existingIds.has(h.id));
+      if (missingHabits.length > 0) {
+        needsUpdate = true;
+        return { ...day, habits: [...day.habits, ...missingHabits.map(h => ({ ...h, done: false }))] };
+      }
+      return day;
+    });
+
+    if (needsUpdate) {
+      setDays(updatedDays);
+    }
+  }, [unlockedSkills]); // Runs whenever skills change
+
+  const calculateXP = (habits) => {
+    return habits.filter(h => h.done).length * 50;
   };
 
   const calculateProgress = (habits) => {
@@ -42,6 +74,7 @@ export default function HabitTracker() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px', padding: '0 20px 20px' }}>
           {days.map(day => {
+            const xp = calculateXP(day.habits);
             const progress = calculateProgress(day.habits);
             return (
               <div key={day.id} style={{
@@ -70,8 +103,9 @@ export default function HabitTracker() {
                 </div>
                 
                 <div style={{ marginTop: '20px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
-                    <span>{progress}%</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 600 }}>
+                    <span>{xp} XP</span>
+                    <span>{day.habits.length * 50} XP Max</span>
                   </div>
                   <div style={{ height: '6px', background: 'var(--border-color)', borderRadius: '3px', overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${progress}%`, background: 'var(--red-text)', transition: 'width var(--transition-fast)' }}></div>

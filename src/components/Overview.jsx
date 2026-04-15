@@ -9,6 +9,7 @@ export default function Overview({ navigate }) {
   const assets = useStore(state => state.assets) || [];
   const goals = useStore(state => state.goals) || { week: [], month: [], year: [] };
   const fridge = useStore(state => state.fridge) || [];
+  const targets = useStore(state => state.targets) || [];
   const profile = useStore(state => state.profile) || { username: '', goals: '' };
 
   const [time, setTime] = useState(new Date());
@@ -26,6 +27,8 @@ export default function Overview({ navigate }) {
   // Calculate habit progress for today
   const todayHabitsList = habits[0]?.habits || [];
   const completedToday = todayHabitsList.filter(h => h.done).length;
+  const habitXpEarned = completedToday * 50;
+  const habitXpMax = todayHabitsList.length * 50;
   const habitProgress = todayHabitsList.length > 0 
     ? Math.round((completedToday / todayHabitsList.length) * 100) 
     : 0;
@@ -36,6 +39,20 @@ export default function Overview({ navigate }) {
   // Calculate total wealth / assets
   const totalWealth = assets.reduce((sum, a) => sum + (a.amount || 0), 0);
   const netWorth = totalWealth - monthlyTotal; // Simplified net worth logic
+
+  // Progress metrics for the 5 databases
+  const goalProg = goals.week.length > 0 ? Math.round((goals.week.filter(g=>g.done).length / goals.week.length) * 100) : 0;
+  const fridgeProg = fridge.length > 0 ? Math.round((fridge.filter(f=>f.status !== 'Not in stock').length / fridge.length) * 100) : 0;
+  const expenseProg = totalWealth > 0 ? Math.max(0, Math.round(100 - (monthlyTotal / totalWealth) * 100)) : 100;
+  const targetProg = targets.length > 0 ? Math.round((targets.filter(t=>t.status === 'Completed').length / targets.length) * 100) : 0;
+
+  const progressItems = [
+    { label: 'Expense Tracker', pct: expenseProg, color: 'var(--blue-text)' },
+    { label: 'Goal Planner', pct: goalProg, color: 'var(--red-text)' },
+    { label: 'Habit Tracker', pct: habitProgress, color: 'var(--purple-text)', explicitDisplay: `${habitXpEarned} / ${habitXpMax} XP` },
+    { label: 'Fridge Stock', pct: fridgeProg, color: 'var(--green-text)' },
+    { label: 'Big Targets', pct: targetProg, color: 'var(--orange-text)' },
+  ];
 
   // Calculate expenses by category for the chart
   const expensesByCategory = expenses.reduce((acc, exp) => {
@@ -145,6 +162,26 @@ export default function Overview({ navigate }) {
         </div>
       </header>
 
+      <div className="overview-card" style={{ marginBottom: '20px' }}>
+        <div className="card-header">
+          <span className="card-icon">📊</span>
+          <h3>Subsystem Synchronization</h3>
+        </div>
+        <div className="card-content" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px' }}>
+          {progressItems.map((item, idx) => (
+            <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', letterSpacing: '0.3px', textTransform: 'uppercase' }}>{item.label}</span>
+                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: item.color }}>{item.explicitDisplay || `${item.pct}%`}</span>
+              </div>
+              <div style={{ width: '100%', height: '8px', background: 'var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
+                <div style={{ width: `${item.pct}%`, height: '100%', background: item.color, transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="time-date-row">
         <div className="overview-card clock-card">
           <div className="clock-content">
@@ -167,10 +204,11 @@ export default function Overview({ navigate }) {
             <h3>Daily Habits</h3>
           </div>
           <div className="card-content" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div className="progress-circle">
-              <span className="progress-number">{habitProgress}%</span>
+            <div className="progress-circle" style={{ flexDirection: 'column', padding: '20px 0' }}>
+              <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--purple-text)' }}>{habitXpEarned}</span>
+              <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600, marginTop: '-5px' }}>XP EARNED</span>
             </div>
-            <div style={{ marginTop: 'auto' }}>
+            <div style={{ marginTop: 'auto', textAlign: 'center' }}>
               <span className="stat-label">{completedToday} of {todayHabitsList.length} habits completed</span>
             </div>
           </div>

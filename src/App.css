@@ -138,8 +138,15 @@
   }
   .sidebar {
     width: 100%;
+    height: auto;
     border-right: none;
     border-bottom: 1px solid var(--border-color);
+  }
+  .sidebar.collapsed {
+    height: 0;
+    width: 100%;
+    padding: 0;
+    border-bottom: none;
   }
 }
 
