@@ -14,7 +14,10 @@ import MovieList from './components/MovieList';
 import ProfileSettings from './components/ProfileSettings';
 import SkillTree from './components/SkillTree';
 import Overview from './components/Overview';
+import SportHub from './components/SportHub';
+import LanguageHub from './components/LanguageHub';
 import Auth from './components/Auth';
+import ProfileModal from './components/ProfileModal';
 import { SKILL_DEF } from './constants';
 
 // Icon for Skill Tree
@@ -81,6 +84,21 @@ const FilmIcon = () => (
   </svg>
 );
 
+// Icon for Workout
+const ActivityIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-activity" viewBox="0 0 16 16">
+    <path fillRule="evenodd" d="M6 2a.5.5 0 0 1 .47.33L10 12.036l1.53-4.208A.5.5 0 0 1 12 7.5h3.5a.5.5 0 0 1 0 1h-3.15l-1.88 5.17a.5.5 0 0 1-.94 0L6 3.964 4.47 8.171A.5.5 0 0 1 4 8.5H.5a.5.5 0 0 1 0-1h3.15l1.88-5.17A.5.5 0 0 1 6 2"/>
+  </svg>
+);
+
+// Icon for Languages
+const TranslateIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-translate" viewBox="0 0 16 16">
+    <path d="M4.545 6.714 4.11 8H3l1.862-5h1.284L8 8H6.833l-.435-1.286zm1.634-.736L5.5 3.956h-.049l-.679 2.022z"/>
+    <path d="M0 2a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v3h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-3H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zm7.138 9.995q.289.451.63.846c-.748.575-1.673 1.001-2.768 1.292.178.217.451.635.555.867 1.125-.359 2.08-.844 2.886-1.494.777.665 1.739 1.165 2.93 1.472.133-.254.414-.673.629-.89-1.125-.253-2.057-.694-2.82-1.284.681-.747 1.222-1.651 1.621-2.757H14V8h-3v1.047h.765c-.318.844-.74 1.546-1.272 2.13a6 6 0 0 1-.415-.492 2 2 0 0 1-.94.31"/>
+  </svg>
+);
+
 // Icon for Overview
 const HomeIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-house-door" viewBox="0 0 16 16">
@@ -100,6 +118,7 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   // Connect to Zustand Global Store
   const profile = useStore((state) => state.profile);
@@ -173,6 +192,8 @@ function App() {
     { path: '/habits', label: 'Habit Tracker', icon: <ListIcon /> },
     { path: '/fridge', label: 'Fridge Stock', icon: <ForkKnifeIcon /> },
     { path: '/targets', label: 'Big Targets', icon: <TrophyIcon /> },
+    { path: '/sport', label: 'Workout Hub', icon: <ActivityIcon /> },
+    { path: '/languages', label: 'Language Hub', icon: <TranslateIcon /> },
     { path: '/books', label: 'Library', icon: <BookIcon /> },
     { path: '/movies', label: 'Cinema', icon: <FilmIcon /> },
   ];
@@ -219,11 +240,21 @@ function App() {
           E.O.M
         </div>
 
-        <div className="user-profile" style={profile.backgroundImage ? { background: 'rgba(255,255,255,0.05)' } : {}}>
+        <div 
+          className="user-profile" 
+          onClick={() => setIsProfileModalOpen(true)}
+          style={{ 
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            background: profile.backgroundImage ? 'rgba(255,255,255,0.05)' : undefined
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = profile.backgroundImage ? 'rgba(255,255,255,0.05)' : 'transparent'}
+        >
           {profile.profilePicture ? (
             <img src={profile.profilePicture} alt="Profile" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
           ) : (
-            <div className="avatar-circle">{profile.username ? profile.username.charAt(1).toUpperCase() : 'U'}</div>
+            <div className="avatar-circle">{profile.username ? profile.username.charAt(0).toUpperCase() : 'U'}</div>
           )}
           <div>
             <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{profile.username || 'My Workspace'}</div>
@@ -291,11 +322,18 @@ function App() {
             <Route path="/habits" element={<HabitTracker />} />
             <Route path="/fridge" element={<FridgeStock />} />
             <Route path="/targets" element={<BigTargets />} />
+            <Route path="/sport" element={<SportHub />} />
+            <Route path="/languages" element={<LanguageHub />} />
             <Route path="/books" element={<BookList />} />
             <Route path="/movies" element={<MovieList />} />
           </Routes>
         </div>
       </div>
+      
+      <ProfileModal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)} 
+      />
     </div>
   );
 }

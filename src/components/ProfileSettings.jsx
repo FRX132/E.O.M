@@ -18,7 +18,10 @@ export default function ProfileSettings() {
     { name: 'Neon Blue', color: '#3b82f6' },
     { name: 'Emerald', color: '#10b981' },
     { name: 'Amethyst', color: '#8b5cf6' },
-    { name: 'Crimson', color: '#ef4444' }
+    { name: 'Crimson', color: '#ef4444' },
+    { name: 'Amber', color: '#f59e0b' },
+    { name: 'Sky', color: '#0ea5e9' },
+    { name: 'Rose', color: '#f43f5e' }
   ];
 
   const handleChange = (e) => {
@@ -162,38 +165,115 @@ export default function ProfileSettings() {
               ⚖️ Physical Metrics & Demographics
             </h3>
 
-            <div className="form-group">
-              <label className="form-label">Age</label>
-              <input 
-                name="age"
-                type="number"
-                className="notion-input" 
-                value={profile.age || ''}
-                onChange={handleChange}
-              />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              <div className="form-group">
+                <label className="form-label">Age</label>
+                <input 
+                  name="age"
+                  type="number"
+                  className="notion-input" 
+                  value={profile.age || ''}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Gender</label>
+                <select 
+                  name="gender"
+                  className="notion-input" 
+                  value={profile.gender || 'Other'}
+                  onChange={handleChange}
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              <div className="form-group">
+                <label className="form-label">Height (cm)</label>
+                <input 
+                  name="height"
+                  type="number"
+                  className="notion-input" 
+                  value={profile.height}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Weight (kg)</label>
+                <input 
+                  name="weight"
+                  type="number"
+                  step="0.1"
+                  className="notion-input" 
+                  value={profile.weight}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              <div className="form-group">
+                <label className="form-label">Target Weight (kg)</label>
+                <input 
+                  name="targetWeight"
+                  type="number"
+                  step="0.1"
+                  className="notion-input" 
+                  value={profile.targetWeight || ''}
+                  onChange={handleChange}
+                  placeholder="Target..."
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Body Fat (%)</label>
+                <input 
+                  name="bodyFat"
+                  type="number"
+                  step="0.1"
+                  className="notion-input" 
+                  value={profile.bodyFat || ''}
+                  onChange={handleChange}
+                  placeholder="e.g. 15"
+                />
+              </div>
             </div>
 
             <div className="form-group">
-              <label className="form-label">Height (cm)</label>
-              <input 
-                name="height"
-                type="number"
+              <label className="form-label">Activity Level</label>
+              <select 
+                name="activityLevel"
                 className="notion-input" 
-                value={profile.height}
+                value={profile.activityLevel || 'Moderate'}
                 onChange={handleChange}
-              />
+              >
+                <option value="Sedentary">Sedentary (Office job)</option>
+                <option value="Light">Lightly Active (1-2 days/week)</option>
+                <option value="Moderate">Moderately Active (3-5 days/week)</option>
+                <option value="VeryActive">Very Active (6-7 days/week)</option>
+                <option value="Athlete">Extra Active (Professional athlete)</option>
+              </select>
             </div>
 
             <div className="form-group">
-              <label className="form-label">Weight (kg)</label>
-              <input 
-                name="weight"
-                type="number"
-                step="0.1"
+              <label className="form-label">Primary Fitness Goal</label>
+              <select 
+                name="fitnessGoal"
                 className="notion-input" 
-                value={profile.weight}
+                value={profile.fitnessGoal || 'Maintain'}
                 onChange={handleChange}
-              />
+              >
+                <option value="Lose Weight">Weight Loss / Definition</option>
+                <option value="Maintain">Maintenance / Functional</option>
+                <option value="Build Muscle">Muscle Gain / Strength</option>
+                <option value="Endurance">Endurance / Stamina</option>
+              </select>
             </div>
           </div>
         </div>
@@ -367,6 +447,59 @@ export default function ProfileSettings() {
                       onClick={() => applyDesignPreset({ blur: 10, radius: 12, isNeon: false, isCompact: false, accent: '#3b82f6', font: 'Roboto' })}
                     >
                       🖥️ Modern OS
+                    </button>
+                    <button 
+                      className="notion-button secondary" 
+                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                      onClick={() => applyDesignPreset({ blur: 12, radius: 8, isNeon: true, isCompact: false, accent: '#10b981', font: 'JetBrains Mono' })}
+                    >
+                      🌿 Emerald Night
+                    </button>
+                    <button 
+                      className="notion-button secondary" 
+                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                      onClick={() => applyDesignPreset({ blur: 5, radius: 20, isNeon: false, isCompact: false, accent: '#f59e0b', font: 'Roboto' })}
+                    >
+                      ☀️ Solarized
+                    </button>
+                    <button 
+                      className="notion-button secondary" 
+                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                      onClick={() => applyDesignPreset({ blur: 20, radius: 4, isNeon: true, isCompact: false, accent: '#0ea5e9', font: 'Outfit' })}
+                    >
+                      🌌 Deep Space
+                    </button>
+                    <button 
+                      className="notion-button secondary" 
+                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                      onClick={() => applyDesignPreset({ blur: 0, radius: 0, isNeon: false, isCompact: true, accent: '#ffffff', font: 'Inter' })}
+                    >
+                      🌑 Noir
+                    </button>
+                    <button 
+                      className="notion-button secondary" 
+                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                      onClick={() => applyDesignPreset({ blur: 15, radius: 30, isNeon: true, isCompact: false, accent: '#f43f5e', font: 'Outfit' })}
+                    >
+                      🌸 Sakura
+                    </button>
+                    <button 
+                      className="notion-button secondary" 
+                      style={{ padding: '6px 14px', fontSize: '0.8rem', background: 'rgba(var(--primary-rgb), 0.1)', border: '1px solid var(--primary)' }}
+                      onClick={() => {
+                        const fonts = ['Inter', 'Outfit', 'JetBrains Mono', 'Roboto'];
+                        const colors = ['#ef4444', '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#0ea5e9', '#f43f5e'];
+                        applyDesignPreset({
+                          blur: Math.floor(Math.random() * 25),
+                          radius: Math.floor(Math.random() * 30),
+                          isNeon: Math.random() > 0.5,
+                          isCompact: Math.random() > 0.7,
+                          accent: colors[Math.floor(Math.random() * colors.length)],
+                          font: fonts[Math.floor(Math.random() * fonts.length)]
+                        });
+                      }}
+                    >
+                      🎲 Randomize
                     </button>
                   </div>
                 </div>

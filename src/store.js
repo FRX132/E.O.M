@@ -37,7 +37,11 @@ const EMPTY_STATE = {
     education: '',
     height: '',
     weight: '',
-    goals: '',
+    gender: 'Other',
+    targetWeight: '',
+    activityLevel: 'Moderate',
+    fitnessGoal: 'Maintain',
+    bodyFat: '',
     profilePicture: '',
     backgroundImage: '',
     heroImage: '',
@@ -52,6 +56,8 @@ const EMPTY_STATE = {
   targets: [],
   books: [],
   movies: [],
+  workouts: [],
+  languages: [],
   skills: ['core'], // Core skill is unlocked by default!
   isAuthenticated: false,
   theme: 'dark',
@@ -63,6 +69,10 @@ const EMPTY_STATE = {
     isNeon: false,
     isCompact: false,
     font: 'Inter'
+  },
+  financeSettings: {
+    categories: ['Utilities', 'Development', 'Home', 'Investment', 'Food', 'Entertainment', 'Health', 'Transport'],
+    monthlyBudget: 2000
   }
 };
 
@@ -79,10 +89,13 @@ const initialState = {
   skills: migrateLegacyData('os_skills', EMPTY_STATE.skills),
   books: migrateLegacyData('os_books', EMPTY_STATE.books),
   movies: migrateLegacyData('os_movies', EMPTY_STATE.movies),
+  workouts: migrateLegacyData('os_workouts', EMPTY_STATE.workouts),
+  languages: migrateLegacyData('os_languages', EMPTY_STATE.languages),
   isAuthenticated: migrateLegacyData('os_is_authenticated', false),
   theme: migrateLegacyData('os_theme', EMPTY_STATE.theme),
   accentColor: migrateLegacyData('os_accent_color', EMPTY_STATE.accentColor),
   designSettings: migrateLegacyData('os_design_settings', EMPTY_STATE.designSettings),
+  financeSettings: migrateLegacyData('os_finance_settings', EMPTY_STATE.financeSettings),
 };
 
 export const useStore = create(
@@ -101,10 +114,15 @@ export const useStore = create(
       setSkills: (updater) => set((state) => ({ skills: typeof updater === 'function' ? updater(state.skills) : updater })),
       setBooks: (updater) => set((state) => ({ books: typeof updater === 'function' ? updater(state.books) : updater })),
       setMovies: (updater) => set((state) => ({ movies: typeof updater === 'function' ? updater(state.movies) : updater })),
+      setWorkouts: (updater) => set((state) => ({ workouts: typeof updater === 'function' ? updater(state.workouts) : updater })),
+      setLanguages: (updater) => set((state) => ({ languages: typeof updater === 'function' ? updater(state.languages) : updater })),
       toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
       setAccentColor: (color) => set({ accentColor: color }),
       setDesignSettings: (newSettings) => set((state) => ({ 
         designSettings: { ...state.designSettings, ...newSettings } 
+      })),
+      setFinanceSettings: (newSettings) => set((state) => ({
+        financeSettings: { ...state.financeSettings, ...newSettings }
       })),
       applyDesignPreset: (config) => set((state) => ({
         accentColor: config.accent || state.accentColor,

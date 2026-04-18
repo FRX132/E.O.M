@@ -99,6 +99,18 @@ export default function Overview({ navigate }) {
   // Get top goals
   const activeGoals = goals.week.filter(g => !g.done).slice(0, 3);
 
+  // Get upcoming bills (due in next 7 days)
+  const upcomingBills = expenses
+    .filter(exp => {
+      if (!exp.dueDate) return false;
+      const due = new Date(exp.dueDate);
+      const now = new Date();
+      const diffTime = due - now;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays >= 0 && diffDays <= 7;
+    })
+    .sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate));
+
   // Get low fridge items
   const lowFridge = fridge.filter(f => f.status === 'Not in stock').slice(0, 3);
 
@@ -410,6 +422,31 @@ export default function Overview({ navigate }) {
           </div>
           <button className="card-action" onClick={() => navigate('/fridge')}>Review Stock</button>
         </div>
+
+        {upcomingBills.length > 0 && (
+          <div className="overview-card bill-alert-card scale-in" style={{ border: '1px solid rgba(var(--primary-rgb), 0.3)', background: 'rgba(var(--primary-rgb), 0.05)' }}>
+            <div className="card-header">
+              <span className="card-icon" style={{ color: 'var(--primary)' }}>🔔</span>
+              <h3 style={{ color: 'var(--primary)' }}>Upcoming Bills</h3>
+            </div>
+            <div className="card-content">
+              <ul className="mini-list">
+                {upcomingBills.map(bill => {
+                  const daysLeft = Math.ceil((new Date(bill.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+                  return (
+                    <li key={bill.id} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span>{bill.name}</span>
+                      <span style={{ fontWeight: 700, fontSize: '0.8rem', opacity: 0.8 }}>
+                        {daysLeft === 0 ? 'DUE TODAY' : `In ${daysLeft}d`} • €{bill.amount}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            <button className="card-action" style={{ background: 'var(--primary)', color: '#fff' }} onClick={() => navigate('/expenses')}>Handle Payments</button>
+          </div>
+        )}
       </div>
 
       <div className="overview-footer-grid">
