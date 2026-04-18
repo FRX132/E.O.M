@@ -103,7 +103,7 @@ export default function FridgeStock() {
                       className={`pill ${PILL_COLORS[item.status]}`}
                       style={{ border: 'none', appearance: 'none', outline: 'none', fontWeight: 600 }}
                     >
-                      {STATUSES.map(s => <option key={s} value={s} style={{background: 'var(--bg-main)', color: '#fff'}}>{s}</option>)}
+                      {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </td>
                   <td>
@@ -113,7 +113,7 @@ export default function FridgeStock() {
                       className={`pill ${PILL_COLORS[item.category] || 'yellow'}`}
                       style={{ border: 'none', appearance: 'none', outline: 'none' }}
                     >
-                      {CATEGORIES.map(c => <option key={c} value={c} style={{background: 'var(--bg-main)', color: '#fff'}}>{c}</option>)}
+                      {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </td>
                   <td>

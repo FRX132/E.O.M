@@ -36,17 +36,10 @@ const Auth = () => {
     }
 
     if (profile.username && profile.username.toLowerCase() === formData.name.toLowerCase()) {
-      const passwordContent = `Your Life Planner OS Password is: ${profile.password}\nPlease keep this file safe.`;
-      const blob = new Blob([passwordContent], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${formData.name}_password.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      setError('Password file downloaded successfully!');
+      if (window.confirm(`Found account for "${profile.username}". Do you want to reveal your backup password on screen?`)) {
+        alert(`Your E.O.M Backup Password is:\n\n${profile.password}\n\nPlease keep it in a safe place!`);
+        setError('Password revealed successfully!');
+      }
     } else {
       setError('Account not found with this name.');
     }
@@ -108,7 +101,7 @@ const Auth = () => {
             variant={theme === 'dark' ? 'light' : 'dark'}
             size="lg" 
             className="px-5 py-3 rounded-pill shadow-lg"
-            style={{ fontSize: '1.5rem', fontWeight: 600, background: theme === 'dark' ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.9)', backdropFilter: 'blur(10px)', transition: 'all 0.3s ease' }}
+            style={{ fontSize: '1.5rem', fontWeight: 600, background: theme === 'dark' ? 'rgba(255,255,255,0.95)' : 'rgba(0,0,0,1)', color: theme === 'dark' ? '#000' : '#fff', backdropFilter: 'blur(10px)', transition: 'all 0.3s ease' }}
             onClick={() => setPhase('options')}
           >
             Welcome
@@ -118,7 +111,7 @@ const Auth = () => {
 
       {phase === 'options' && (
         <Container className="d-flex justify-content-center align-items-center h-100">
-          <Card className="auth-card border-0 text-center shadow-lg" style={{ maxWidth: '400px', width: '100%', background: theme === 'dark' ? 'rgba(20, 20, 24, 0.7)' : 'rgba(255, 255, 255, 0.7)' }}>
+          <Card className="auth-card border-0 text-center shadow-lg" style={{ maxWidth: '400px', width: '100%', background: theme === 'dark' ? 'rgba(20, 20, 24, 0.75)' : 'rgba(255, 255, 255, 0.95)' }}>
             <Card.Body className="p-4 d-flex flex-column gap-3">
               <Card.Title as="h2" className="mb-4" style={{ color: 'var(--text-main)' }}>Select Option</Card.Title>
               <Button 
@@ -153,7 +146,7 @@ const Auth = () => {
 
       {phase === 'forgot_shortcut' && (
         <Container className="d-flex justify-content-center align-items-center h-100">
-          <Card className="auth-card border-0" style={{ maxWidth: '400px', width: '100%', background: theme === 'dark' ? 'rgba(20, 20, 24, 0.7)' : 'rgba(255, 255, 255, 0.7)' }}>
+          <Card className="auth-card border-0" style={{ maxWidth: '400px', width: '100%', background: theme === 'dark' ? 'rgba(20, 20, 24, 0.75)' : 'rgba(255, 255, 255, 0.95)' }}>
             <Card.Body className="p-4">
               <Card.Title as="h3" className="mb-3 text-center" style={{ color: 'var(--text-main)' }}>Recover Password</Card.Title>
               {error && <div className="auth-error mb-3">{error}</div>}
@@ -178,7 +171,7 @@ const Auth = () => {
       )}
 
       {phase === 'form' && (
-        <Card className="auth-card border-0 mx-auto" style={{ maxWidth: !isLoginMode ? '600px' : '420px', background: theme === 'dark' ? 'rgba(20, 20, 24, 0.7)' : 'rgba(255, 255, 255, 0.7)' }}>
+        <Card className="auth-card border-0 mx-auto" style={{ maxWidth: !isLoginMode ? '600px' : '420px', background: theme === 'dark' ? 'rgba(20, 20, 24, 0.75)' : 'rgba(255, 255, 255, 0.95)' }}>
           <Card.Body className="p-4 p-sm-5 py-sm-4">
             <div className="auth-header">
               <div className="auth-logo" style={{ color: 'var(--text-main)', background: theme === 'dark' ? undefined : 'var(--bg-main)' }}>
@@ -187,7 +180,7 @@ const Auth = () => {
                 </svg>
               </div>
               <h1 style={{ color: 'var(--text-main)' }}>{isLoginMode ? 'Welcome Back' : 'Create an Account'}</h1>
-              <p style={{ color: 'var(--text-muted)' }}>{isLoginMode ? 'Enter your credentials to access your OS.' : 'Start managing your life with Life Planner OS.'}</p>
+              <p style={{ color: 'var(--text-muted)' }}>{isLoginMode ? 'Enter your credentials to access your OS.' : 'Start managing your life with E.O.M.'}</p>
             </div>
 
             <form className="auth-form" onSubmit={handleSubmit}>
@@ -201,7 +194,7 @@ const Auth = () => {
                   placeholder="e.g. Creator"
                   value={formData.name}
                   onChange={handleChange}
-                  style={{ background: theme === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)', color: 'var(--text-main)' }}
+                  style={{ background: 'var(--bg-card-alt)', color: 'var(--text-main)' }}
                 />
               </div>
 
@@ -216,7 +209,7 @@ const Auth = () => {
                         placeholder="25"
                         value={formData.age}
                         onChange={handleChange}
-                        style={{ background: theme === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)', color: 'var(--text-main)' }}
+                        style={{ background: 'var(--bg-card-alt)', color: 'var(--text-main)' }}
                       />
                     </div>
                     <div className="col-4 auth-input-group">
@@ -227,7 +220,7 @@ const Auth = () => {
                         placeholder="70"
                         value={formData.weight}
                         onChange={handleChange}
-                        style={{ background: theme === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)', color: 'var(--text-main)' }}
+                        style={{ background: 'var(--bg-card-alt)', color: 'var(--text-main)' }}
                       />
                     </div>
                     <div className="col-4 auth-input-group">
@@ -238,7 +231,7 @@ const Auth = () => {
                         placeholder="180"
                         value={formData.height}
                         onChange={handleChange}
-                        style={{ background: theme === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)', color: 'var(--text-main)' }}
+                        style={{ background: 'var(--bg-card-alt)', color: 'var(--text-main)' }}
                       />
                     </div>
                   </div>
@@ -250,7 +243,7 @@ const Auth = () => {
                       placeholder="e.g. BSc Computer Science"
                       value={formData.education}
                       onChange={handleChange}
-                      style={{ background: theme === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)', color: 'var(--text-main)' }}
+                      style={{ background: 'var(--bg-card-alt)', color: 'var(--text-main)' }}
                     />
                   </div>
                 </>

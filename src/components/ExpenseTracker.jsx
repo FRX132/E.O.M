@@ -75,7 +75,7 @@ export default function ExpenseTracker() {
       </div>
 
       <div className="notion-block" style={{ marginBottom: '20px' }}>
-        <div style={{ display: 'flex', gap: '10px', padding: '10px 20px' }}>
+        <div className="notion-tabs" style={{ paddingBottom: '10px' }}>
           <button
             className={`notion-tab ${viewMode === 'expenses' ? 'active' : ''}`}
             onClick={() => setViewMode('expenses')}
@@ -113,15 +113,15 @@ export default function ExpenseTracker() {
           </div>
 
           <div style={{ overflowX: 'auto', padding: '0 20px 20px' }}>
-            <table className="notion-table">
+            <table className="notion-table" style={{ minWidth: '600px' }}>
               <thead>
                 <tr>
-                  <th>Aa Description</th>
-                  <th># Amount</th>
-                  <th>◘ Category</th>
-                  <th>● Account</th>
-                  <th>🕐 Created time</th>
-                  <th></th>
+                  <th style={{ width: '35%' }}>Aa Description</th>
+                  <th style={{ width: '15%' }}># Amount</th>
+                  <th style={{ width: '15%' }}>◘ Category</th>
+                  <th style={{ width: '15%' }}>● Account</th>
+                  <th style={{ width: '15%' }}>🕐 Created time</th>
+                  <th style={{ width: '5%' }}></th>
                 </tr>
               </thead>
               <tbody>
@@ -135,21 +135,24 @@ export default function ExpenseTracker() {
                       />
                     </td>
                     <td>
-                      €<input
-                        type="number"
-                        value={expense.amount}
-                        onChange={(e) => updateRow(expense.id, 'amount', parseFloat(e.target.value) || 0)}
-                        style={{ background: 'transparent', border: 'none', color: 'inherit', maxWidth: '60px', outline: 'none', marginLeft: '4px' }}
-                      />
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <span style={{ color: 'var(--text-muted)', marginRight: '4px' }}>€</span>
+                        <input
+                          type="number"
+                          value={expense.amount}
+                          onChange={(e) => updateRow(expense.id, 'amount', parseFloat(e.target.value) || 0)}
+                          style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%', outline: 'none' }}
+                        />
+                      </div>
                     </td>
                     <td>
                       <select
                         value={expense.category}
                         onChange={(e) => updateRow(expense.id, 'category', e.target.value)}
                         className={`pill ${PILL_COLORS[expense.category]}`}
-                        style={{ border: 'none', appearance: 'none', outline: 'none' }}
+                        style={{ border: 'none', appearance: 'none', outline: 'none', width: '100%' }}
                       >
-                        {CATEGORIES.map(c => <option key={c} value={c} style={{ background: 'var(--bg-main)', color: '#fff' }}>{c}</option>)}
+                        {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                       </select>
                     </td>
                     <td>
@@ -157,20 +160,20 @@ export default function ExpenseTracker() {
                         value={expense.account}
                         onChange={(e) => updateRow(expense.id, 'account', e.target.value)}
                         className={`pill ${PILL_COLORS[expense.account]}`}
-                        style={{ border: 'none', appearance: 'none', outline: 'none' }}
+                        style={{ border: 'none', appearance: 'none', outline: 'none', width: '100%' }}
                       >
-                        {ACCOUNTS.map(a => <option key={a} value={a} style={{ background: 'var(--bg-main)', color: '#fff' }}>{a}</option>)}
+                        {ACCOUNTS.map(a => <option key={a} value={a}>{a}</option>)}
                       </select>
                     </td>
-                    <td style={{ color: 'var(--text-muted)' }}>{expense.date}</td>
-                    <td>
-                      <button onClick={() => deleteRow(expense.id)} style={{ color: 'var(--red-text)', opacity: 0.5, fontSize: '1.2rem' }}>×</button>
+                    <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{expense.date}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button onClick={() => deleteRow(expense.id)} style={{ color: 'var(--red-text)', opacity: 0.5, fontSize: '1.2rem', padding: '0 5px' }}>×</button>
                     </td>
                   </tr>
                 ))}
                 <tr>
                   <td colSpan="6">
-                    <button onClick={addRow} style={{ color: 'var(--text-muted)', fontSize: '0.85rem', padding: '10px 0', width: '100%', textAlign: 'left' }}>
+                    <button onClick={addRow} style={{ color: 'var(--text-muted)', fontSize: '0.85rem', padding: '10px 10px', width: '100%', textAlign: 'left' }}>
                       + New page
                     </button>
                   </td>
@@ -191,7 +194,7 @@ export default function ExpenseTracker() {
                 {['Cash', 'Stock', 'Crypto'].map(type => {
                   const typeTotal = assets.filter(a => a.type === type).reduce((sum, a) => sum + a.amount, 0);
                   return (
-                    <div key={type} className="asset-stat-card" style={{ background: 'rgba(255,255,255,0.02)', padding: '15px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                    <div key={type} className="asset-stat-card" style={{ background: 'var(--bg-card-alt)', padding: '15px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{type}</div>
                       <div style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-main)' }}>€{typeTotal.toLocaleString()}</div>
                     </div>
@@ -226,7 +229,7 @@ export default function ExpenseTracker() {
                           className={`pill blue`}
                           style={{ border: 'none', appearance: 'none', outline: 'none' }}
                         >
-                          {ASSET_TYPES.map(t => <option key={t} value={t} style={{ background: 'var(--bg-main)', color: '#fff' }}>{t}</option>)}
+                          {ASSET_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                         </select>
                       </td>
                       <td>

@@ -1,0 +1,35 @@
+.habit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 0 20px 40px;
+}
+
+@media (max-width: 768px) {
+  .habit-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 10px 20px;
+  }
+}
+
+.notion-block.roadmap {
+  border-left: 4px solid var(--primary);
+  background: var(--bg-card-alt);
+}
+
+.quest-roadmap-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  transition: all 0.2s ease;
+}
+
+.quest-roadmap-item:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: var(--primary);
+}

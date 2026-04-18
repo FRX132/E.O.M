@@ -1,62 +1,155 @@
+// ...existing code...
 # Life Planner OS 🧠
 
-Welcome to **Life Planner OS**, a highly personalized, minimalist, Notion-inspired desktop application designed to gamify and organize your entire life. Built with React, Zustand, and Electron, it serves as an all-in-one personal dashboard for tracking habits, finances, physical metrics, overarching goals, and skill progressions.
+A minimalist, Notion-inspired desktop app to gamify and organize your life. Built with React, Zustand and Electron — local-first, privacy-focused, and extensible.
 
-## ✨ Features
+## Highlights
+- RPG-style radial Skill Tree (Health, Social, Career, Spirit, Mental)
+- Dynamic Habit Tracker connected to Skill Tree
+- Expense Tracker and Goal Planner
+- Profile customization and local persistence (Zustand + LocalStorage)
+- Dark-mode first, glassmorphism UI
 
-- **RPG-Style Skill Tree:** A fully interactive, radial mindmap of life skills (Health, Social, Career, Spirit, Mental). Unlock skills through an interconnected web of prerequisites.
-- **Dynamic Habit Tracker:** Seamlessly integrated with the Skill Tree. As you unlock new skills, the required daily habits automatically appear in your rolling 10-day tracker.
-- **Expense Tracker:** Monitor your cash flow, track big purchases, and categorize your daily spending using an intuitive interface.
-- **Goal Planner:** Drill down your life's big targets into manageable milestones using a structured tier system.
-- **Profile Customization & Auth Cache:** Upload custom background images, profile pictures, and set your core overarching life objectives.
-- **Notion-Like Aesthetics:** Clean typography, glassmorphism elements, dark-mode first design, and robust UX features.
-- **Local First & Privacy Focused:** All data is persisted entirely locally using Zustand and LocalStorage. No data leaves your machine. Hard resets are available via a "Factory Reset" option.
+## Tech Stack
+- React, Vite
+- Zustand (persist middleware)
+- Electron (desktop wrapper)
+- @xyflow/react + dagre for node graph layouts
 
-## 🛠️ Technology Stack
+## Quick start (developer)
+1. Clone
+```sh
+git clone https://github.com/FRX132/E.O.M.git
+cd E.O.M
+```
+2. Install
+```sh
+npm install
+```
+3. Dev (Vite + Electron)
+```sh
+npm run electron:dev
+```
 
-- **Frontend Core:** React, Vite
-- **Styling:** Vanilla CSS (App.css, index.css) + Glassmorphism UI
-- **State Management:** Zustand (with persist middleware for auto-saving)
-- **Node Graph / Map:** `@xyflow/react` + `dagre` (for automated radial tree layouts)
-- **Desktop Wrapper:** Electron (for native macOS windowing capabilities)
+## Build & Release (recommended)
+- Produce web build:
+```sh
+npm run build
+```
+- Package Electron app (example):
+```sh
+npm run package
+# or: npm run dist
+```
+- Publish platform binaries via GitHub Releases (preferred) or use Git LFS for large assets.
 
-## 🚀 Getting Started
+## Git / Large files
+- Do NOT commit `node_modules/` (huge, platform-specific). Keep it in `.gitignore`.
+- Binary releases and large artifacts (>100 MB) should be uploaded to GitHub Releases or tracked with Git LFS.
+- To move existing large files to LFS:
+```sh
+brew install git-lfs
+git lfs install
+git lfs track "release/**" "*.exe" "*.dmg" "*.app"
+git add .gitattributes
+git commit -m "Track large binaries with Git LFS"
+# migrate history if needed:
+git lfs migrate import --include="release/**,*.exe,*.dmg,*.app" --include-ref=refs/heads/main
+git push origin main --force
+```
 
-To get a local copy up and running, follow these simple steps.
+## Project layout
+- src/components/ — UI widgets (SkillTree, HabitTracker, ExpenseTracker, ...)
+- src/store.js — Zustand store + persistence + factory reset
+- src/App.jsx — Router and main app shell
+- electron/ — Electron main & preload scripts
 
-### Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
+## Contributing
+- Open an issue for feature requests or bugs.
+- For history-rewrites (LFS / large-file removal) coordinate with all contributors — they will need to re-clone.
 
-### Installation
+## Troubleshooting
+- Push rejected with "file exceeds 100 MB" → use Git LFS or remove the file from history (BFG/git-filter-repo) and force-push.
+- If builds differ between platforms, publish platform-specific release artifacts instead of checking them into git.
 
-1. Clone the repository
-   ```sh
-   git clone https://github.com/your_username_/life-planner-os.git
-   ```
-2. Navigate to the project directory
-   ```sh
-   cd life-planner-os
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Start the application
-   The project uses `concurrently` to run the Vite dev server and Electron backend simultaneously.
-   ```sh
-   npm run electron:dev
-   ```
+## License
+MIT — see LICENSE.
+// ...existing code...
+```// filepath: /Users/_freakzy_/Desktop/Antigravity Agents/OS/README.md
+// ...existing code...
+# Life Planner OS 🧠
 
-## 🏗️ Project Structure
+A minimalist, Notion-inspired desktop app to gamify and organize your life. Built with React, Zustand and Electron — local-first, privacy-focused, and extensible.
 
-- `src/components/`: Houses all the core dashboard widgets (`SkillTree`, `ExpenseTracker`, `HabitTracker`, `ProfileSettings`, etc.)
-- `src/store.js`: The central "brain" of the app. Handles all global state, localStorage persistence, default definitions, and factory reset overrides.
-- `src/App.jsx`: The main React Router that manages the sidebar navigation and routes you to the different OS apps.
-- `electron/`: Contains the native desktop wrapper configurations (`main.js`, `preload.cjs`).
+## Highlights
+- RPG-style radial Skill Tree (Health, Social, Career, Spirit, Mental)
+- Dynamic Habit Tracker connected to Skill Tree
+- Expense Tracker and Goal Planner
+- Profile customization and local persistence (Zustand + LocalStorage)
+- Dark-mode first, glassmorphism UI
 
-## 💡 How It Works
-- **The Core Habit:** Out of the box, the system starts with zero noise. The Habit Tracker begins with exactly one routine: the "Daily Tracker Check." 
-- **Skill Progression:** By clicking nodes in the Skill Tree (e.g. Health -> Sports -> Gym), you are challenged to fulfill a new real-world habit. Unlocking it adds that routine to your daily tracker permanently.
+## Tech Stack
+- React, Vite
+- Zustand (persist middleware)
+- Electron (desktop wrapper)
+- @xyflow/react + dagre for node graph layouts
 
-## 📄 License
-Distributed under the MIT License. See `LICENSE` for more information.
+## Quick start (developer)
+1. Clone
+```sh
+git clone https://github.com/FRX132/E.O.M.git
+cd E.O.M
+```
+2. Install
+```sh
+npm install
+```
+3. Dev (Vite + Electron)
+```sh
+npm run electron:dev
+```
+
+## Build & Release (recommended)
+- Produce web build:
+```sh
+npm run build
+```
+- Package Electron app (example):
+```sh
+npm run package
+# or: npm run dist
+```
+- Publish platform binaries via GitHub Releases (preferred) or use Git LFS for large assets.
+
+## Git / Large files
+- Do NOT commit `node_modules/` (huge, platform-specific). Keep it in `.gitignore`.
+- Binary releases and large artifacts (>100 MB) should be uploaded to GitHub Releases or tracked with Git LFS.
+- To move existing large files to LFS:
+```sh
+brew install git-lfs
+git lfs install
+git lfs track "release/**" "*.exe" "*.dmg" "*.app"
+git add .gitattributes
+git commit -m "Track large binaries with Git LFS"
+# migrate history if needed:
+git lfs migrate import --include="release/**,*.exe,*.dmg,*.app" --include-ref=refs/heads/main
+git push origin main --force
+```
+
+## Project layout
+- src/components/ — UI widgets (SkillTree, HabitTracker, ExpenseTracker, ...)
+- src/store.js — Zustand store + persistence + factory reset
+- src/App.jsx — Router and main app shell
+- electron/ — Electron main & preload scripts
+
+## Contributing
+- Open an issue for feature requests or bugs.
+- For history-rewrites (LFS / large-file removal) coordinate with all contributors — they will need to re-clone.
+
+## Troubleshooting
+- Push rejected with "file exceeds 100 MB" → use Git LFS or remove the file from history (BFG/git-filter-repo) and force-push.
+- If builds differ between platforms, publish platform-specific release artifacts instead of checking them into git.
+
+## License
+MIT — see LICENSE.
+// ...existing code...

@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useStore } from '../store';
 import { SKILL_DEF } from '../constants';
+import './HabitTracker.css';
 
 // Data is now entirely driven by the Zustand store (store.js), seeded by the SkillTree Core habit.
 
@@ -8,7 +9,18 @@ export default function HabitTracker() {
   const days = useStore(state => state.habits);
   const setDays = useStore(state => state.setHabits);
 
+  const activeQuests = useStore(state => state.activeQuests || []);
+  const updateQuestProgress = useStore(state => state.updateQuestProgress);
+
   const toggleHabit = (dayId, habitId) => {
+    // Check if it's a quest habit
+    if (habitId.startsWith('quest-')) {
+      const skillId = habitId.replace('quest-', '');
+      // Prevent double updates if already triggering
+      updateQuestProgress(skillId);
+      return;
+    }
+
     setDays(days.map(d => {
       if (d.id !== dayId) return d;
       return {
@@ -18,32 +30,7 @@ export default function HabitTracker() {
     }));
   };
 
-  const unlockedSkills = useStore(state => state.skills);
 
-  // Sync all unlocked skill habits into all 10 days
-  useEffect(() => {
-    if (!days || days.length === 0) return;
-
-    // Build the set of habits that should exist based on unlocked skills
-    const habitsThatShouldExist = SKILL_DEF
-      .filter(skill => unlockedSkills.includes(skill.id) && skill.habit)
-      .map(skill => ({ id: `h-${skill.id}`, name: skill.habit }));
-
-    let needsUpdate = false;
-    const updatedDays = days.map(day => {
-      const existingIds = new Set(day.habits.map(h => h.id));
-      const missingHabits = habitsThatShouldExist.filter(h => !existingIds.has(h.id));
-      if (missingHabits.length > 0) {
-        needsUpdate = true;
-        return { ...day, habits: [...day.habits, ...missingHabits.map(h => ({ ...h, done: false }))] };
-      }
-      return day;
-    });
-
-    if (needsUpdate) {
-      setDays(updatedDays);
-    }
-  }, [unlockedSkills]); // Runs whenever skills change
 
   const calculateXP = (habits) => {
     return habits.filter(h => h.done).length * 50;
@@ -72,19 +59,12 @@ export default function HabitTracker() {
           <button className="notion-tab active">days</button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px', padding: '0 20px 20px' }}>
-          {days.map(day => {
+        <div className="habit-grid">
+          {days.filter(day => day.id >= new Date().toISOString().split('T')[0]).map(day => {
             const xp = calculateXP(day.habits);
             const progress = calculateProgress(day.habits);
             return (
-              <div key={day.id} style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid var(--border-light)',
-                borderRadius: '8px',
-                padding: '16px',
-                display: 'flex',
-                flexDirection: 'column'
-              }}>
+              <div key={day.id} className="notion-block roadmap" style={{ padding: '20px', position: 'relative' }}>
                 <div style={{ fontSize: '0.9rem', color: 'var(--orange-text)', marginBottom: '12px', fontWeight: 600 }}>{day.date}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
                   {day.habits.map(habit => (
@@ -100,6 +80,28 @@ export default function HabitTracker() {
                       </span>
                     </div>
                   ))}
+
+                  {/* Render Quests for all roadmap days */}
+                  {activeQuests.map(q => {
+                    const skill = SKILL_DEF.find(s => s.id === q.skillId);
+                    return (
+                      <div key={q.skillId} className="quest-roadmap-item">
+                         <input 
+                          type="checkbox" 
+                          onChange={() => toggleHabit(day.id, `quest-${q.skillId}`)} 
+                          style={{ cursor: 'pointer', marginTop: '3px' }}
+                        />
+                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                           <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary)' }}>
+                             {skill?.icon} {skill?.name} Unlock Quest
+                           </span>
+                           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                             Progress: {q.progress} / {q.total}
+                           </span>
+                         </div>
+                      </div>
+                    );
+                  })}
                 </div>
                 
                 <div style={{ marginTop: '20px' }}>

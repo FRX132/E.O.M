@@ -1,7 +1,7 @@
-import { app, BrowserWindow, ipcMain, globalShortcut } from 'electron';
+import { app, BrowserWindow, globalShortcut, dialog } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { exec } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,6 +47,26 @@ app.whenReady().then(() => {
 
   createWindow();
 
+  // ----- Auto-Updater Logic -----
+  // The app will check for updates on startup
+  autoUpdater.checkForUpdatesAndNotify();
+
+  autoUpdater.on('update-available', () => {
+    console.log('Update available.');
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'Update Ready',
+      message: 'A new version of E.O.M has been downloaded. Restart to apply?',
+      buttons: ['Restart', 'Later']
+    }).then((result) => {
+      if (result.response === 0) autoUpdater.quitAndInstall();
+    });
+  });
+  // -------------------------------
+
   // Add shortcut to easily open Developer Tools anywhere
   globalShortcut.register('CommandOrControl+Shift+I', () => {
     const win = BrowserWindow.getFocusedWindow();
@@ -65,5 +85,6 @@ app.on('will-quit', () => {
 });
 
 app.on('window-all-closed', function () {
+  // eslint-disable-next-line no-undef
   if (process.platform !== 'darwin') app.quit();
 });

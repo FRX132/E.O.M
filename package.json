@@ -1,7 +1,7 @@
 {
-  "name": "antigravity-agents",
+  "name": "eom",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.1.1",
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
@@ -17,6 +17,7 @@
     "@xyflow/react": "^12.10.2",
     "bootstrap": "^5.3.8",
     "dagre": "^0.8.5",
+    "electron-updater": "^6.8.3",
     "react": "^19.2.4",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.4",
@@ -42,7 +43,14 @@
   },
   "build": {
     "appId": "com.freakzy.lifeplanneros",
-    "productName": "Life Planner OS",
+    "productName": "E.O.M",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "FRX132",
+        "repo": "E.O.M"
+      }
+    ],
     "mac": {
       "target": "dmg",
       "category": "public.app-category.productivity",

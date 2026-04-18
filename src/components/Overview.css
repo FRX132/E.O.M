@@ -1,63 +1,253 @@
 .overview-container {
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0 0 40px 0;
   animation: fadeIn 0.5s ease-out;
 }
 
-.overview-header {
-  margin-bottom: 40px;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+/* Hero Section */
+.overview-hero {
+  position: relative;
+  height: 280px;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
-.header-top {
+.hero-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.hero-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.9);
+}
+
+.change-cover-btn {
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+  transition: all 0.2s ease;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.overview-hero:hover .change-cover-btn {
+  opacity: 1;
+}
+
+.change-cover-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent 0%, var(--bg-main) 100%);
+}
+
+.hero-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 0 40px 20px 40px;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  z-index: 5;
+  transition: all 0.3s ease;
 }
 
-.overview-header h1 {
+.hero-user {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.hero-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
+  background: var(--bg-card);
+  border: 4px solid var(--bg-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 8px;
-  letter-spacing: -0.02em;
+  color: var(--primary);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
 }
 
-.overview-header .highlight {
-  color: var(--blue-text);
-  text-shadow: 0 0 20px rgba(0, 120, 255, 0.3);
+.hero-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.overview-header .subtitle {
-  color: var(--text-muted);
-  font-size: 1.1rem;
+.hero-welcome {
+  padding-bottom: 5px;
 }
 
-.year-stats {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-}
-
-.day-count {
-  font-size: 0.9rem;
-  font-weight: 600;
+.hero-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+  letter-spacing: -0.03em;
   color: var(--text-main);
 }
 
-.year-pct {
+.hero-title .highlight {
+  color: var(--primary);
+}
+
+.hero-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-badge {
+  color: var(--green-text);
+  font-weight: 600;
+  background: var(--green-bg);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 20px;
+}
+
+.hero-stat-item {
+  text-align: right;
+}
+
+.stat-value {
+  display: block;
   font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--blue-text);
+  font-weight: 800;
+  color: var(--primary);
   line-height: 1;
 }
 
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Rank & XP Styles */
+.rank-badge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.rank-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.rank-letter {
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--text-main);
+  text-shadow: 0 0 20px rgba(var(--primary-rgb), 0.5);
+  font-family: 'Inter', sans-serif;
+}
+
+.xp-overview-container {
+  flex: 1;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+}
+
+.xp-text-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.xp-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.xp-value-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.xp-bar-outer {
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.xp-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--purple-text));
+  box-shadow: 0 0 15px var(--primary);
+  border-radius: 5px;
+  transition: width 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.next-rank-text {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: right;
+  letter-spacing: 0.5px;
+}
+
+/* Year Progress */
 .year-progress-container {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-card-alt);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 12px;
@@ -73,26 +263,40 @@
 .dot {
   width: 6px;
   height: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-color);
   border-radius: 1px;
   transition: all 0.3s;
+  opacity: 0.5;
 }
 
 .dot.active {
+  background: var(--primary);
+  opacity: 1;
+  box-shadow: 0 0 5px var(--primary);
+}
+
+:root[data-theme="dark"] .dot {
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+}
+
+:root[data-theme="dark"] .dot.active {
   background: #fff;
   box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
+/* Grid Override */
 .overview-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 25px;
   margin-bottom: 25px;
+  padding: 0 40px;
 }
 
 .overview-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+  border: none;
   border-radius: 16px;
   padding: 24px;
   display: flex;
@@ -100,13 +304,24 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-md);
 }
 
 .overview-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-float);
+}
+
+:root[data-theme="dark"] .overview-card {
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: none;
+  border: 1px solid var(--border-light);
+}
+
+:root[data-theme="dark"] .overview-card:hover {
   background: rgba(255, 255, 255, 0.05);
-  border-color: var(--blue-text);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  border-color: var(--primary);
 }
 
 .card-header {
@@ -141,38 +356,65 @@
 }
 
 /* Habit Circle */
+.progress-circle-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+}
+
 .progress-circle-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 15px;
+  align-items: center;
 }
 
 .progress-circle {
-  width: 100px;
-  height: 100px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
-  background: conic-gradient(var(--blue-text) var(--progress), transparent 0);
+  background: conic-gradient(var(--purple-text) var(--progress), var(--bg-card-alt) 0);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  transition: all 0.5s ease;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.progress-circle::after {
-  content: '';
-  position: absolute;
-  width: 85px;
-  height: 85px;
-  background: var(--bg-main);
+.progress-circle .progress-inner {
+  width: 110px;
+  height: 110px;
+  background: var(--bg-card);
   border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
 
-.progress-value {
-  position: relative;
-  z-index: 1;
-  font-size: 1.25rem;
+.xp-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--purple-text);
+  line-height: 1;
+}
+
+.xp-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
   font-weight: 700;
-  color: var(--text-main);
+  margin-top: 2px;
+  letter-spacing: 0.05em;
+}
+
+:root[data-theme="dark"] .progress-circle .progress-inner {
+  background: #1a1a1b;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 .card-status {
@@ -196,7 +438,7 @@
 
 .finance-chart-container {
   flex: 1;
-  min-height: 140px;
+  min-height: 180px;
   width: 100%;
   display: flex;
   align-items: center;
@@ -266,7 +508,7 @@
 }
 
 .bullet {
-  color: var(--blue-text);
+  color: var(--primary);
   font-weight: bold;
 }
 
@@ -294,23 +536,52 @@
 }
 
 .card-action:hover {
-  background: var(--blue-text);
+  background: var(--primary);
   color: white;
-  border-color: var(--blue-text);
+  border-color: var(--primary);
 }
 
 /* Footer Grid */
 .overview-footer-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 25px;
+  padding: 0 40px;
 }
 
 .objective-text {
-  font-size: 1.2rem;
-  color: var(--blue-text);
+  font-size: 1.15rem;
+  color: var(--primary);
   font-style: italic;
   line-height: 1.6;
+  font-weight: 500;
+}
+
+/* Rule Card Specifics */
+.rule-card {
+  border: 1px solid rgba(var(--primary-rgb), 0.2) !important;
+  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.05), var(--bg-card)) !important;
+}
+
+.rule-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--primary);
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.rule-text {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
 }
 
 @keyframes fadeIn {
@@ -321,9 +592,10 @@
 /* Time & Date Row */
 .time-date-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 25px;
   margin-bottom: 25px;
+  padding: 0 40px;
 }
 
 /* Clock Card */
@@ -332,20 +604,29 @@
   justify-content: center;
   align-items: center;
   text-align: center;
+  background: linear-gradient(135deg, rgba(212, 143, 72, 0.08), var(--bg-card));
+  border-color: var(--border-color);
+  min-height: 250px;
+}
+
+:root[data-theme="dark"] .clock-card {
   background: linear-gradient(135deg, rgba(0, 120, 255, 0.08), rgba(0, 0, 0, 0.2));
   border-color: rgba(0, 120, 255, 0.3);
   box-shadow: inset 0 0 40px rgba(0, 120, 255, 0.05);
-  min-height: 250px;
 }
 
 .time-display {
   font-size: 4.5rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-main);
   letter-spacing: 2px;
-  text-shadow: 0 0 30px rgba(0, 120, 255, 0.6);
   font-variant-numeric: tabular-nums;
   line-height: 1;
+}
+
+:root[data-theme="dark"] .time-display {
+  color: #fff;
+  text-shadow: 0 0 30px rgba(0, 120, 255, 0.6);
 }
 
 .time-display .colon {
@@ -360,7 +641,7 @@
 
 .date-display {
   font-size: 1.1rem;
-  color: var(--blue-text);
+  color: var(--primary);
   margin-top: 10px;
   font-weight: 600;
   text-transform: uppercase;
@@ -390,13 +671,13 @@
   font-size: 1.2rem;
   font-weight: 600;
   margin: 0;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .cal-nav {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -409,8 +690,8 @@
 }
 
 .cal-nav:hover {
-  background: var(--blue-text);
-  border-color: var(--blue-text);
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
 .cal-weekdays {
@@ -437,7 +718,7 @@
   justify-content: center;
   font-size: 0.9rem;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-card-alt);
   color: var(--text-main);
   transition: all 0.2s;
   cursor: default;
@@ -452,9 +733,131 @@
 }
 
 .cal-day.today {
-  background: var(--blue-text);
+  background: var(--primary);
   color: #fff;
   font-weight: 700;
   box-shadow: 0 0 15px rgba(0, 120, 255, 0.4);
 }
+.sync-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  padding: 24px 20px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 100%);
+}
 
+.sync-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sync-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sync-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.sync-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.sync-bar-outer {
+  width: 100%;
+  height: 8px;
+  background: var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sync-bar-inner {
+  height: 100%;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Responsiveness Media Queries */
+@media (max-width: 1024px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+    padding: 0 20px;
+  }
+  .time-date-row {
+    grid-template-columns: 1fr;
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 900px) {
+  .overview-hero {
+    height: auto;
+    min-height: 450px;
+  }
+  .hero-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 20px 40px 20px;
+    gap: 30px;
+  }
+
+  .hero-stats {
+    width: 100%;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .xp-overview-container {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .hero-stat-item {
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: 1.8rem;
+  }
+
+  .hero-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 2.2rem;
+  }
+
+  .change-cover-btn {
+    right: 20px;
+    padding: 6px 10px;
+    opacity: 0.8 !important;
+  }
+
+  .overview-footer-grid {
+    grid-template-columns: 1fr;
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.5rem;
+  }
+  .time-display {
+    font-size: 3rem;
+  }
+  .rank-letter {
+    font-size: 2rem;
+  }
+  .hero-stats {
+    gap: 15px;
+  }
+}

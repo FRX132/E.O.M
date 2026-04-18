@@ -15,20 +15,41 @@ const CATEGORY_COLORS = {
 };
 
 const CustomSkillNode = ({ data }) => {
-  const { node, isUnlocked, canUnlock, handleNodeClick } = data;
+  const { node, isUnlocked, canUnlock, handleNodeClick, theme } = data;
   
   const unlockedState = isUnlocked(node.id);
-  const availableState = canUnlock(node) || unlockedState;
   const color = CATEGORY_COLORS[node.category] || '#777';
+  const isDark = theme === 'dark';
+
+  const nodeBg = unlockedState 
+    ? (isDark ? 'rgba(30, 30, 30, 0.98)' : 'rgba(255, 255, 255, 1)') 
+    : (isDark ? 'rgba(20, 20, 20, 0.4)' : 'rgba(240, 240, 240, 0.3)');
+  
+  const nodeText = unlockedState
+    ? (isDark ? '#fff' : '#1a1a1b')
+    : (isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.4)');
+
+  const nodeBorder = unlockedState
+    ? color
+    : (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)');
 
   if (node.id === 'core') {
      return (
       <div
         onClick={() => handleNodeClick(node)}
         style={{
-          border: `2px solid ${color}`, background: 'rgba(20,20,20,0.9)', padding: '12px 24px', borderRadius: '8px',
-          cursor: 'pointer', color: 'var(--text-main)', fontSize: '1rem', fontWeight: 'bold', boxShadow: `0 0 20px ${color}60`
+          border: `2px solid ${color}`, 
+          background: isDark ? 'rgba(20,20,20,0.9)' : '#1a1a1b', 
+          padding: '12px 24px', 
+          borderRadius: '12px',
+          cursor: 'pointer', 
+          color: '#fff', 
+          fontSize: '1rem', 
+          fontWeight: 'bold', 
+          boxShadow: isDark ? `0 0 20px ${color}40` : '0 10px 30px rgba(0,0,0,0.2)',
+          transition: 'transform 0.2s ease',
         }}
+        className="skill-node-core"
         title="Life Tree - Your core"
       >
         <Handle type="source" position={Position.Top} id="s-top" style={{visibility: 'hidden'}} />
@@ -44,26 +65,32 @@ const CustomSkillNode = ({ data }) => {
     <div
       onClick={() => handleNodeClick(node)}
       style={{
-        border: `1px solid ${unlockedState ? color : 'var(--border-color)'}`,
-        background: unlockedState ? 'rgba(20,20,20,0.95)' : 'var(--bg-main)',
-        padding: '6px 14px',
-        borderRadius: '6px',
+        border: `1.5px solid ${nodeBorder}`,
+        background: nodeBg,
+        padding: '8px 16px',
+        borderRadius: '10px',
         cursor: 'pointer',
-        opacity: unlockedState ? 1 : (availableState ? 0.7 : 0.3),
-        color: unlockedState ? 'var(--text-main)' : 'var(--text-muted)',
-        fontSize: '0.8rem',
+        opacity: unlockedState ? 1 : 1, // Keep opacity high but use text color for state
+        color: nodeText,
+        fontSize: '0.9rem',
+        fontWeight: unlockedState ? 600 : 500,
         whiteSpace: 'nowrap',
         display: 'flex',
         alignItems: 'center',
-        gap: '6px',
-        boxShadow: unlockedState ? `0 0 10px ${color}40` : 'none',
-        transition: 'all 0.2s',
+        gap: '8px',
+        boxShadow: unlockedState ? (isDark ? `0 0 15px ${color}30` : `0 4px 12px ${color}20`) : 'none',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        backdropFilter: 'blur(8px)',
       }}
       title="View Details"
-      className="custom-node-hover"
+      className="custom-skill-node"
     >
       <Handle type="target" position={data.targetPos} style={{ visibility: 'hidden' }} />
-      <span style={{ fontSize: '1rem' }}>{node.icon}</span>
+      <span style={{ 
+        fontSize: '1.2rem', 
+        filter: unlockedState ? 'none' : 'grayscale(100%) brightness(0.8)',
+        opacity: unlockedState ? 1 : 0.6
+      }}>{node.icon}</span>
       <span>{node.name}</span>
       <Handle type="source" position={data.sourcePos} style={{ visibility: 'hidden' }} />
     </div>
@@ -74,12 +101,12 @@ const nodeTypes = { customSkill: CustomSkillNode };
 
 export default function SkillTree() {
   const [selectedNode, setSelectedNode] = React.useState(null);
-
+  const theme = useStore(state => state.theme);
   const unlocked = useStore(state => state.skills);
-  const setUnlocked = useStore(state => state.setSkills);
   
-  const habitsDays = useStore(state => state.habits);
-  const setHabitsDays = useStore(state => state.setHabits);
+  const xp = useStore(state => state.profile.xp || 0);
+  const activeQuests = useStore(state => state.activeQuests || []);
+  const startQuest = useStore(state => state.startQuest);
 
   const isUnlocked = React.useCallback((id) => unlocked.includes(id), [unlocked]);
   const canUnlock = React.useCallback((node) => {
@@ -91,22 +118,17 @@ export default function SkillTree() {
     setSelectedNode(node);
   };
 
-  const handleUnlockSkill = (node) => {
+  const handleStartQuest = (node) => {
     if (isUnlocked(node.id)) return;
-    if (canUnlock(node)) {
-      setUnlocked([...unlocked, node.id]);
-      
-      if (node.habit) {
-         const newHabit = { id: `h-${node.id}`, name: node.habit, done: false };
-         const updatedDays = habitsDays.map(day => {
-            if (day.habits.find(h => h.id === newHabit.id)) return day;
-            return { ...day, habits: [...day.habits, newHabit] };
-         });
-         setHabitsDays(updatedDays);
-      }
+    if (activeQuests.some(q => q.skillId === node.id)) return;
+    
+    if (canUnlock(node) && xp >= (node.xpReq || 0)) {
+      startQuest(node.id, node.duration || 1);
       setSelectedNode(null);
     }
   };
+
+  const getActiveQuest = (id) => activeQuests.find(q => q.skillId === id);
 
   // 1. Calculate static layout in useMemo
   const { layoutedNodes, layoutedEdges } = useMemo(() => {
@@ -125,7 +147,7 @@ export default function SkillTree() {
     finalNodes.push({
       id: 'core',
       type: 'customSkill',
-      data: { node: coreNode, isUnlocked, canUnlock, handleNodeClick },
+      data: { node: coreNode, isUnlocked, canUnlock, handleNodeClick, theme },
       position: { x: 0, y: 0 }
     });
 
@@ -144,9 +166,9 @@ export default function SkillTree() {
           target: node.id,
           animated: !isCompleted && isAvailable,
           style: {
-            stroke: isCompleted ? CATEGORY_COLORS[node.category] : 'var(--text-muted)',
-            strokeWidth: isCompleted ? 2.5 : 1.5,
-            opacity: isCompleted || isAvailable ? 1 : 0.2
+            stroke: isCompleted ? CATEGORY_COLORS[node.category] : (theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'),
+            strokeWidth: isCompleted ? 3 : 1.5,
+            opacity: isCompleted || isAvailable ? 1 : 0.3
           }
         };
 
@@ -206,7 +228,7 @@ export default function SkillTree() {
         finalNodes.push({
           id: n.id,
           type: 'customSkill',
-          data: { node: n, isUnlocked, canUnlock, handleNodeClick, targetPos: branch.targetPos, sourcePos: branch.sourcePos },
+          data: { node: n, isUnlocked, canUnlock, handleNodeClick, targetPos: branch.targetPos, sourcePos: branch.sourcePos, theme },
           position: { x: finalX, y: finalY }
         });
       });
@@ -214,7 +236,7 @@ export default function SkillTree() {
     });
 
     return { layoutedNodes: finalNodes, layoutedEdges: finalEdges };
-  }, [isUnlocked, canUnlock]); // Dependency tracks unlocked for data sync
+  }, [isUnlocked, canUnlock, theme]); // Dependency tracks unlocked for data sync
 
   // 2. Map Layout into ReactFlow state hooks to allow dragging
   const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
@@ -233,11 +255,34 @@ export default function SkillTree() {
     }));
   }, [layoutedNodes, layoutedEdges, setNodes, setEdges]);
 
+  const [isSnapEnabled, setIsSnapEnabled] = React.useState(true);
+  const gridColor = theme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.1)';
+
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '20px', position: 'relative' }}>
         <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Skill Progression</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Unlock your potential. Prerequisites must be completed first.</p>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px' }}>
+          <p style={{ color: 'var(--text-muted)', margin: 0 }}>Unlock your potential. Prerequisites must be completed first.</p>
+          <button 
+            onClick={() => setIsSnapEnabled(!isSnapEnabled)}
+            style={{
+              padding: '4px 12px',
+              fontSize: '0.7rem',
+              borderRadius: '20px',
+              border: `1px solid ${isSnapEnabled ? 'var(--primary)' : 'var(--border-color)'}`,
+              background: isSnapEnabled ? 'var(--primary)' : 'transparent',
+              color: isSnapEnabled ? '#fff' : 'var(--text-muted)',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              textTransform: 'uppercase',
+              fontWeight: 600,
+              letterSpacing: '0.5px'
+            }}
+          >
+            Grid Snap: {isSnapEnabled ? 'ON' : 'OFF'}
+          </button>
+        </div>
       </div>
 
       <div className="notion-block" style={{ flex: 1, padding: 0, height: '80vh', width: '100%', overflow: 'hidden' }}>
@@ -252,8 +297,10 @@ export default function SkillTree() {
           minZoom={0.2}
           maxZoom={2}
           proOptions={{ hideAttribution: true }}
+          snapToGrid={isSnapEnabled}
+          snapGrid={[30, 30]}
         >
-          <Background color="rgba(255,255,255,0.05)" gap={30} size={2} />
+          <Background variant="lines" color={gridColor} gap={30} size={1} />
           <Controls style={{ display: 'flex', flexDirection: 'row' }} />
         </ReactFlow>
       </div>
@@ -279,25 +326,74 @@ export default function SkillTree() {
                <p style={{ color: 'var(--text-muted)', lineHeight: 1.5, fontSize: '0.9rem' }}>{selectedNode.desc}</p>
              </div>
              
-             {selectedNode.habit && (
-               <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', marginTop: '8px' }}>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>Daily Routine Needed</div>
+              {selectedNode.habit && (
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', marginTop: '8px' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>Core Habit</div>
                   <div style={{ fontWeight: 600 }}>{selectedNode.habit}</div>
-               </div>
-             )}
+                </div>
+              )}
 
-             <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
-               {isUnlocked(selectedNode.id) ? (
-                 <button className="notion-btn" disabled style={{ flex: 1, opacity: 0.5 }}>Already Unlocked</button>
-               ) : canUnlock(selectedNode) ? (
-                 <button className="notion-btn" style={{ flex: 1, background: CATEGORY_COLORS[selectedNode.category] || 'var(--primary)', color: '#fff', border: 'none', boxShadow: `0 0 10px ${CATEGORY_COLORS[selectedNode.category]}40` }} onClick={() => handleUnlockSkill(selectedNode)}>
-                   Unlock Skill
-                 </button>
-               ) : (
-                 <button className="notion-btn" disabled style={{ flex: 1, opacity: 0.5 }}>Prerequisites not met</button>
-               )}
-               <button className="notion-btn secondary" onClick={() => setSelectedNode(null)}>Close</button>
-             </div>
+              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', marginTop: '8px' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>Requirements</div>
+                <div style={{ display: 'flex', gap: '15px', fontSize: '0.85rem' }}>
+                  <div style={{ color: xp >= (selectedNode.xpReq || 0) ? 'var(--green-text)' : 'var(--red-text)' }}>
+                    {selectedNode.xpReq || 0} XP
+                  </div>
+                  {selectedNode.duration && (
+                    <div style={{ color: 'var(--blue-text)' }}>
+                      {selectedNode.duration} Days
+                    </div>
+                  )}
+                </div>
+                {selectedNode.quest && (
+                  <div style={{ marginTop: '8px', fontSize: '0.85rem', color: 'var(--text-main)', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '8px' }}>
+                    <b>Quest:</b> {selectedNode.quest}
+                  </div>
+                )}
+              </div>
+
+              {getActiveQuest(selectedNode.id) && (
+                <div style={{ marginTop: '8px' }}>
+                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '4px' }}>
+                     <span>Progression</span>
+                     <span>{getActiveQuest(selectedNode.id).progress} / {getActiveQuest(selectedNode.id).total} Days</span>
+                   </div>
+                   <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div style={{ 
+                        width: `${(getActiveQuest(selectedNode.id).progress / getActiveQuest(selectedNode.id).total) * 100}%`, 
+                        height: '100%', 
+                        background: 'var(--primary)',
+                        transition: 'width 0.3s'
+                      }} />
+                   </div>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                {isUnlocked(selectedNode.id) ? (
+                  <button className="notion-btn" disabled style={{ flex: 1, opacity: 0.5 }}>Skill Unlocked</button>
+                ) : getActiveQuest(selectedNode.id) ? (
+                   <button className="notion-btn" disabled style={{ flex: 1, border: '1px solid var(--primary)', color: 'var(--primary)', background: 'transparent' }}>Quest in Progress</button>
+                ) : canUnlock(selectedNode) ? (
+                  <button 
+                    className="notion-btn" 
+                    style={{ 
+                      flex: 1, 
+                      background: xp >= (selectedNode.xpReq || 0) ? (CATEGORY_COLORS[selectedNode.category] || 'var(--primary)') : 'var(--border-color)', 
+                      color: '#fff', 
+                      border: 'none', 
+                      boxShadow: xp >= (selectedNode.xpReq || 0) ? `0 0 10px ${CATEGORY_COLORS[selectedNode.category]}40` : 'none',
+                      cursor: xp >= (selectedNode.xpReq || 0) ? 'pointer' : 'not-allowed'
+                    }} 
+                    onClick={() => xp >= (selectedNode.xpReq || 0) && handleStartQuest(selectedNode)}
+                  >
+                    {xp >= (selectedNode.xpReq || 0) ? 'Start Unlock Quest' : 'Not enough XP'}
+                  </button>
+                ) : (
+                  <button className="notion-btn" disabled style={{ flex: 1, opacity: 0.5 }}>Prerequisites not met</button>
+                )}
+                <button className="notion-btn secondary" onClick={() => setSelectedNode(null)}>Close</button>
+              </div>
           </div>
         </div>
       )}

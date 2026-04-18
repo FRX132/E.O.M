@@ -9,10 +9,13 @@ import GoalPlanner from './components/GoalPlanner';
 import HabitTracker from './components/HabitTracker';
 import FridgeStock from './components/FridgeStock';
 import BigTargets from './components/BigTargets';
+import BookList from './components/BookList';
+import MovieList from './components/MovieList';
 import ProfileSettings from './components/ProfileSettings';
 import SkillTree from './components/SkillTree';
 import Overview from './components/Overview';
 import Auth from './components/Auth';
+import { SKILL_DEF } from './constants';
 
 // Icon for Skill Tree
 const BeakerIcon = () => (
@@ -28,6 +31,71 @@ const BarChartIcon = () => (
   </svg>
 );
 
+// Icon for Habits
+const ListIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-list" viewBox="0 0 16 16">
+    <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
+  </svg>
+);
+
+// Icon for Wallet
+const WalletIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-wallet" viewBox="0 0 16 16">
+    <path d="M0 3a2 2 0 0 1 2-2h13.5a.5.5 0 0 1 0 1H15v2a1 1 0 0 1 1 1v8.5a1.5 1.5 0 0 1-1.5 1.5h-12A2.5 2.5 0 0 1 0 12.5V3zm1 1.732V12.5A1.5 1.5 0 0 0 2.5 14h12a.5.5 0 0 0 .5-.5V5H2a1.99 1.99 0 0 1-1-.268zM1 3a1 1 0 0 0 1 1h12V2H2a1 1 0 0 0-1 1z" />
+  </svg>
+);
+
+// Icon for Food
+const ForkKnifeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-fork-knife" viewBox="0 0 16 16">
+    <path d="M13 .5c0-.276-.226-.506-.498-.465-1.703.257-2.94 2.012-3 8.462a.5.5 0 0 0 .498.5c.56.01 1 .13 1 1.003v5.5a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5zM4.25 0a.25.25 0 0 1 .25.25v5.122a.128.128 0 0 0 .256.006l.233-5.14A.25.25 0 0 1 5.24 0h.522a.25.25 0 0 1 .25.238l.233 5.14a.128.128 0 0 0 .256-.006V.25A.25.25 0 0 1 6.75 0h.29a.5.5 0 0 1 .498.458l.423 5.07a1.69 1.69 0 0 1-1.059 1.711l-.053.022a.92.92 0 0 0-.58.884L6.47 15a.971.971 0 1 1-1.942 0l.202-6.855a.92.92 0 0 0-.58-.884l-.053-.022a1.69 1.69 0 0 1-1.059-1.712L3.462.458A.5.5 0 0 1 3.96 0z" />
+  </svg>
+);
+
+// Icon for Goals
+const GoalIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-geo-alt" viewBox="0 0 16 16">
+    <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10" />
+    <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+  </svg>
+);
+
+// Icon for Big Targets
+const TrophyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-trophy" viewBox="0 0 16 16">
+    <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5q0 .807-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33 33 0 0 1 2.5.5m.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935m10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935M3.504 1q.01.775.056 1.469c.13 2.028.457 3.546.87 4.667C5.294 9.48 6.484 10 7 10a.5.5 0 0 1 .5.5v2.61a1 1 0 0 1-.757.97l-1.426.356a.5.5 0 0 0-.179.085L4.5 15h7l-.638-.479a.5.5 0 0 0-.18-.085l-1.425-.356a1 1 0 0 1-.757-.97V10.5A.5.5 0 0 1 9 10c.516 0 1.706-.52 2.57-2.864.413-1.12.74-2.64.87-4.667q.045-.694.056-1.469z" />
+  </svg>
+);
+
+// Icon for Library
+const BookIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-bookmark" viewBox="0 0 16 16">
+    <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z" />
+  </svg>
+);
+
+// Icon for Cinema
+const FilmIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-film" viewBox="0 0 16 16">
+    <path d="M0 1a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1zm4 0v6h8V1H4zm8 8H4v6h8V9zM1 1v2h2V1H1zm2 3H1v2h2V4zM1 7v2h2V7H1zm2 3H1v2h2v-2zm-2 3v2h2v-2H1zM15 1h-2v2h2V1zm-2 3v2h2V4h-2zm2 3h-2v2h2V7zm-2 3v2h2v-2h-2zm2 3h-2v2h2v-2z" />
+  </svg>
+);
+
+// Icon for Overview
+const HomeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-house-door" viewBox="0 0 16 16">
+    <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4z" />
+  </svg>
+);
+
+// Icon for Settings
+const SettingsIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-gear" viewBox="0 0 16 16">
+    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+  </svg>
+);
+
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,10 +105,61 @@ function App() {
   const profile = useStore((state) => state.profile);
   const isAuthenticated = useStore((state) => state.isAuthenticated);
   const theme = useStore((state) => state.theme);
+  const accentColor = useStore((state) => state.accentColor);
+
+  const syncHabits = useStore((state) => state.syncHabits);
+  const unlockedSkills = useStore((state) => state.skills);
+  const designSettings = useStore((state) => state.designSettings);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
+    const root = document.documentElement;
+    root.setAttribute('data-theme', theme);
+    root.style.setProperty('--primary', accentColor);
+
+    // Convert hex to RGB for semi-transparent variations
+    const r = parseInt(accentColor.slice(1, 3), 16);
+    const g = parseInt(accentColor.slice(3, 5), 16);
+    const b = parseInt(accentColor.slice(5, 7), 16);
+    root.style.setProperty('--primary-rgb', `${r}, ${g}, ${b}`);
+
+    // Design Mode variables
+    root.style.setProperty('--glass-blur', `${designSettings.enabled ? designSettings.blur : 0}px`);
+    root.style.setProperty('--border-radius-custom', `${designSettings.enabled ? designSettings.radius : 12}px`);
+
+    // Dynamic Font Selection
+    let fontValue = 'var(--font-main)';
+    if (designSettings.enabled) {
+      if (designSettings.font === 'Outfit') fontValue = 'var(--font-outfit)';
+      else if (designSettings.font === 'JetBrains Mono') fontValue = 'var(--font-mono)';
+      else if (designSettings.font === 'Roboto') fontValue = 'var(--font-roboto)';
+    }
+    root.style.setProperty('--font-main', fontValue);
+
+    if (designSettings.enabled && designSettings.isNeon) {
+      root.style.setProperty('--neon-glow', `0 0 15px rgba(${r}, ${g}, ${b}, 0.5)`);
+      root.style.setProperty('--border-neon', `1px solid rgba(${r}, ${g}, ${b}, 0.8)`);
+    } else {
+      root.style.setProperty('--neon-glow', 'none');
+      root.style.setProperty('--border-neon', '1px solid var(--border-color)');
+    }
+
+    if (designSettings.enabled && designSettings.isCompact) {
+      root.style.setProperty('--compact-gap', '10px');
+      root.style.setProperty('--compact-padding', '12px');
+    } else {
+      root.style.setProperty('--compact-gap', '24px');
+      root.style.setProperty('--compact-padding', '24px');
+    }
+
+  }, [theme, accentColor, designSettings]);
+
+  // Bug Fix: Habit Tracker Rollover & Skill Sync
+  // Removed 'habits' from dependency to avoid infinite loop
+  useEffect(() => {
+    if (isAuthenticated) {
+      syncHabits(SKILL_DEF);
+    }
+  }, [isAuthenticated, unlockedSkills, syncHabits]);
 
   const getActiveTabProps = (path) => {
     // Treat "/" as overview, otherwise match exactly
@@ -49,16 +168,18 @@ function App() {
   };
 
   const navItemsOS = [
-    { path: '/expenses', label: 'Expense Tracker', icon: '💸' },
-    { path: '/goals', label: 'Goal Planner', icon: '📍' },
-    { path: '/habits', label: 'Habit Tracker', icon: '📝' },
-    { path: '/fridge', label: 'Fridge Stock', icon: '🍏' },
-    { path: '/targets', label: 'Big Targets', icon: '🎯' },
+    { path: '/expenses', label: 'Expense Tracker', icon: <WalletIcon /> },
+    { path: '/goals', label: 'Goal Planner', icon: <GoalIcon /> },
+    { path: '/habits', label: 'Habit Tracker', icon: <ListIcon /> },
+    { path: '/fridge', label: 'Fridge Stock', icon: <ForkKnifeIcon /> },
+    { path: '/targets', label: 'Big Targets', icon: <TrophyIcon /> },
+    { path: '/books', label: 'Library', icon: <BookIcon /> },
+    { path: '/movies', label: 'Cinema', icon: <FilmIcon /> },
   ];
 
   const navItemsAccount = [
-    { path: '/overview', label: 'Overview', icon: '🏠' },
-    { path: '/settings', label: 'Settings', icon: '⚙️' },
+    { path: '/overview', label: 'Overview', icon: <HomeIcon /> },
+    { path: '/settings', label: 'Settings', icon: <SettingsIcon /> },
     { path: '/skills', label: 'Skill Tree', icon: <BeakerIcon /> },
   ];
 
@@ -82,12 +203,20 @@ function App() {
 
   return (
     <div className="app-container" style={backgroundStyle}>
+      {/* Backdrop for mobile only */}
+      {isSidebarOpen && window.innerWidth <= 900 && (
+        <div
+          className="sidebar-backdrop"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       <div className={`sidebar ${!isSidebarOpen ? 'collapsed' : ''}`} style={profile.backgroundImage ? { backdropFilter: 'blur(20px)', background: theme === 'dark' ? 'rgba(10,10,12,0.85)' : 'rgba(255,255,255,0.85)' } : {}}>
         <div className="app-title">
           <div className="app-logo" style={{ background: 'transparent', color: 'var(--text-main)', padding: 0 }}>
             <BarChartIcon />
           </div>
-          Life Planner OS
+          E.O.M
         </div>
 
         <div className="user-profile" style={profile.backgroundImage ? { background: 'rgba(255,255,255,0.05)' } : {}}>
@@ -108,7 +237,10 @@ function App() {
             <button
               key={item.path}
               className={`nav-item ${getActiveTabProps(item.path)}`}
-              onClick={() => navigate(item.path)}
+              onClick={() => {
+                navigate(item.path);
+                if (window.innerWidth <= 900) setIsSidebarOpen(false);
+              }}
             >
               <span className="nav-icon">{item.icon}</span>
               {item.label}
@@ -122,7 +254,10 @@ function App() {
             <button
               key={item.path}
               className={`nav-item ${getActiveTabProps(item.path)}`}
-              onClick={() => navigate(item.path)}
+              onClick={() => {
+                navigate(item.path);
+                if (window.innerWidth <= 900) setIsSidebarOpen(false);
+              }}
             >
               <span className="nav-icon">{item.icon}</span>
               {item.label}
@@ -136,28 +271,16 @@ function App() {
 
         {/* Toggle Button */}
         <button
+          className="sidebar-toggle"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          style={{
-            position: 'absolute',
-            top: '20px',
-            left: '20px',
-            background: theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-            border: 'none',
-            color: 'var(--text-main)',
-            padding: '8px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 100
-          }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+          aria-label="Toggle Sidebar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
             <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
           </svg>
         </button>
 
-        <div className="view-transition" style={{ paddingTop: '20px' }}>
+        <div className="view-transition" style={{ paddingTop: '40px' }}>
           <Routes>
             <Route path="/" element={<Overview navigate={navigate} />} />
             <Route path="/overview" element={<Overview navigate={navigate} />} />
@@ -168,6 +291,8 @@ function App() {
             <Route path="/habits" element={<HabitTracker />} />
             <Route path="/fridge" element={<FridgeStock />} />
             <Route path="/targets" element={<BigTargets />} />
+            <Route path="/books" element={<BookList />} />
+            <Route path="/movies" element={<MovieList />} />
           </Routes>
         </div>
       </div>
