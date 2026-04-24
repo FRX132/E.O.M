@@ -1,14 +1,14 @@
 {
   "name": "eom",
   "private": true,
-  "version": "1.1.1",
+  "version": "1.1.2",
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:build": "vite build && electron-builder",
-    "electron:build:win": "vite build && electron-builder --win",
+    "electron:build:win": "vite build && electron-builder --win --x64",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

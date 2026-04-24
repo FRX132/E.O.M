@@ -1,7 +1,10 @@
 import { app, BrowserWindow, globalShortcut, dialog } from 'electron';
-import { autoUpdater } from 'electron-updater';
+import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+const require = createRequire(import.meta.url);
+const { autoUpdater } = require('electron-updater');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,23 +51,29 @@ app.whenReady().then(() => {
   createWindow();
 
   // ----- Auto-Updater Logic -----
-  // The app will check for updates on startup
-  autoUpdater.checkForUpdatesAndNotify();
+  // The app will check for updates on startup in production
+  if (!isDev) {
+    try {
+      autoUpdater.checkForUpdatesAndNotify();
 
-  autoUpdater.on('update-available', () => {
-    console.log('Update available.');
-  });
+      autoUpdater.on('update-available', () => {
+        console.log('Update available.');
+      });
 
-  autoUpdater.on('update-downloaded', () => {
-    dialog.showMessageBox({
-      type: 'info',
-      title: 'Update Ready',
-      message: 'A new version of E.O.M has been downloaded. Restart to apply?',
-      buttons: ['Restart', 'Later']
-    }).then((result) => {
-      if (result.response === 0) autoUpdater.quitAndInstall();
-    });
-  });
+      autoUpdater.on('update-downloaded', () => {
+        dialog.showMessageBox({
+          type: 'info',
+          title: 'Update Ready',
+          message: 'A new version of E.O.M has been downloaded. Restart to apply?',
+          buttons: ['Restart', 'Later']
+        }).then((result) => {
+          if (result.response === 0) autoUpdater.quitAndInstall();
+        });
+      });
+    } catch (err) {
+      console.error('Failed to check for updates:', err);
+    }
+  }
   // -------------------------------
 
   // Add shortcut to easily open Developer Tools anywhere

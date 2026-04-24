@@ -1,155 +1,90 @@
-// ...existing code...
-# Life Planner OS 🧠
+# E.O.M — Life Planner OS 🧠
 
-A minimalist, Notion-inspired desktop app to gamify and organize your life. Built with React, Zustand and Electron — local-first, privacy-focused, and extensible.
+**E.O.M** (End of Month / Each One Matters) is a premium, minimalist desktop application designed to gamify and organize every facet of your life. Built with a "local-first" philosophy, it combines productivity with RPG-inspired progression mechanics.
 
-## Highlights
-- RPG-style radial Skill Tree (Health, Social, Career, Spirit, Mental)
-- Dynamic Habit Tracker connected to Skill Tree
-- Expense Tracker and Goal Planner
-- Profile customization and local persistence (Zustand + LocalStorage)
-- Dark-mode first, glassmorphism UI
+![E.O.M Dashboard](https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=400&fit=crop&q=80)
 
-## Tech Stack
-- React, Vite
-- Zustand (persist middleware)
-- Electron (desktop wrapper)
-- @xyflow/react + dagre for node graph layouts
+## ✨ Core Modules
 
-## Quick start (developer)
-1. Clone
-```sh
-git clone https://github.com/FRX132/E.O.M.git
-cd E.O.M
-```
-2. Install
-```sh
-npm install
-```
-3. Dev (Vite + Electron)
-```sh
-npm run electron:dev
-```
+### 💰 Finance Hub (Expense Tracker)
+Professional-grade financial management with:
+- **Automatic Calculations**: Real-time tracking of income, expenses, and total balance.
+- **Recurring Payments**: Automated monthly deductions for bills and subscriptions.
+- **Budgeting**: Set and monitor budgets across custom categories.
+- **Visual Analytics**: Dynamic charts showing cash flow trends throughout the year.
 
-## Build & Release (recommended)
-- Produce web build:
-```sh
-npm run build
-```
-- Package Electron app (example):
-```sh
-npm run package
-# or: npm run dist
-```
-- Publish platform binaries via GitHub Releases (preferred) or use Git LFS for large assets.
+### 🏋️‍♂️ Workout Hub (Anatomical Map)
+High-fidelity fitness tracking featuring:
+- **Dual Anatomy Support**: Toggle between male and female anatomical frames.
+- **Muscle Targeting**: Interactive SVG maps to select and log specific muscle group sessions.
+- **Smart Sync**: Automatically syncs body structure with your user profile gender.
 
-## Git / Large files
-- Do NOT commit `node_modules/` (huge, platform-specific). Keep it in `.gitignore`.
-- Binary releases and large artifacts (>100 MB) should be uploaded to GitHub Releases or tracked with Git LFS.
-- To move existing large files to LFS:
-```sh
-brew install git-lfs
-git lfs install
-git lfs track "release/**" "*.exe" "*.dmg" "*.app"
-git add .gitattributes
-git commit -m "Track large binaries with Git LFS"
-# migrate history if needed:
-git lfs migrate import --include="release/**,*.exe,*.dmg,*.app" --include-ref=refs/heads/main
-git push origin main --force
-```
+### 🌍 Language Hub
+Track your journey to polyglot status:
+- **Level Progression**: CEFR standard tracking (A1 to C2).
+- **Metric Monitoring**: Visual progress bars and session notes for each language.
+- **Resource Management**: Dedicated space for learning materials and goals.
 
-## Project layout
-- src/components/ — UI widgets (SkillTree, HabitTracker, ExpenseTracker, ...)
-- src/store.js — Zustand store + persistence + factory reset
-- src/App.jsx — Router and main app shell
-- electron/ — Electron main & preload scripts
+### 🛡️ Skill Tree & Habits
+The heart of the gamification engine:
+- **RPG Progression**: Unlock and level up branches in Health, Social, Career, Spirit, and Mental.
+- **Dynamic Habits**: Habits are directly linked to your Skill Tree; completing them earns XP and advances your rank.
 
-## Contributing
-- Open an issue for feature requests or bugs.
-- For history-rewrites (LFS / large-file removal) coordinate with all contributors — they will need to re-clone.
+### 📚 Media Databases
+- **Library (Books)**: Track reading progress, ratings, and collections.
+- **Cinema (Movies/Series)**: Manage your watch-list and historical media consumption.
 
-## Troubleshooting
-- Push rejected with "file exceeds 100 MB" → use Git LFS or remove the file from history (BFG/git-filter-repo) and force-push.
-- If builds differ between platforms, publish platform-specific release artifacts instead of checking them into git.
+---
 
-## License
-MIT — see LICENSE.
-// ...existing code...
-```// filepath: /Users/_freakzy_/Desktop/Antigravity Agents/OS/README.md
-// ...existing code...
-# Life Planner OS 🧠
+## 🚀 Technical Highlights
+- **Vite + React**: Blazing fast development and optimized production bundles.
+- **Zustand**: State management with local persistence (Privacy First).
+- **Electron**: Cross-platform desktop experience.
+- **Glassmorphism UI**: High-end aesthetic with customizable accent colors and neon modes.
 
-A minimalist, Notion-inspired desktop app to gamify and organize your life. Built with React, Zustand and Electron — local-first, privacy-focused, and extensible.
+---
 
-## Highlights
-- RPG-style radial Skill Tree (Health, Social, Career, Spirit, Mental)
-- Dynamic Habit Tracker connected to Skill Tree
-- Expense Tracker and Goal Planner
-- Profile customization and local persistence (Zustand + LocalStorage)
-- Dark-mode first, glassmorphism UI
+## 🛠️ Getting Started
 
-## Tech Stack
-- React, Vite
-- Zustand (persist middleware)
-- Electron (desktop wrapper)
-- @xyflow/react + dagre for node graph layouts
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [npm](https://www.npmjs.com/)
 
-## Quick start (developer)
-1. Clone
-```sh
-git clone https://github.com/FRX132/E.O.M.git
-cd E.O.M
-```
-2. Install
-```sh
-npm install
-```
-3. Dev (Vite + Electron)
-```sh
-npm run electron:dev
-```
+### Installation
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/FRX132/E.O.M.git
+   cd E.O.M
+   ```
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+3. Launch development mode:
+   ```sh
+   npm run electron:dev
+   ```
 
-## Build & Release (recommended)
-- Produce web build:
-```sh
-npm run build
-```
-- Package Electron app (example):
-```sh
-npm run package
-# or: npm run dist
-```
-- Publish platform binaries via GitHub Releases (preferred) or use Git LFS for large assets.
+---
 
-## Git / Large files
-- Do NOT commit `node_modules/` (huge, platform-specific). Keep it in `.gitignore`.
-- Binary releases and large artifacts (>100 MB) should be uploaded to GitHub Releases or tracked with Git LFS.
-- To move existing large files to LFS:
-```sh
-brew install git-lfs
-git lfs install
-git lfs track "release/**" "*.exe" "*.dmg" "*.app"
-git add .gitattributes
-git commit -m "Track large binaries with Git LFS"
-# migrate history if needed:
-git lfs migrate import --include="release/**,*.exe,*.dmg,*.app" --include-ref=refs/heads/main
-git push origin main --force
-```
+## 📦 Building for Production
+To generate installers for testers or personal use:
 
-## Project layout
-- src/components/ — UI widgets (SkillTree, HabitTracker, ExpenseTracker, ...)
-- src/store.js — Zustand store + persistence + factory reset
-- src/App.jsx — Router and main app shell
-- electron/ — Electron main & preload scripts
+- **Windows Build**: `npm run electron:build:win`
+- **Mac Build**: `npm run electron:build`
+- **Web Preview**: `npm run build && npm run preview`
 
-## Contributing
-- Open an issue for feature requests or bugs.
-- For history-rewrites (LFS / large-file removal) coordinate with all contributors — they will need to re-clone.
+Generated binaries will be located in the `release/` directory.
 
-## Troubleshooting
-- Push rejected with "file exceeds 100 MB" → use Git LFS or remove the file from history (BFG/git-filter-repo) and force-push.
-- If builds differ between platforms, publish platform-specific release artifacts instead of checking them into git.
+---
 
-## License
-MIT — see LICENSE.
-// ...existing code...
+## 📂 Project Structure
+- `src/components/` — UI Modules (Finance, Workout, Language, etc.)
+- `src/store.js` — Global state, persistence logic, and profile data.
+- `src/data/` — Anatomical path data and asset JSONs.
+- `electron/` — Main process and desktop integration scripts.
+
+---
+
+## 📜 License
+MIT — Created by [FRX132](https://github.com/FRX132).
