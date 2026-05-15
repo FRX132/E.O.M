@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// Styling
 import './Styles/GoalModal.css';
 
 export default function BigTargetModal({ isOpen, onClose, onSave, initialData }) {
@@ -24,10 +25,10 @@ export default function BigTargetModal({ isOpen, onClose, onSave, initialData })
 
   const handleSave = () => {
     if (!targetData.title) return;
-    
+
     // Generate default image if none provided
     const finalImg = targetData.img || `https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400&h=300&fit=crop&q=${Date.now()}`;
-    
+
     onSave({
       title: targetData.title,
       category: targetData.category,
@@ -35,7 +36,7 @@ export default function BigTargetModal({ isOpen, onClose, onSave, initialData })
       date: initialData?.date || new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
       status: initialData?.status || 'Not started'
     });
-    
+
     setTargetData({ title: '', category: 'Work', img: '' });
     onClose();
   };
@@ -51,10 +52,10 @@ export default function BigTargetModal({ isOpen, onClose, onSave, initialData })
           <div className="mac-section-title">General Info</div>
           <div className="mac-input-group">
             <div className="mac-row" style={{ minHeight: '60px' }}>
-              <input 
-                className="mac-input" 
+              <input
+                className="mac-input"
                 style={{ fontWeight: 600, fontSize: '17px' }}
-                placeholder="Target Title" 
+                placeholder="Target Title"
                 value={targetData.title}
                 onChange={(e) => setTargetData({ ...targetData, title: e.target.value })}
                 autoFocus
@@ -62,7 +63,7 @@ export default function BigTargetModal({ isOpen, onClose, onSave, initialData })
             </div>
             <div className="mac-row">
               <span className="mac-row-label">Category</span>
-              <select 
+              <select
                 className="mac-select"
                 value={targetData.category}
                 onChange={(e) => setTargetData({ ...targetData, category: e.target.value })}
@@ -77,9 +78,9 @@ export default function BigTargetModal({ isOpen, onClose, onSave, initialData })
           <div className="mac-section-title">Appearance</div>
           <div className="mac-input-group">
             <div className="mac-row">
-              <input 
-                className="mac-input" 
-                placeholder="Image URL (Unsplash recommended)" 
+              <input
+                className="mac-input"
+                placeholder="Image URL (Unsplash recommended)"
                 value={targetData.img}
                 onChange={(e) => setTargetData({ ...targetData, img: e.target.value })}
               />
@@ -92,8 +93,8 @@ export default function BigTargetModal({ isOpen, onClose, onSave, initialData })
 
         <div className="mac-modal-footer">
           <button className="mac-btn mac-btn-cancel" onClick={onClose}>Abbrechen</button>
-          <button 
-            className="mac-btn mac-btn-add" 
+          <button
+            className="mac-btn mac-btn-add"
             onClick={handleSave}
             disabled={!targetData.title}
           >

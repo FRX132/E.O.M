@@ -36,6 +36,9 @@ export default function ExpenseTracker() {
   const [viewMode, setViewMode] = useState('expenses'); // 'expenses' or 'wallet'
   const [newCatName, setNewCatName] = useState('');
   const [isCatEditorOpen, setIsCatEditorOpen] = useState(false);
+  
+  const [editingLimit, setEditingLimit] = useState(null);
+  const [tempLimit, setTempLimit] = useState('');
 
   // --- Logic ---
 
@@ -118,16 +121,6 @@ export default function ExpenseTracker() {
   const budgetProgressMonthly = Math.min(100, (currentMonthTotal / limits.monthly) * 100);
   const totalWealth = assets.reduce((sum, a) => sum + (a.amount || 0), 0);
 
-  const handleAdjustLimit = (timeframe) => {
-    const val = prompt(`Set ${timeframe} limit (€):`, limits[timeframe.toLowerCase()]);
-    if (val) {
-      setFinanceSettings({
-        ...financeSettings,
-        limits: { ...limits, [timeframe.toLowerCase()]: parseInt(val) }
-      });
-    }
-  };
-
   // --- Filter Logic ---
   const filteredExpenses = expenses.filter(exp => {
     if (activeTab === 'All') return true;
@@ -170,12 +163,53 @@ export default function ExpenseTracker() {
               return (
                 <div key={timeframe} style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '10px' }}>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '5px' }}>{timeframe} Limit</div>
-                  <div 
-                    style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)', cursor: 'pointer' }}
-                    onClick={() => handleAdjustLimit(timeframe)}
-                  >
-                    €{limit.toLocaleString()}
-                  </div>
+                  {editingLimit === timeframe ? (
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.2rem', marginRight: '4px' }}>€</span>
+                      <input 
+                        type="number" 
+                        autoFocus
+                        value={tempLimit}
+                        onChange={e => setTempLimit(e.target.value)}
+                        onBlur={() => {
+                          const val = parseInt(tempLimit);
+                          if (!isNaN(val)) {
+                            setFinanceSettings({
+                              ...financeSettings,
+                              limits: { ...limits, [timeframe.toLowerCase()]: val }
+                            });
+                          }
+                          setEditingLimit(null);
+                        }}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') e.target.blur();
+                          if (e.key === 'Escape') setEditingLimit(null);
+                        }}
+                        style={{ 
+                          background: 'rgba(0,0,0,0.2)', 
+                          border: '1px solid var(--primary)', 
+                          color: 'var(--primary)', 
+                          fontSize: '1.1rem', 
+                          fontWeight: 800, 
+                          width: '100%', 
+                          borderRadius: '6px',
+                          outline: 'none',
+                          padding: '2px 8px'
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div 
+                      style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)', cursor: 'pointer', display: 'inline-block' }}
+                      onClick={() => {
+                        setEditingLimit(timeframe);
+                        setTempLimit(limit);
+                      }}
+                      title="Click to edit limit"
+                    >
+                      €{limit.toLocaleString()}
+                    </div>
+                  )}
                 </div>
               );
             })}
