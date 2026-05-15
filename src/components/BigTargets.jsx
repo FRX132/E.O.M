@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import { useStore } from '../store';
 import BigTargetModal from './BigTargetModal';
 
+const TrophyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-trophy" viewBox="0 0 16 16">
+    <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5q0 .807-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33 33 0 0 1 2.5.5m.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935m10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935M3.504 1q.01.775.056 1.469c.13 2.028.457 3.546.87 4.667C5.294 9.48 6.484 10 7 10a.5.5 0 0 1 .5.5v2.61a1 1 0 0 1-.757.97l-1.426.356a.5.5 0 0 0-.179.085L4.5 15h7l-.638-.479a.5.5 0 0 0-.18-.085l-1.425-.356a1 1 0 0 1-.757-.97V10.5A.5.5 0 0 1 9 10c.516 0 1.706-.52 2.57-2.864.413-1.12.74-2.64.87-4.667q.045-.694.056-1.469z"/>
+  </svg>
+);
+
 const PILL_COLORS = {
   'Personal': 'purple',
   'Work': 'orange',
@@ -47,17 +53,18 @@ export default function BigTargets() {
     : projects.filter(p => activeTab === 'Active' ? p.status === 'In progress' : p.status === 'Not started');
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Big Targets</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Plan and manage long-term goals without losing focus.<br />Break big ideas into clear projects and track progress.</p>
+    <div className="premium-container">
+      <div className="premium-header-container">
+        <div className="premium-icon-wrapper">
+          <TrophyIcon />
+        </div>
+        <h1 className="premium-title">Big Targets</h1>
+        <p className="premium-subtitle">Plan and manage long-term goals without losing focus.<br />Break big ideas into clear projects and track progress.</p>
       </div>
 
       <div className="notion-block">
         <div className="notion-header" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-trophy" viewBox="0 0 16 16">
-            <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5q0 .807-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33 33 0 0 1 2.5.5m.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935m10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935M3.504 1q.01.775.056 1.469c.13 2.028.457 3.546.87 4.667C5.294 9.48 6.484 10 7 10a.5.5 0 0 1 .5.5v2.61a1 1 0 0 1-.757.97l-1.426.356a.5.5 0 0 0-.179.085L4.5 15h7l-.638-.479a.5.5 0 0 0-.18-.085l-1.425-.356a1 1 0 0 1-.757-.97V10.5A.5.5 0 0 1 9 10c.516 0 1.706-.52 2.57-2.864.413-1.12.74-2.64.87-4.667q.045-.694.056-1.469z"/>
-          </svg>
+          <span style={{color: 'var(--primary)', display: 'inline-flex', transform: 'scale(0.8)'}}><TrophyIcon /></span>
           Projects
         </div>
 
@@ -76,20 +83,14 @@ export default function BigTargets() {
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px', padding: '0 20px 20px' }}>
+        <div className="premium-grid" style={{ padding: '0 20px 20px' }}>
 
           {filteredProjects.map((project) => (
             <div 
               key={project.id} 
               onClick={() => openEditModal(project)}
-              style={{
-                background: 'var(--bg-main)',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                border: '1px solid var(--border-light)',
-                cursor: 'pointer'
-              }}
+              className="premium-card"
+              style={{ padding: 0 }}
             >
               <div style={{ width: '100%', height: '140px', backgroundImage: `url(${project.img})`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
               <div style={{ padding: '16px' }}>
@@ -117,19 +118,16 @@ export default function BigTargets() {
 
           <div
             onClick={openAddModal}
+            className="premium-card"
             style={{
-              borderRadius: '8px',
-              border: '1px dashed var(--border-color)',
-              display: 'flex',
-              alignItems: 'center',
               justifyContent: 'center',
+              alignItems: 'center',
               minHeight: '200px',
+              borderStyle: 'dashed',
+              background: 'transparent',
               color: 'var(--text-muted)',
-              cursor: 'pointer',
-              transition: 'background var(--transition-fast)'
+              cursor: 'pointer'
             }}
-            onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-card-alt)'}
-            onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
           >
             + New page
           </div>

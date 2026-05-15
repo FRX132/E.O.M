@@ -23,27 +23,24 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
   const anatomyData = gender === 'female' ? femaleAnatomy : maleAnatomy;
 
   const MusclePath = ({ slug, paths, label }) => {
-    // Force absolute start for all paths to prevent relative shift issues
-    const normalizedPaths = Object.values(paths).flat().map(p => {
-      const trimmed = p.trim();
-      if (trimmed.startsWith('m')) {
-        return 'M' + trimmed.slice(1);
-      }
-      return trimmed;
-    });
-
-    const dString = normalizedPaths.join(' ');
-    
     const isSelected = selectedMuscle === slug;
+    
+    // Flatten paths with their respective transforms
+    const allPaths = [];
+    if (paths.common) {
+      allPaths.push(...paths.common.map(d => ({ d, transform: paths.transform?.common })));
+    }
+    if (paths.left) {
+      allPaths.push(...paths.left.map(d => ({ d, transform: paths.transform?.left })));
+    }
+    if (paths.right) {
+      allPaths.push(...paths.right.map(d => ({ d, transform: paths.transform?.right })));
+    }
 
     return (
-      <path
+      <g
         id={slug}
-        d={dString}
-        fill={isSelected ? 'var(--primary)' : 'rgba(230, 60, 60, 0.15)'}
-        stroke={isSelected ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.1)'}
-        strokeWidth="0.8"
-        className="muscle-path"
+        className="muscle-group"
         onClick={() => onSelectMuscle(slug)}
         style={{ 
           cursor: 'pointer', 
@@ -52,7 +49,19 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
         }}
       >
         <title>{label || slug}</title>
-      </path>
+        {allPaths.map((item, idx) => (
+          <path
+            key={idx}
+            d={item.d}
+            transform={item.transform || ''}
+            fill={isSelected ? 'var(--primary)' : 'rgba(230, 60, 60, 0.15)'}
+            stroke={isSelected ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.1)'}
+            strokeWidth="0.8"
+            className="muscle-path"
+            style={{ pointerEvents: 'all' }}
+          />
+        ))}
+      </g>
     );
   };
 
@@ -182,7 +191,7 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
       </div>
 
       <style>{`
-        .muscle-path:hover {
+        .muscle-group:hover .muscle-path {
           fill: rgba(var(--primary-rgb, 230, 30, 30), 0.7) !important;
           stroke: rgba(255, 255, 255, 0.6) !important;
           filter: drop-shadow(0 0 15px rgba(var(--primary-rgb, 230, 30, 30), 0.5)) !important;

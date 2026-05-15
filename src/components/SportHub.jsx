@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import { useStore } from '../store';
 import MuscleMap from './MuscleMap';
+import { EXERCISE_DATABASE } from './WorkoutModal';
 import WorkoutModal from './WorkoutModal';
+
+const SportIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M4 6a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm2.625.547a3 3 0 0 0-5.25 0l-.398.696a3 3 0 0 0 0 3.014l.398.696a3 3 0 0 0 5.25 0l.398-.696a3 3 0 0 0 0-3.014l-.398-.696zM12 6a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm2.625.547a3 3 0 0 0-5.25 0l-.398.696a3 3 0 0 0 0 3.014l.398.696a3 3 0 0 0 5.25 0l.398-.696a3 3 0 0 0 0-3.014l-.398-.696z"/>
+  </svg>
+);
 
 export default function SportHub() {
   const workouts = useStore(state => state.workouts) || [];
@@ -10,6 +17,7 @@ export default function SportHub() {
 
   const [selectedMuscle, setSelectedMuscle] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState('map'); // 'map' or 'database'
 
   const handleSelectMuscle = (muscleId) => {
     setSelectedMuscle(muscleId);
@@ -27,8 +35,29 @@ export default function SportHub() {
   };
 
   return (
-    <div className="notion-block" style={{ padding: '0 20px 40px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(400px, 1fr) 400px', gap: '40px', alignItems: 'start', maxWidth: '1400px', margin: '0 auto' }}>
+    <div className="premium-container" style={{ maxWidth: '1400px' }}>
+      <div className="premium-header-container">
+        <div className="premium-icon-wrapper">
+          <SportIcon />
+        </div>
+        <h1 className="premium-title">Fitness Hub</h1>
+        <p className="premium-subtitle">Anatomical mapping & workout tracking.</p>
+      </div>
+
+      <div className="notion-block" style={{ marginBottom: '20px' }}>
+        <div className="notion-tabs" style={{ paddingBottom: '10px' }}>
+          <button className={`notion-tab ${viewMode === 'map' ? 'active' : ''}`} onClick={() => setViewMode('map')}>
+            🧍 Anatomical Map
+          </button>
+          <button className={`notion-tab ${viewMode === 'database' ? 'active' : ''}`} onClick={() => setViewMode('database')}>
+            📚 Exercise Database
+          </button>
+        </div>
+      </div>
+
+      {viewMode === 'map' ? (
+      <div className="notion-block" style={{ padding: '0 20px 40px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(400px, 1fr) 400px', gap: '40px', alignItems: 'start', margin: '0 auto' }}>
         
         {/* Left Side: Interactive Body */}
         <div style={{
@@ -141,10 +170,50 @@ export default function SportHub() {
               </div>
             )}
           </div>
-
+        </div>
+        </div>
+      </div>
+      ) : (
+      <div className="notion-block" style={{ padding: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Exercise & Machine Database</h2>
+          <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+            Browse all available equipment and movements.
+          </div>
         </div>
 
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+          {Object.entries(EXERCISE_DATABASE).map(([muscle, exercises]) => (
+            <div key={muscle} style={{
+              background: 'rgba(255,255,255,0.02)',
+              borderRadius: '16px',
+              padding: '20px',
+              border: '1px solid var(--border-color)',
+            }}>
+              <h3 style={{ textTransform: 'capitalize', color: 'var(--primary)', marginBottom: '15px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
+                {muscle.replace('-', ' ')}
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {exercises.map(ex => (
+                  <div key={ex.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{ex.name}</div>
+                    <span style={{ 
+                      fontSize: '0.7rem', 
+                      padding: '2px 8px', 
+                      borderRadius: '12px', 
+                      background: 'rgba(255,255,255,0.05)',
+                      color: 'var(--text-muted)'
+                    }}>
+                      {ex.type || 'Standard'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
+      )}
 
       <WorkoutModal 
         isOpen={isModalOpen}

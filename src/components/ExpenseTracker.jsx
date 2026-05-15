@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import { useStore } from '../store';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, ResponsiveContainer, Cell } from 'recharts';
 
+const WalletIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499L12.136.326zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484L5.562 3zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z"/>
+  </svg>
+);
+
 const PILL_COLORS = {
   'Utilities': 'blue',
   'Development': 'blue',
@@ -41,7 +47,8 @@ export default function ExpenseTracker() {
       category: financeSettings.categories[0] || 'Uncategorized',
       account: 'Personal',
       date: new Date().toISOString().split('T')[0], // Use ISO for easier parsing
-      dueDate: '' // For bills
+      dueDate: '', // For bills
+      recurrence: 'None'
     };
     setExpenses([...expenses, newEntry]);
   };
@@ -106,8 +113,20 @@ export default function ExpenseTracker() {
 
   const monthlyTotals = getMonthlyData();
   const currentMonthTotal = monthlyTotals[new Date().getMonth()].amount;
-  const budgetProgress = Math.min(100, (currentMonthTotal / financeSettings.monthlyBudget) * 100);
+  
+  const limits = financeSettings.limits || { daily: 50, weekly: 350, monthly: 2000, yearly: 24000 };
+  const budgetProgressMonthly = Math.min(100, (currentMonthTotal / limits.monthly) * 100);
   const totalWealth = assets.reduce((sum, a) => sum + (a.amount || 0), 0);
+
+  const handleAdjustLimit = (timeframe) => {
+    const val = prompt(`Set ${timeframe} limit (€):`, limits[timeframe.toLowerCase()]);
+    if (val) {
+      setFinanceSettings({
+        ...financeSettings,
+        limits: { ...limits, [timeframe.toLowerCase()]: parseInt(val) }
+      });
+    }
+  };
 
   // --- Filter Logic ---
   const filteredExpenses = expenses.filter(exp => {
@@ -125,42 +144,58 @@ export default function ExpenseTracker() {
   });
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '100px' }}>
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '8px', fontWeight: 800 }}>Finance Hub</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Advanced Capital & Resource Management</p>
+    <div className="premium-container">
+      <div className="premium-header-container">
+        <div className="premium-icon-wrapper">
+          <WalletIcon />
+        </div>
+        <h1 className="premium-title">Finance Hub</h1>
+        <p className="premium-subtitle">Advanced Capital & Resource Management</p>
       </div>
 
       {/* --- Top Stats & Charts --- */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
-        {/* Budget Progress */}
-        <div className="notion-block" style={{ padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h3 style={{ margin: 0, fontSize: '1rem' }}>Monthly Budget</h3>
-            <span style={{ fontSize: '1.2rem', fontWeight: 800, color: budgetProgress > 90 ? 'var(--red-text)' : 'var(--blue-text)' }}>
-              €{currentMonthTotal.toLocaleString()} / €{financeSettings.monthlyBudget.toLocaleString()}
-            </span>
+        {/* Budget Progress limits */}
+        <div className="premium-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ margin: 0, fontSize: '1rem' }}>Adjustable Limits</h3>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Tap value to adjust</span>
           </div>
-          <div style={{ height: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden', position: 'relative' }}>
-            <div style={{ 
-              width: `${budgetProgress}%`, 
-              height: '100%', 
-              background: budgetProgress > 90 ? 'var(--red-text)' : 'var(--primary)',
-              boxShadow: `0 0 15px ${budgetProgress > 90 ? 'rgba(239, 68, 68, 0.4)' : 'rgba(var(--primary-rgb), 0.4)'}`,
-              transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)'
-            }} />
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+            {['Daily', 'Weekly', 'Monthly', 'Yearly'].map(timeframe => {
+              const limit = limits[timeframe.toLowerCase()];
+              let value = currentMonthTotal; // For simplicity, we just show Monthly progress currently, or we can calculate real ones.
+              // To be accurate, let's just display the limits as configurable inputs.
+              return (
+                <div key={timeframe} style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '10px' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '5px' }}>{timeframe} Limit</div>
+                  <div 
+                    style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)', cursor: 'pointer' }}
+                    onClick={() => handleAdjustLimit(timeframe)}
+                  >
+                    €{limit.toLocaleString()}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div style={{ marginTop: '15px', color: 'var(--text-muted)', fontSize: '0.8rem', display: 'flex', justifyContent: 'space-between' }}>
-            <span>{Math.round(budgetProgress)}% Consumed</span>
-            <button 
-              onClick={() => {
-                const val = prompt('Set Monthly Budget (€):', financeSettings.monthlyBudget);
-                if (val) setFinanceSettings({ monthlyBudget: parseInt(val) });
-              }}
-              style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontWeight: 600 }}
-            >
-              Adjust Limit
-            </button>
+
+          <div style={{ marginTop: 'auto', paddingTop: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '5px' }}>
+              <span>Monthly Budget Progress</span>
+              <span style={{ color: budgetProgressMonthly > 90 ? 'var(--red-text)' : 'inherit' }}>
+                €{currentMonthTotal.toLocaleString()} / €{limits.monthly.toLocaleString()}
+              </span>
+            </div>
+            <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
+              <div style={{ 
+                width: `${budgetProgressMonthly}%`, 
+                height: '100%', 
+                background: budgetProgressMonthly > 90 ? 'var(--red-text)' : 'var(--primary)',
+                transition: 'width 0.5s ease'
+              }} />
+            </div>
           </div>
         </div>
 
@@ -256,13 +291,14 @@ export default function ExpenseTracker() {
             <table className="notion-table" style={{ minWidth: '800px' }}>
               <thead>
                 <tr>
-                  <th style={{ width: '25%' }}>Aa Description</th>
+                  <th style={{ width: '22%' }}>Aa Description</th>
                   <th style={{ width: '12%' }}># Amount</th>
                   <th style={{ width: '15%' }}>◘ Category</th>
                   <th style={{ width: '10%' }}>● Account</th>
-                  <th style={{ width: '15%' }}>📅 Trans. Date</th>
-                  <th style={{ width: '15%' }}>🔔 Billing Date</th>
-                  <th style={{ width: '8%' }}></th>
+                  <th style={{ width: '12%' }}>📅 Trans. Date</th>
+                  <th style={{ width: '12%' }}>↻ Recurrence</th>
+                  <th style={{ width: '12%' }}>🔔 Billing Date</th>
+                  <th style={{ width: '5%' }}></th>
                 </tr>
               </thead>
               <tbody>
@@ -312,6 +348,19 @@ export default function ExpenseTracker() {
                       />
                     </td>
                     <td>
+                      <select
+                        value={expense.recurrence || 'None'}
+                        onChange={(e) => updateRow(expense.id, 'recurrence', e.target.value)}
+                        style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-main)', fontSize: '0.8rem', outline: 'none', borderRadius: '4px', padding: '2px 5px' }}
+                      >
+                        <option value="None">None</option>
+                        <option value="Daily">Daily</option>
+                        <option value="Weekly">Weekly</option>
+                        <option value="Monthly">Monthly</option>
+                        <option value="Yearly">Yearly</option>
+                      </select>
+                    </td>
+                    <td>
                        <input
                         type="date"
                         value={expense.dueDate || ''}
@@ -357,7 +406,7 @@ export default function ExpenseTracker() {
                   const typeTotal = items.reduce((sum, a) => sum + (a.amount || 0), 0);
                   
                   return (
-                    <div key={type} className="asset-stat-card" style={{ background: 'var(--bg-card-alt)', padding: '20px', borderRadius: '15px', border: '1px solid var(--border-color)', position: 'relative' }}>
+                    <div key={type} className="premium-card">
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>{type} Balance</div>
                       <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', marginTop: '5px' }}>€{typeTotal.toLocaleString()}</div>
                       <div style={{ position: 'absolute', top: '15px', right: '15px', opacity: 0.2, fontSize: '1.5rem' }}>

@@ -1,7 +1,13 @@
 import React from 'react';
 import { useStore } from '../store';
 import { SKILL_DEF } from '../constants';
-import './HabitTracker.css';
+import './Styles/HabitTracker.css';
+
+const ListIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+    <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+  </svg>
+);
 
 // Data is now entirely driven by the Zustand store (store.js), seeded by the SkillTree Core habit.
 
@@ -44,10 +50,13 @@ export default function HabitTracker() {
   };
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Habit Tracker</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Build consistent habits without overthinking.<br/>Track progress daily and stay accountable.</p>
+    <div className="premium-container">
+      <div className="premium-header-container">
+        <div className="premium-icon-wrapper">
+          <ListIcon />
+        </div>
+        <h1 className="premium-title">Habit Tracker</h1>
+        <p className="premium-subtitle">Build consistent habits without overthinking.<br/>Track progress daily and stay accountable.</p>
       </div>
 
       <div className="notion-block">
@@ -64,7 +73,7 @@ export default function HabitTracker() {
             const xp = calculateXP(day.habits);
             const progress = calculateProgress(day.habits);
             return (
-              <div key={day.id} className="notion-block roadmap" style={{ padding: '20px', position: 'relative' }}>
+              <div key={day.id} className="premium-card">
                 <div style={{ fontSize: '0.9rem', color: 'var(--orange-text)', marginBottom: '12px', fontWeight: 600 }}>{day.date}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
                   {day.habits.map(habit => (

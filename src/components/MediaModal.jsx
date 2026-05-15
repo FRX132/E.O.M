@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './GoalModal.css';
+import './Styles/GoalModal.css';
 
 export default function MediaModal({ isOpen, onClose, onSave, initialData, type = 'Book' }) {
   const [mediaData, setMediaData] = useState({

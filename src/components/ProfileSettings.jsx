@@ -1,6 +1,13 @@
+// Imports 
 import React, { useState } from 'react';
 import { useStore } from '../store';
 
+const SettingsIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.902 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+  </svg>
+);
 
 export default function ProfileSettings() {
   const profile = useStore(state => state.profile);
@@ -11,7 +18,9 @@ export default function ProfileSettings() {
   const accentColor = useStore(state => state.accentColor);
   const setAccentColor = useStore(state => state.setAccentColor);
   const applyDesignPreset = useStore(state => state.applyDesignPreset);
+
   const [saveStatus, setSaveStatus] = useState('');
+
 
   const presets = [
     { name: 'Original', color: '#d48f48' },
@@ -74,13 +83,16 @@ export default function ProfileSettings() {
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '40px' }}>
-        <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Profile Settings</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Manage your personal details and overarching objectives.</p>
+    <div className="premium-container">
+      <div className="premium-header-container">
+        <div className="premium-icon-wrapper">
+          <SettingsIcon />
+        </div>
+        <h1 className="premium-title">Profile Settings</h1>
+        <p className="premium-subtitle">Manage your personal details and overarching objectives.</p>
       </div>
 
-      <div className="notion-block" style={{ padding: '30px' }}>
+      <div className="premium-card" style={{ padding: '30px' }}>
         
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
           
@@ -105,12 +117,18 @@ export default function ProfileSettings() {
               <label className="form-label">Education</label>
               <input 
                 name="education"
-                type="text"
+                type="submit"
                 className="notion-input" 
                 value={profile.education || ''}
                 onChange={handleChange}
-                placeholder="e.g. BSc Computer Science"
+                option="e.g. BSc Computer Science"
               />
+              <option value="Matura"></option>
+              <option value="Bachelor"></option>
+              <option value="Master"></option>
+              <option value="Doktor"></option>
+
+  
             </div>
 
             <div className="form-group">
@@ -585,8 +603,10 @@ export default function ProfileSettings() {
               }}>
               Clear UI Cache
             </button>
+            
             <button 
               onClick={handleReset}
+              
               style={{ 
                 background: 'rgba(255,50,50,0.1)', 
                 color: 'var(--red-text)', 
@@ -597,7 +617,7 @@ export default function ProfileSettings() {
                 fontWeight: 600,
                 fontSize: '0.8rem'
               }}>
-              Factory Reset OS
+              Factory Reset
             </button>
           </div>
         </div>

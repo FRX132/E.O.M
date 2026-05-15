@@ -1,0 +1,133 @@
+/* Premium Layout CSS */
+/* Provides standard layout wrappers, headers, and cards mimicking TripMode */
+
+@keyframes bodyFadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Base Container */
+.premium-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+/* Header Section */
+.premium-header-container {
+  text-align: center;
+  margin-bottom: 40px;
+  animation: bodyFadeIn 0.5s ease-out;
+}
+
+.premium-icon-wrapper {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(var(--primary-rgb), 0.15);
+  color: var(--primary);
+  margin-bottom: 15px;
+  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.3);
+}
+
+.premium-title {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.premium-subtitle {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+/* Grid Layouts */
+.premium-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Premium Glass Card */
+.premium-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* Inner elements of cards */
+.premium-card-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.premium-card-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Badges */
+.premium-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--bg-input);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* Notes / Description box */
+.premium-notes {
+  margin-top: 5px;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  opacity: 0.85;
+  background: rgba(255,255,255,0.03);
+  padding: 12px;
+  border-radius: 10px;
+  line-height: 1.5;
+}
+
+/* Floating Actions */
+.premium-action-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.premium-action-btn:hover {
+  opacity: 1;
+}
+
+.premium-action-btn.delete {
+  color: var(--red-text);
+}

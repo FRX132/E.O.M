@@ -4,6 +4,13 @@ import { useStore } from '../store';
 const CATEGORIES = ['Dairy & Eggs', 'Fruits', 'Vegetables', 'Meat', 'Snacks', 'Bakery', 'Beverages'];
 const STATUSES = ['In stock', 'Not in stock'];
 
+const FridgeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M4 11h2v-1H4v1zm0-3h2V7H4v1zm0-3h2V4H4v1z"/>
+    <path d="M2.5 0A1.5 1.5 0 0 0 1 1.5v13A1.5 1.5 0 0 0 2.5 16h11a1.5 1.5 0 0 0 1.5-1.5v-13A1.5 1.5 0 0 0 13.5 0h-11zM14 1.5v4.5H2v-4.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5zm0 5.5v7.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V7h12z"/>
+  </svg>
+);
+
 const PILL_COLORS = {
   'In stock': 'green',
   'Not in stock': 'red',
@@ -48,10 +55,13 @@ export default function FridgeStock() {
   const filteredFood = activeTab === 'All' || activeTab.includes('more') ? food : food.filter(f => f.category === activeTab);
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Fridge Stock</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Track what you have and what's running out.<br/>Avoid waste and shop smarter.</p>
+    <div className="premium-container">
+      <div className="premium-header-container">
+        <div className="premium-icon-wrapper">
+          <FridgeIcon />
+        </div>
+        <h1 className="premium-title">Fridge Stock</h1>
+        <p className="premium-subtitle">Track what you have and what's running out.<br/>Avoid waste and shop smarter.</p>
       </div>
 
       <div className="notion-block">

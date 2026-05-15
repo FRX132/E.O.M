@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Overview.css';
+import './Styles/Overview.css';
 import { useStore } from '../store';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { calculateRank, SKILL_DEF } from '../constants';
@@ -235,7 +235,7 @@ export default function Overview({ navigate }) {
         </div>
       </div>
 
-      <div className="notion-block" style={{ marginBottom: '25px' }}>
+      <div className="premium-card" style={{ marginBottom: '25px', padding: 0 }}>
         <div className="notion-tabs" style={{ marginBottom: '0', padding: '12px 20px', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
           <div className="notion-header" style={{ padding: 0, background: 'transparent', border: 'none', color: '#fff' }}>
             <span className="card-icon">📊</span>

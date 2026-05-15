@@ -3,6 +3,12 @@ import { useStore } from '../store';
 import GoalModal from './GoalModal';
 import { SKILL_DEF } from '../constants';
 
+const GoalIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-crosshair" viewBox="0 0 16 16">
+    <path d="M8.5.5a.5.5 0 0 0-1 0v.518A7 7 0 0 0 1.018 7.5H.5a.5.5 0 0 0 0 1h.518A7 7 0 0 0 7.5 14.982v.518a.5.5 0 0 0 1 0v-.518A7 7 0 0 0 14.982 8.5h.518a.5.5 0 0 0 0-1h-.518A7 7 0 0 0 8.5 1.018zm-6.48 7A6 6 0 0 1 7.5 2.02v.48a.5.5 0 0 0 1 0v-.48a6 6 0 0 1 5.48 5.48h-.48a.5.5 0 0 0 0 1h.48a6 6 0 0 1-5.48 5.48v-.48a.5.5 0 0 0-1 0v.48A6 6 0 0 1 2.02 8.5h.48a.5.5 0 0 0 0-1zM8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+  </svg>
+);
+
 export default function GoalPlanner() {
   const goals = useStore(state => state.goals);
   const setGoals = useStore(state => state.setGoals);
@@ -117,10 +123,13 @@ export default function GoalPlanner() {
   );
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Goal Planner</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Turn goals into clear, manageable actions.<br/>Plan what matters weekly, monthly, and yearly.</p>
+    <div className="premium-container">
+      <div className="premium-header-container">
+        <div className="premium-icon-wrapper">
+          <GoalIcon />
+        </div>
+        <h1 className="premium-title">Goal Planner</h1>
+        <p className="premium-subtitle">Turn goals into clear, manageable actions.<br/>Plan what matters weekly, monthly, and yearly.</p>
       </div>
 
       <div className="notion-block">

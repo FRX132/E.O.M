@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './GoalModal.css';
+import './Styles/GoalModal.css';
 
 export default function GoalModal({ isOpen, onClose, onSave, initialColumn }) {
   const [goalData, setGoalData] = useState({

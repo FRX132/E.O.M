@@ -5,6 +5,12 @@ import { useStore } from '../store';
 import dagre from 'dagre';
 import { SKILL_DEF } from '../constants';
 
+const TreeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M8.416.223a.5.5 0 0 0-.832 0l-3 4.5A.5.5 0 0 0 5 5.5h.098L3.076 8.735A.5.5 0 0 0 3.5 9.5h.191l-1.638 3.276a.5.5 0 0 0 .447.724H7V16h2v-2.5h4.5a.5.5 0 0 0 .447-.724L12.31 9.5h.191a.5.5 0 0 0 .424-.765L10.902 5.5H11a.5.5 0 0 0 .416-.777l-3-4.5zM6.437 4.758A1.5 1.5 0 0 0 5 5.5h-.01L8 1.01l3.01 4.49H11a1.5 1.5 0 0 0-1.437-.742l-3.126.5z"/>
+  </svg>
+);
+
 const CATEGORY_COLORS = {
   Core: '#ffffff',
   Health: '#B8B062',
@@ -259,11 +265,14 @@ export default function SkillTree() {
   const gridColor = theme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.1)';
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ textAlign: 'center', marginBottom: '20px', position: 'relative' }}>
-        <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Skill Progression</h1>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px' }}>
-          <p style={{ color: 'var(--text-muted)', margin: 0 }}>Unlock your potential. Prerequisites must be completed first.</p>
+    <div className="premium-container" style={{ maxWidth: '1200px', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="premium-header-container" style={{ position: 'relative' }}>
+        <div className="premium-icon-wrapper">
+          <TreeIcon />
+        </div>
+        <h1 className="premium-title">Skill Progression</h1>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px', marginTop: '8px' }}>
+          <p className="premium-subtitle" style={{ margin: 0 }}>Unlock your potential. Prerequisites must be completed first.</p>
           <button 
             onClick={() => setIsSnapEnabled(!isSnapEnabled)}
             style={{

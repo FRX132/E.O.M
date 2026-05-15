@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../store';
 import { Card, Button, Container } from 'react-bootstrap';
-import './Auth.css';
+import './Styles/Auth.css';
 
 const Auth = () => {
   const profile = useStore((state) => state.profile);

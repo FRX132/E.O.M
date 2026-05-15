@@ -1,55 +1,71 @@
 import React, { useState, useEffect } from 'react';
-import './GoalModal.css';
+import './Styles/GoalModal.css';
 
-const EXERCISE_DATABASE = {
+export const EXERCISE_DATABASE = {
   chest: [
-    { name: 'Bench Press', sets: 3, reps: '8-12' },
-    { name: 'Incline Dumbbell Press', sets: 3, reps: '10-12' },
-    { name: 'Chest Flyes', sets: 3, reps: '12-15' },
-    { name: 'Pushups', sets: 3, reps: 'Until Failure' }
+    { name: 'Bench Press', type: 'Free Weight', sets: 3, reps: '8-12' },
+    { name: 'Incline Dumbbell Press', type: 'Free Weight', sets: 3, reps: '10-12' },
+    { name: 'Chest Flyes', type: 'Free Weight', sets: 3, reps: '12-15' },
+    { name: 'Pushups', type: 'Bodyweight', sets: 3, reps: 'Until Failure' },
+    { name: 'Chest Press Machine', type: 'Machine', sets: 3, reps: '10-12' },
+    { name: 'Pec Deck Machine', type: 'Machine', sets: 3, reps: '12-15' },
+    { name: 'Cable Crossovers', type: 'Cable', sets: 3, reps: '12-15' }
   ],
   'upper-back': [
-    { name: 'Pullups', sets: 3, reps: 'Until Failure' },
-    { name: 'Bent Over Rows', sets: 3, reps: '8-10' },
-    { name: 'Lat Pulldowns', sets: 3, reps: '10-12' }
+    { name: 'Pullups', type: 'Bodyweight', sets: 3, reps: 'Until Failure' },
+    { name: 'Bent Over Rows', type: 'Free Weight', sets: 3, reps: '8-10' },
+    { name: 'Lat Pulldowns', type: 'Cable', sets: 3, reps: '10-12' },
+    { name: 'Seated Cable Row', type: 'Cable', sets: 3, reps: '10-12' },
+    { name: 'T-Bar Row Machine', type: 'Machine', sets: 3, reps: '8-10' }
   ],
   'lower-back': [
-    { name: 'Deadlifts', sets: 3, reps: '5-8' },
-    { name: 'Hyperextensions', sets: 3, reps: '15' }
+    { name: 'Deadlifts', type: 'Free Weight', sets: 3, reps: '5-8' },
+    { name: 'Hyperextensions', type: 'Bodyweight', sets: 3, reps: '15' },
+    { name: 'Back Extension Machine', type: 'Machine', sets: 3, reps: '12-15' }
   ],
   deltoids: [
-    { name: 'Overhead Press', sets: 3, reps: '8-10' },
-    { name: 'Lateral Raises', sets: 3, reps: '15-20' },
-    { name: 'Front Raises', sets: 3, reps: '12-15' },
-    { name: 'Rear Delt Flyes', sets: 3, reps: '12-15' }
+    { name: 'Overhead Press', type: 'Free Weight', sets: 3, reps: '8-10' },
+    { name: 'Lateral Raises', type: 'Free Weight', sets: 3, reps: '15-20' },
+    { name: 'Front Raises', type: 'Free Weight', sets: 3, reps: '12-15' },
+    { name: 'Rear Delt Flyes', type: 'Free Weight', sets: 3, reps: '12-15' },
+    { name: 'Shoulder Press Machine', type: 'Machine', sets: 3, reps: '10-12' },
+    { name: 'Cable Lateral Raises', type: 'Cable', sets: 3, reps: '12-15' }
   ],
   biceps: [
-    { name: 'Barbell Curls', sets: 3, reps: '10-12' },
-    { name: 'Hammer Curls', sets: 3, reps: '12' },
-    { name: 'Preacher Curls', sets: 2, reps: '12-15' }
+    { name: 'Barbell Curls', type: 'Free Weight', sets: 3, reps: '10-12' },
+    { name: 'Hammer Curls', type: 'Free Weight', sets: 3, reps: '12' },
+    { name: 'Preacher Curls', type: 'Free Weight', sets: 2, reps: '12-15' },
+    { name: 'Bicep Curl Machine', type: 'Machine', sets: 3, reps: '10-12' },
+    { name: 'Cable Curls', type: 'Cable', sets: 3, reps: '12-15' }
   ],
   triceps: [
-    { name: 'Skull Crushers', sets: 3, reps: '10-12' },
-    { name: 'Tricep Pushdowns', sets: 3, reps: '12-15' },
-    { name: 'Dips', sets: 3, reps: 'Until Failure' }
+    { name: 'Skull Crushers', type: 'Free Weight', sets: 3, reps: '10-12' },
+    { name: 'Tricep Pushdowns', type: 'Cable', sets: 3, reps: '12-15' },
+    { name: 'Dips', type: 'Bodyweight', sets: 3, reps: 'Until Failure' },
+    { name: 'Tricep Extension Machine', type: 'Machine', sets: 3, reps: '10-12' }
   ],
   abs: [
-    { name: 'Plank', sets: 3, reps: '60s' },
-    { name: 'Leg Raises', sets: 3, reps: '15-20' },
-    { name: 'Crunches', sets: 3, reps: '20' }
+    { name: 'Plank', type: 'Bodyweight', sets: 3, reps: '60s' },
+    { name: 'Leg Raises', type: 'Bodyweight', sets: 3, reps: '15-20' },
+    { name: 'Crunches', type: 'Bodyweight', sets: 3, reps: '20' },
+    { name: 'Ab Crunch Machine', type: 'Machine', sets: 3, reps: '15-20' },
+    { name: 'Cable Crunches', type: 'Cable', sets: 3, reps: '15-20' }
   ],
   quadriceps: [
-    { name: 'Squats', sets: 3, reps: '8-10' },
-    { name: 'Leg Press', sets: 3, reps: '10-12' },
-    { name: 'Leg Extensions', sets: 3, reps: '15' }
+    { name: 'Squats', type: 'Free Weight', sets: 3, reps: '8-10' },
+    { name: 'Leg Press', type: 'Machine', sets: 3, reps: '10-12' },
+    { name: 'Leg Extensions', type: 'Machine', sets: 3, reps: '15' },
+    { name: 'Hack Squat Machine', type: 'Machine', sets: 3, reps: '8-10' }
   ],
   hamstring: [
-    { name: 'Stiff Leg Deadlifts', sets: 3, reps: '10-12' },
-    { name: 'Leg Curls', sets: 3, reps: '12-15' }
+    { name: 'Stiff Leg Deadlifts', type: 'Free Weight', sets: 3, reps: '10-12' },
+    { name: 'Seated Leg Curls', type: 'Machine', sets: 3, reps: '12-15' },
+    { name: 'Lying Leg Curls', type: 'Machine', sets: 3, reps: '10-12' }
   ],
   calves: [
-    { name: 'Standing Calf Raises', sets: 4, reps: '15-20' },
-    { name: 'Seated Calf Raises', sets: 3, reps: '15-20' }
+    { name: 'Standing Calf Raises', type: 'Free Weight', sets: 4, reps: '15-20' },
+    { name: 'Seated Calf Raise Machine', type: 'Machine', sets: 3, reps: '15-20' },
+    { name: 'Calf Press on Leg Press Machine', type: 'Machine', sets: 3, reps: '15-20' }
   ]
 };
 
@@ -125,7 +141,20 @@ export default function WorkoutModal({ isOpen, onClose, onSave, selectedMuscle }
                   border: '1px solid rgba(255,255,255,0.05)'
                 }}>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{ex.name}</div>
+                    <div style={{ fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {ex.name}
+                      {ex.type && (
+                        <span style={{ 
+                          fontSize: '0.65rem', 
+                          padding: '2px 6px', 
+                          borderRadius: '4px', 
+                          background: 'rgba(var(--primary-rgb), 0.2)', 
+                          color: 'var(--primary)' 
+                        }}>
+                          {ex.type}
+                        </span>
+                      )}
+                    </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{ex.sets} Sets × {ex.reps} Reps</div>
                   </div>
                   <input 

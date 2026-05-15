@@ -58,6 +58,7 @@ const EMPTY_STATE = {
   movies: [],
   workouts: [],
   languages: [],
+  trips: [], // Added for Trip Mode
   skills: ['core'], // Core skill is unlocked by default!
   isAuthenticated: false,
   theme: 'dark',
@@ -72,7 +73,12 @@ const EMPTY_STATE = {
   },
   financeSettings: {
     categories: ['Utilities', 'Development', 'Home', 'Investment', 'Food', 'Entertainment', 'Health', 'Transport'],
-    monthlyBudget: 2000
+    limits: {
+      daily: 50,
+      weekly: 350,
+      monthly: 2000,
+      yearly: 24000
+    }
   }
 };
 
@@ -91,6 +97,7 @@ const initialState = {
   movies: migrateLegacyData('os_movies', EMPTY_STATE.movies),
   workouts: migrateLegacyData('os_workouts', EMPTY_STATE.workouts),
   languages: migrateLegacyData('os_languages', EMPTY_STATE.languages),
+  trips: migrateLegacyData('os_trips', EMPTY_STATE.trips), // Added for Trip Mode
   isAuthenticated: migrateLegacyData('os_is_authenticated', false),
   theme: migrateLegacyData('os_theme', EMPTY_STATE.theme),
   accentColor: migrateLegacyData('os_accent_color', EMPTY_STATE.accentColor),
@@ -116,6 +123,7 @@ export const useStore = create(
       setMovies: (updater) => set((state) => ({ movies: typeof updater === 'function' ? updater(state.movies) : updater })),
       setWorkouts: (updater) => set((state) => ({ workouts: typeof updater === 'function' ? updater(state.workouts) : updater })),
       setLanguages: (updater) => set((state) => ({ languages: typeof updater === 'function' ? updater(state.languages) : updater })),
+      setTrips: (updater) => set((state) => ({ trips: typeof updater === 'function' ? updater(state.trips) : updater })),
       toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
       setAccentColor: (color) => set({ accentColor: color }),
       setDesignSettings: (newSettings) => set((state) => ({ 
@@ -174,7 +182,6 @@ export const useStore = create(
         skills: state.skills.includes(skillId) ? state.skills : [...state.skills, skillId]
       })),
       
-      // Bug Fix: Centralized sync logic to avoid infinite loops in React components
       syncHabits: (skillDefs) => set((state) => {
         let needsUpdate = false;
         let updatedHabits = [...state.habits];
