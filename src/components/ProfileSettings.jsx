@@ -82,6 +82,63 @@ export default function ProfileSettings() {
     }
   };
 
+  const handleExport = async () => {
+    const state = useStore.getState();
+    const dataStr = JSON.stringify(state, null, 2);
+    
+    if (window.electronAPI && window.electronAPI.saveBackup) {
+      const success = await window.electronAPI.saveBackup(dataStr);
+      if (success) alert('Backup saved successfully!');
+    } else {
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `life_os_backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  const handleImport = async (e) => {
+    if (window.electronAPI && window.electronAPI.loadBackup) {
+      const dataStr = await window.electronAPI.loadBackup();
+      if (dataStr) {
+        try {
+          const data = JSON.parse(dataStr);
+          if (data && data.profile) {
+            useStore.setState(data);
+            alert('Data imported successfully!');
+          } else {
+            alert('Invalid backup file structure!');
+          }
+        } catch (err) {
+          alert('Error reading backup file!');
+        }
+      }
+      return;
+    }
+
+    const file = e.target?.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (data && data.profile) {
+          useStore.setState(data);
+          alert('Data imported successfully!');
+        } else {
+          alert('Invalid backup file structure!');
+        }
+      } catch (err) {
+        alert('Error reading backup file!');
+      }
+    };
+    reader.readAsText(file);
+    if (e.target) e.target.value = null;
+  };
+
   return (
     <div className="premium-container">
       <div className="premium-header-container">
@@ -620,6 +677,61 @@ export default function ProfileSettings() {
               Factory Reset
             </button>
           </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: '15px', gap: '10px' }}>
+          <button 
+            onClick={handleExport}
+            style={{ 
+              background: 'rgba(50,200,100,0.1)', 
+              color: 'var(--green-text, #22c55e)', 
+              border: '1px solid var(--green-text, #22c55e)', 
+              padding: '8px 16px', 
+              borderRadius: '6px', 
+              cursor: 'pointer', 
+              fontWeight: 600,
+              fontSize: '0.8rem'
+            }}>
+            📥 Export Backup
+          </button>
+          {window.electronAPI ? (
+            <button 
+              onClick={handleImport}
+              style={{ 
+                background: 'rgba(50,200,100,0.1)', 
+                color: 'var(--green-text, #22c55e)', 
+                border: '1px solid var(--green-text, #22c55e)', 
+                padding: '8px 16px', 
+                borderRadius: '6px', 
+                cursor: 'pointer', 
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                margin: 0
+              }}>
+              📤 Import Backup
+            </button>
+          ) : (
+            <label 
+              style={{ 
+                background: 'rgba(50,200,100,0.1)', 
+                color: 'var(--green-text, #22c55e)', 
+                border: '1px solid var(--green-text, #22c55e)', 
+                padding: '8px 16px', 
+                borderRadius: '6px', 
+                cursor: 'pointer', 
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                margin: 0
+              }}>
+              📤 Import Backup
+              <input 
+                type="file" 
+                accept=".json" 
+                onChange={handleImport} 
+                style={{ display: 'none' }}
+              />
+            </label>
+          )}
         </div>
 
       </div>

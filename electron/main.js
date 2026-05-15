@@ -1,4 +1,5 @@
-import { app, BrowserWindow, globalShortcut, dialog } from 'electron';
+import { app, BrowserWindow, globalShortcut, dialog, ipcMain } from 'electron';
+import fs from 'fs';
 import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -46,8 +47,31 @@ function createWindow() {
 app.whenReady().then(() => {
   
   // Set up native IPC bindings before creating the window
+  ipcMain.handle('save-backup', async (event, dataStr) => {
+    const { filePath } = await dialog.showSaveDialog({
+      title: 'Save Backup',
+      defaultPath: `life_os_backup_${new Date().toISOString().split('T')[0]}.json`,
+      filters: [{ name: 'JSON Files', extensions: ['json'] }]
+    });
+    if (filePath) {
+      fs.writeFileSync(filePath, dataStr, 'utf-8');
+      return true;
+    }
+    return false;
+  });
 
-
+  ipcMain.handle('load-backup', async () => {
+    const { filePaths } = await dialog.showOpenDialog({
+      title: 'Load Backup',
+      properties: ['openFile'],
+      filters: [{ name: 'JSON Files', extensions: ['json'] }]
+    });
+    if (filePaths && filePaths.length > 0) {
+      const dataStr = fs.readFileSync(filePaths[0], 'utf-8');
+      return dataStr;
+    }
+    return null;
+  });
   createWindow();
 
   // ----- Auto-Updater Logic -----

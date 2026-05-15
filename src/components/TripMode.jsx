@@ -126,7 +126,7 @@ export default function TripMode() {
           <Globe
             width={globeWidth}
             height={450}
-            globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
+            globeImageUrl="https://unpkg.com/three-globe/example/img/earth-dark.jpg"
             backgroundColor="rgba(0,0,0,0)"
             polygonsData={countries.features}
             polygonAltitude={d => (isVisited(d) ? 0.04 : 0.01)}
