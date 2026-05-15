@@ -1,3 +1,4 @@
+// Ranking System
 export const RANK_TIERS = [
   { rank: 'Z', minXp: 0 },
   { rank: 'W', minXp: 20000 },

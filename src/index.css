@@ -6,17 +6,17 @@
   --bg-header: #422918;
   --border-color: #333333;
   --border-light: #2a2a2a;
-  
+
   --bg-card-alt: rgba(255, 255, 255, 0.03);
-  
+
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7);
   --shadow-float: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
-  
+
   --text-main: #f0f0f0;
   --text-muted: #888888;
-  
+
   --primary: #d48f48;
   --blue-bg: #1e3a5f;
   --blue-text: #66b3ff;
@@ -37,7 +37,7 @@
   --font-mono: 'JetBrains Mono', monospace;
   --font-roboto: 'Roboto', sans-serif;
   --transition-fast: 0.15s ease;
-  
+
   /* Bootstrap Overrides */
   --bs-body-color: var(--text-main);
   --bs-heading-color: var(--text-main);
@@ -52,9 +52,9 @@
   --bg-header: #f8fafc;
   --border-color: #f1f5f9;
   --border-light: #f8fafc;
-  
+
   --bg-card-alt: rgba(0, 0, 0, 0.02);
-  
+
   --text-main: #1a1a1b;
   --text-muted: #737373;
 
@@ -72,12 +72,12 @@
   --purple-bg: #fbf9ff;
   --purple-text: #6f42c1;
   --header-text: #24292e;
-  
+
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
   --shadow-float: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.01);
-  
+
   /* Bootstrap Overrides */
   --bs-body-color: var(--text-main);
   --bs-heading-color: var(--text-main);
@@ -86,12 +86,14 @@
   --bs-link-hover-color: var(--blue-text);
 }
 
+/* All */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* Background */
 body {
   font-family: var(--font-main);
   background-color: var(--bg-main);
@@ -100,10 +102,17 @@ body {
   min-height: 100vh;
 }
 
-h1, h2, h3, h4, h5, h6 {
+/* Header */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--text-main);
 }
 
+/* Buttons */
 button {
   cursor: pointer;
   font-family: inherit;
@@ -123,10 +132,12 @@ button {
   backdrop-filter: blur(var(--glass-blur));
 }
 
+/* Dark mode */
 :root[data-theme="dark"] .notion-block {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
+/* Header */
 .notion-header {
   background: var(--bg-header);
   padding: 12px 20px;
@@ -138,6 +149,7 @@ button {
   border-bottom: 1px solid var(--border-color);
 }
 
+/* Tabs */
 .notion-tabs {
   display: flex;
   gap: 20px;
@@ -147,18 +159,21 @@ button {
   background: var(--bg-card);
 }
 
+/* Light mode */
 :root[data-theme="light"] .notion-tabs {
   background: linear-gradient(135deg, #1a1a1b 0%, #000 100%);
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
 }
 
+/* Light mode tabs */
 :root[data-theme="light"] .notion-tabs {
   background: linear-gradient(135deg, #1a1a1b 0%, #000 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 0px; 
+  margin-bottom: 0px;
 }
 
+/* Light mode tabs */
 :root[data-theme="light"] .notion-tab {
   color: rgba(255, 255, 255, 0.5);
   font-weight: 600;
@@ -166,11 +181,13 @@ button {
   letter-spacing: 0.5px;
 }
 
+/* Light mode tabs active */
 :root[data-theme="light"] .notion-tab.active {
   color: #fff;
   border-bottom: 2px solid #fff;
 }
 
+/*Tabs */
 .notion-tab {
   padding: 12px 20px;
   color: var(--text-muted);
@@ -181,16 +198,19 @@ button {
   cursor: pointer;
 }
 
+/* Tabs active */
 .notion-tab.active {
   color: var(--primary);
   border-bottom: 2px solid var(--primary);
 }
 
+/* Table */
 .notion-table {
   width: 100%;
   border-collapse: collapse;
 }
 
+/* Table header */
 .notion-table th {
   text-align: left;
   padding: 10px 20px;
@@ -200,16 +220,23 @@ button {
   border-bottom: 1px solid var(--border-light);
 }
 
+/* Table cells */
 .notion-table td {
   padding: 12px 20px;
   font-size: 0.9rem;
   border-bottom: 1px solid var(--border-light);
 }
 
+/* Table row hover */
 .notion-table tr:hover td {
   background: var(--bg-card-alt);
 }
 
+.notion-table tr:hover td {
+  background: var(--bg-card-alt);
+}
+
+/* Pills */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -219,30 +246,65 @@ button {
   font-weight: 600;
 }
 
-.pill.green { background: var(--green-bg); color: var(--green-text); }
-.pill.red { background: var(--red-bg); color: var(--red-text); }
-.pill.blue { background: var(--blue-bg); color: var(--blue-text); }
-.pill.orange { background: var(--orange-bg); color: var(--orange-text); }
-.pill.yellow { background: var(--yellow-bg); color: var(--yellow-text); }
-.pill.purple { background: var(--purple-bg); color: var(--purple-text); }
+/* Pills colors */
+.pill.green {
+  background: var(--green-bg);
+  color: var(--green-text);
+}
+
+/* Red pill */
+.pill.red {
+  background: var(--red-bg);
+  color: var(--red-text);
+}
+
+/* Blue pill */
+.pill.blue {
+  background: var(--blue-bg);
+  color: var(--blue-text);
+}
+
+/* Orange pill */
+.pill.orange {
+  background: var(--orange-bg);
+  color: var(--orange-text);
+}
+
+/* Yellow pill */
+.pill.yellow {
+  background: var(--yellow-bg);
+  color: var(--yellow-text);
+}
+
+.pill.purple {
+  background: var(--purple-bg);
+  color: var(--purple-text);
+}
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
+
+/* Scrollbar track */
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* Scrollbar thumb */
 ::-webkit-scrollbar-thumb {
   background: var(--border-color);
   border-radius: 4px;
 }
+
+/* Scrollbar thumb hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #444;
 }
 
 /* Form Styles */
-.notion-input, .notion-textarea {
+.notion-input,
+.notion-textarea {
   width: 100%;
   padding: 10px 14px;
   background: var(--bg-card-alt);
@@ -256,16 +318,20 @@ button {
   backdrop-filter: blur(var(--glass-blur));
 }
 
-.notion-input:focus, .notion-textarea:focus {
+/* Input focus */
+.notion-input:focus,
+.notion-textarea:focus {
   border-color: var(--primary);
   background: rgba(255, 255, 255, 0.05);
 }
 
+/* Textarea */
 .notion-textarea {
   resize: vertical;
   min-height: 80px;
 }
 
+/* Button */
 .notion-button {
   padding: 10px 20px;
   background: var(--blue-bg);
@@ -281,10 +347,12 @@ button {
   opacity: 0.8;
 }
 
+/* Form group */
 .form-group {
   margin-bottom: 20px;
 }
 
+/* Form label */
 .form-label {
   display: block;
   font-size: 0.85rem;
@@ -306,6 +374,7 @@ button {
   backdrop-filter: blur(10px);
 }
 
+/* ReactFlow controls button */
 .react-flow__controls-button {
   background: transparent !important;
   border: none !important;
@@ -320,18 +389,21 @@ button {
   fill: var(--text-main) !important;
 }
 
+/* ReactFlow controls button hover */
 .react-flow__controls-button:hover {
   background: var(--bg-card-alt) !important;
   color: var(--primary) !important;
   fill: var(--primary) !important;
 }
 
+/* ReactFlow controls button svg */
 .react-flow__controls-button svg {
   width: 16px !important;
   height: 16px !important;
   fill: currentColor !important;
 }
 
+/* ReactFlow background */
 .react-flow__background {
   opacity: 0.8;
 }

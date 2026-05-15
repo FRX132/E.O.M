@@ -24,11 +24,31 @@ export default function Overview({ navigate }) {
 
   const DEFAULT_HERO = "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=2000";
 
-  const handleUpdateCover = () => {
-    const url = prompt('Enter Image or GIF URL for cover:', profile.heroImage || DEFAULT_HERO);
-    if (url !== null) {
-      setProfile({ heroImage: url });
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File is too large! Please select an image under 5MB.");
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64Content = reader.result;
+      
+      const currentData = localStorage.getItem('life_os_storage') || '';
+      const estimatedTotalSize = currentData.length + base64Content.length;
+      
+      if (estimatedTotalSize > 4 * 1024 * 1024) {
+        alert("⚠️ STORAGE LIMIT REACHED: This image is too large or your database is too full. Please use a smaller image to ensure your data can be saved.");
+        return;
+      }
+
+      setProfile({ heroImage: base64Content });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = null; // reset input
   };
 
   const changeMonth = (offset) => {
@@ -185,13 +205,19 @@ export default function Overview({ navigate }) {
         <div className="hero-cover">
           <img src={profile.heroImage || DEFAULT_HERO} alt="Cover" />
           <div className="hero-overlay"></div>
-          <button className="change-cover-btn" onClick={handleUpdateCover} style={{ opacity: 0.8 }}>
+          <label className="change-cover-btn" style={{ opacity: 0.8, cursor: 'pointer' }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-camera" viewBox="0 0 16 16">
               <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4z"/>
               <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
             </svg>
             Change Cover
-          </button>
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleImageUpload} 
+              style={{ display: 'none' }}
+            />
+          </label>
         </div>
         <div className="hero-content">
           <div className="hero-user">

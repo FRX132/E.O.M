@@ -230,6 +230,18 @@ export default function ProfileSettings() {
                     />
                   </label>
                 </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Cover Image (Overview):</span>
+                  <label className="notion-button secondary" style={{ margin: 0, padding: '4px 12px', fontSize: '0.75rem', cursor: 'pointer' }}>
+                    Upload
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={(e) => handleImageUpload(e, 'heroImage')} 
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                </div>
               </div>
             </div>
           </div>
