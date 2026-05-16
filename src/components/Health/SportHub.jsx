@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useStore } from '../store';
+import { useStore } from '../../store';
 import MuscleMap from './MuscleMap';
 import { EXERCISE_DATABASE } from './WorkoutModal';
 import WorkoutModal from './WorkoutModal';

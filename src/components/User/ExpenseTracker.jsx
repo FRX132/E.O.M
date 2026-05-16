@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useStore } from '../store';
+import { useStore } from '../../store';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const WalletIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499L12.136.326zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484L5.562 3zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z"/>
+    <path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499L12.136.326zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484L5.562 3zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z" />
   </svg>
 );
 
@@ -27,7 +27,7 @@ export default function ExpenseTracker() {
   const expenses = useStore(state => state.expenses);
   const assets = useStore(state => state.assets);
   const financeSettings = useStore(state => state.financeSettings);
-  
+
   const setExpenses = useStore(state => state.setExpenses);
   const setAssets = useStore(state => state.setAssets);
   const setFinanceSettings = useStore(state => state.setFinanceSettings);
@@ -36,7 +36,7 @@ export default function ExpenseTracker() {
   const [viewMode, setViewMode] = useState('expenses'); // 'expenses' or 'wallet'
   const [newCatName, setNewCatName] = useState('');
   const [isCatEditorOpen, setIsCatEditorOpen] = useState(false);
-  
+
   const [editingLimit, setEditingLimit] = useState(null);
   const [tempLimit, setTempLimit] = useState('');
 
@@ -103,7 +103,7 @@ export default function ExpenseTracker() {
   const getMonthlyData = () => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const data = months.map(m => ({ name: m, amount: 0 }));
-    
+
     expenses.forEach(exp => {
       const d = new Date(exp.date);
       if (!isNaN(d)) {
@@ -116,7 +116,7 @@ export default function ExpenseTracker() {
 
   const monthlyTotals = getMonthlyData();
   const currentMonthTotal = monthlyTotals[new Date().getMonth()].amount;
-  
+
   const limits = financeSettings.limits || { daily: 50, weekly: 350, monthly: 2000, yearly: 24000 };
   const budgetProgressMonthly = Math.min(100, (currentMonthTotal / limits.monthly) * 100);
   const totalWealth = assets.reduce((sum, a) => sum + (a.amount || 0), 0);
@@ -154,7 +154,7 @@ export default function ExpenseTracker() {
             <h3 style={{ margin: 0, fontSize: '1rem' }}>Adjustable Limits</h3>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Tap value to adjust</span>
           </div>
-          
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
             {['Daily', 'Weekly', 'Monthly', 'Yearly'].map(timeframe => {
               const limit = limits[timeframe.toLowerCase()];
@@ -166,8 +166,8 @@ export default function ExpenseTracker() {
                   {editingLimit === timeframe ? (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <span style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.2rem', marginRight: '4px' }}>€</span>
-                      <input 
-                        type="number" 
+                      <input
+                        type="number"
                         autoFocus
                         value={tempLimit}
                         onChange={e => setTempLimit(e.target.value)}
@@ -185,13 +185,13 @@ export default function ExpenseTracker() {
                           if (e.key === 'Enter') e.target.blur();
                           if (e.key === 'Escape') setEditingLimit(null);
                         }}
-                        style={{ 
-                          background: 'rgba(0,0,0,0.2)', 
-                          border: '1px solid var(--primary)', 
-                          color: 'var(--primary)', 
-                          fontSize: '1.1rem', 
-                          fontWeight: 800, 
-                          width: '100%', 
+                        style={{
+                          background: 'rgba(0,0,0,0.2)',
+                          border: '1px solid var(--primary)',
+                          color: 'var(--primary)',
+                          fontSize: '1.1rem',
+                          fontWeight: 800,
+                          width: '100%',
                           borderRadius: '6px',
                           outline: 'none',
                           padding: '2px 8px'
@@ -199,7 +199,7 @@ export default function ExpenseTracker() {
                       />
                     </div>
                   ) : (
-                    <div 
+                    <div
                       style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)', cursor: 'pointer', display: 'inline-block' }}
                       onClick={() => {
                         setEditingLimit(timeframe);
@@ -223,9 +223,9 @@ export default function ExpenseTracker() {
               </span>
             </div>
             <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
-              <div style={{ 
-                width: `${budgetProgressMonthly}%`, 
-                height: '100%', 
+              <div style={{
+                width: `${budgetProgressMonthly}%`,
+                height: '100%',
                 background: budgetProgressMonthly > 90 ? 'var(--red-text)' : 'var(--primary)',
                 transition: 'width 0.5s ease'
               }} />
@@ -235,20 +235,20 @@ export default function ExpenseTracker() {
 
         {/* Yearly Bar Chart */}
         <div className="notion-block" style={{ padding: '20px', height: '200px', minHeight: '200px', minWidth: 0 }}>
-           <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%">
             <BarChart data={monthlyTotals}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
               <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 10 }} />
-              <ReTooltip 
+              <ReTooltip
                 cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                 contentStyle={{ background: 'rgba(15,15,20,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
                 itemStyle={{ color: 'var(--primary)' }}
               />
               <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
                 {monthlyTotals.map((entry, index) => (
-                  <Cell 
-                    key={`cell-${index}`} 
-                    fill={index === new Date().getMonth() ? 'var(--primary)' : 'rgba(255,255,255,0.1)'} 
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={index === new Date().getMonth() ? 'var(--primary)' : 'rgba(255,255,255,0.1)'}
                   />
                 ))}
               </Bar>
@@ -265,8 +265,8 @@ export default function ExpenseTracker() {
           <button className={`notion-tab ${viewMode === 'wallet' ? 'active' : ''}`} onClick={() => setViewMode('wallet')}>
             💳 Assets & Net Worth
           </button>
-          <button 
-            className={`notion-tab ${isCatEditorOpen ? 'active' : ''}`} 
+          <button
+            className={`notion-tab ${isCatEditorOpen ? 'active' : ''}`}
             onClick={() => setIsCatEditorOpen(!isCatEditorOpen)}
             style={{ marginLeft: 'auto', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '4px 15px' }}
           >
@@ -282,8 +282,8 @@ export default function ExpenseTracker() {
             {financeSettings.categories.map(cat => (
               <span key={cat} className={`pill ${PILL_COLORS[cat] || 'blue'}`} style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingRight: '8px' }}>
                 {cat}
-                <button 
-                  onClick={() => removeCategory(cat)} 
+                <button
+                  onClick={() => removeCategory(cat)}
                   style={{ background: 'none', border: 'none', color: 'inherit', fontWeight: 800, cursor: 'pointer', padding: '0 4px', opacity: 0.5 }}
                 >
                   ×
@@ -292,11 +292,11 @@ export default function ExpenseTracker() {
             ))}
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
-            <input 
-              className="notion-input" 
-              placeholder="New category name..." 
-              value={newCatName} 
-              onChange={e => setNewCatName(e.target.value)} 
+            <input
+              className="notion-input"
+              placeholder="New category name..."
+              value={newCatName}
+              onChange={e => setNewCatName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && addCategory()}
               style={{ maxWidth: '250px' }}
             />
@@ -322,7 +322,7 @@ export default function ExpenseTracker() {
           </div>
 
           <div className="notion-table-wrapper" style={{ overflowX: 'auto', padding: '0 20px 20px', minWidth: 0 }}>
-            <table className="notion-table" style={{ minWidth: '800px' }}>
+            <table className="notion-table" style={{ minWidth: '1000px' }}>
               <thead>
                 <tr>
                   <th style={{ width: '22%' }}>Aa Description</th>
@@ -352,7 +352,7 @@ export default function ExpenseTracker() {
                           type="number"
                           value={expense.amount}
                           onChange={(e) => updateRow(expense.id, 'amount', parseFloat(e.target.value) || 0)}
-                          style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%', outline: 'none', fontWeight: 600 }}
+                          style={{ background: 'transparent', border: 'none', color: 'inherit', width: '80px', outline: 'none', fontWeight: 600 }}
                         />
                       </div>
                     </td>
@@ -374,7 +374,7 @@ export default function ExpenseTracker() {
                       />
                     </td>
                     <td>
-                       <input
+                      <input
                         type="date"
                         value={expense.date}
                         onChange={(e) => updateRow(expense.id, 'date', e.target.value)}
@@ -395,15 +395,15 @@ export default function ExpenseTracker() {
                       </select>
                     </td>
                     <td>
-                       <input
+                      <input
                         type="date"
                         value={expense.dueDate || ''}
                         onChange={(e) => updateRow(expense.id, 'dueDate', e.target.value)}
-                        style={{ 
-                          background: expense.dueDate ? 'rgba(var(--primary-rgb), 0.1)' : 'transparent', 
-                          border: 'none', 
-                          color: expense.dueDate ? 'var(--primary)' : 'var(--text-muted)', 
-                          fontSize: '0.8rem', 
+                        style={{
+                          background: expense.dueDate ? 'rgba(var(--primary-rgb), 0.1)' : 'transparent',
+                          border: 'none',
+                          color: expense.dueDate ? 'var(--primary)' : 'var(--text-muted)',
+                          fontSize: '0.8rem',
                           outline: 'none',
                           borderRadius: '4px',
                           padding: '2px 5px'
@@ -427,94 +427,94 @@ export default function ExpenseTracker() {
           </div>
         </div>
       ) : (
-          <div className="notion-block scale-in">
-             <div className="notion-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>💳 Capital Assets</span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>Total: €{totalWealth.toLocaleString()}</span>
-            </div>
-
-            <div style={{ padding: '20px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', marginBottom: '30px' }}>
-                {ASSET_TYPES.map(type => {
-                  const items = assets.filter(a => a.type === type);
-                  const typeTotal = items.reduce((sum, a) => sum + (a.amount || 0), 0);
-                  
-                  return (
-                    <div key={type} className="premium-card">
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>{type} Balance</div>
-                      <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', marginTop: '5px' }}>€{typeTotal.toLocaleString()}</div>
-                      <div style={{ position: 'absolute', top: '15px', right: '15px', opacity: 0.2, fontSize: '1.5rem' }}>
-                        {type === 'Bank' ? '🏛️' : type === 'Cash' ? '💵' : type === 'Stock' ? '📈' : type === 'Crypto' ? '🪙' : type === 'Investment' ? '🏦' : '📦'}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <table className="notion-table">
-                <thead>
-                  <tr>
-                    <th>Aa Asset Name</th>
-                    <th>◘ Type</th>
-                    <th># Value</th>
-                    <th>% Change</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {assets.map((asset) => (
-                    <tr key={asset.id}>
-                      <td>
-                        <input
-                          value={asset.name}
-                          onChange={(e) => updateAsset(asset.id, 'name', e.target.value)}
-                          style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%', outline: 'none' }}
-                        />
-                      </td>
-                      <td>
-                        <select
-                          value={asset.type}
-                          onChange={(e) => updateAsset(asset.id, 'type', e.target.value)}
-                          className={`pill blue`}
-                          style={{ border: 'none', appearance: 'none', outline: 'none' }}
-                        >
-                          {ASSET_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                        </select>
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <span style={{ color: 'var(--text-muted)', marginRight: '4px' }}>€</span>
-                          <input
-                            type="number"
-                            value={asset.amount}
-                            onChange={(e) => updateAsset(asset.id, 'amount', parseFloat(e.target.value) || 0)}
-                            style={{ background: 'transparent', border: 'none', color: 'inherit', maxWidth: '100px', outline: 'none', fontWeight: 600 }}
-                          />
-                        </div>
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <span style={{ 
-                            color: asset.change >= 0 ? 'var(--green-text)' : 'var(--red-text)', 
-                            fontWeight: 800,
-                            fontSize: '0.9rem'
-                          }}>
-                            {asset.change >= 0 ? '+' : ''}{asset.change?.toFixed(1)}%
-                          </span>
-                        </div>
-                      </td>
-                      <td>
-                        <button onClick={() => deleteAsset(asset.id)} style={{ color: 'var(--red-text)', opacity: 0.5, fontSize: '1.2rem' }}>×</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <button onClick={addAsset} style={{ color: 'var(--primary)', fontSize: '0.85rem', padding: '20px 0', width: '100%', textAlign: 'left', borderTop: '1px solid var(--border-color)', marginTop: '10px', fontWeight: 600 }}>
-                + Register New Capital Asset
-              </button>
-            </div>
+        <div className="notion-block scale-in">
+          <div className="notion-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>💳 Capital Assets</span>
+            <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>Total: €{totalWealth.toLocaleString()}</span>
           </div>
+
+          <div style={{ padding: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+              {ASSET_TYPES.map(type => {
+                const items = assets.filter(a => a.type === type);
+                const typeTotal = items.reduce((sum, a) => sum + (a.amount || 0), 0);
+
+                return (
+                  <div key={type} className="premium-card">
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>{type} Balance</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', marginTop: '5px' }}>€{typeTotal.toLocaleString()}</div>
+                    <div style={{ position: 'absolute', top: '15px', right: '15px', opacity: 0.2, fontSize: '1.5rem' }}>
+                      {type === 'Bank' ? '🏛️' : type === 'Cash' ? '💵' : type === 'Stock' ? '📈' : type === 'Crypto' ? '🪙' : type === 'Investment' ? '🏦' : '📦'}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <table className="notion-table">
+              <thead>
+                <tr>
+                  <th>Aa Asset Name</th>
+                  <th>◘ Type</th>
+                  <th># Value</th>
+                  <th>% Change</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {assets.map((asset) => (
+                  <tr key={asset.id}>
+                    <td>
+                      <input
+                        value={asset.name}
+                        onChange={(e) => updateAsset(asset.id, 'name', e.target.value)}
+                        style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%', outline: 'none' }}
+                      />
+                    </td>
+                    <td>
+                      <select
+                        value={asset.type}
+                        onChange={(e) => updateAsset(asset.id, 'type', e.target.value)}
+                        className={`pill blue`}
+                        style={{ border: 'none', appearance: 'none', outline: 'none' }}
+                      >
+                        {ASSET_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                      </select>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <span style={{ color: 'var(--text-muted)', marginRight: '4px' }}>€</span>
+                        <input
+                          type="number"
+                          value={asset.amount}
+                          onChange={(e) => updateAsset(asset.id, 'amount', parseFloat(e.target.value) || 0)}
+                          style={{ background: 'transparent', border: 'none', color: 'inherit', maxWidth: '100px', outline: 'none', fontWeight: 600 }}
+                        />
+                      </div>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{
+                          color: asset.change >= 0 ? 'var(--green-text)' : 'var(--red-text)',
+                          fontWeight: 800,
+                          fontSize: '0.9rem'
+                        }}>
+                          {asset.change >= 0 ? '+' : ''}{asset.change?.toFixed(1)}%
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <button onClick={() => deleteAsset(asset.id)} style={{ color: 'var(--red-text)', opacity: 0.5, fontSize: '1.2rem' }}>×</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button onClick={addAsset} style={{ color: 'var(--primary)', fontSize: '0.85rem', padding: '20px 0', width: '100%', textAlign: 'left', borderTop: '1px solid var(--border-color)', marginTop: '10px', fontWeight: 600 }}>
+              + Register New Capital Asset
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

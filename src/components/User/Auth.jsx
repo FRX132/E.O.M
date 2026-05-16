@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useStore } from '../store';
+import { useStore } from '../../store';
 import { Card, Button, Container } from 'react-bootstrap';
-import './Styles/Auth.css';
+import '../Styles/Auth.css';
 
 const Auth = () => {
   const profile = useStore((state) => state.profile);
@@ -82,7 +82,7 @@ const Auth = () => {
   return (
     <div className="auth-container">
       {/* Theme Toggle Button */}
-      <button 
+      <button
         onClick={toggleTheme}
         style={{
           position: 'absolute', top: '20px', right: '20px',
@@ -97,9 +97,9 @@ const Auth = () => {
 
       {phase === 'welcome' && (
         <Container className="d-flex flex-column justify-content-center align-items-center h-100">
-          <Button 
+          <Button
             variant={theme === 'dark' ? 'light' : 'dark'}
-            size="lg" 
+            size="lg"
             className="px-5 py-3 rounded-pill shadow-lg"
             style={{ fontSize: '1.5rem', fontWeight: 600, background: theme === 'dark' ? 'rgba(255,255,255,0.95)' : 'rgba(0,0,0,1)', color: theme === 'dark' ? '#000' : '#fff', backdropFilter: 'blur(10px)', transition: 'all 0.3s ease' }}
             onClick={() => setPhase('options')}
@@ -114,24 +114,24 @@ const Auth = () => {
           <Card className="auth-card border-0 text-center shadow-lg" style={{ maxWidth: '400px', width: '100%', background: theme === 'dark' ? 'rgba(20, 20, 24, 0.75)' : 'rgba(255, 255, 255, 0.95)' }}>
             <Card.Body className="p-4 d-flex flex-column gap-3">
               <Card.Title as="h2" className="mb-4" style={{ color: 'var(--text-main)' }}>Select Option</Card.Title>
-              <Button 
+              <Button
                 variant={theme === 'dark' ? 'light' : 'dark'}
-                size="lg" 
+                size="lg"
                 onClick={() => { setIsLoginMode(true); setPhase('form'); }}
               >
                 Login
               </Button>
-              <Button 
+              <Button
                 variant={theme === 'dark' ? 'outline-light' : 'outline-dark'}
-                size="lg" 
+                size="lg"
                 onClick={() => { setIsLoginMode(true); setPhase('forgot_shortcut'); }}
               >
                 Forgot Password
               </Button>
               <div className="mt-3">
                 <hr className="border-secondary" />
-                <Button 
-                  variant="link" 
+                <Button
+                  variant="link"
                   className="text-decoration-none"
                   style={{ color: 'var(--text-main)' }}
                   onClick={() => { setIsLoginMode(false); setPhase('form'); }}
@@ -295,9 +295,9 @@ const Auth = () => {
               >
                 {isLoginMode ? 'Register' : 'Sign In'}
               </button>
-              <br/>
-              <button 
-                type="button" 
+              <br />
+              <button
+                type="button"
                 className="auth-switch-btn mt-2"
                 style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 500 }}
                 onClick={() => setPhase('options')}

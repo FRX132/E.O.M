@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useStore } from '../store';
+import { useStore } from '../../store';
 import Globe from 'react-globe.gl';
 
 const GlobeIcon = () => (

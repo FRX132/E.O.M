@@ -61,6 +61,9 @@ const EMPTY_STATE = {
   languages: [],
   trips: [], // Added for Trip Mode
   skills: ['core'], // Core skill is unlocked by default!
+  canvasNodes: null,
+  canvasEdges: null,
+  aiKnowledgeBase: [],
   isAuthenticated: false,
   autoBackupPath: null,
   theme: 'dark',
@@ -100,6 +103,9 @@ const initialState = {
   workouts: migrateLegacyData('os_workouts', EMPTY_STATE.workouts),
   languages: migrateLegacyData('os_languages', EMPTY_STATE.languages),
   trips: migrateLegacyData('os_trips', EMPTY_STATE.trips), // Added for Trip Mode
+  canvasNodes: migrateLegacyData('os_canvas_nodes', EMPTY_STATE.canvasNodes),
+  canvasEdges: migrateLegacyData('os_canvas_edges', EMPTY_STATE.canvasEdges),
+  aiKnowledgeBase: migrateLegacyData('os_knowledge_base', EMPTY_STATE.aiKnowledgeBase),
   isAuthenticated: migrateLegacyData('os_is_authenticated', false),
   autoBackupPath: migrateLegacyData('os_auto_backup_path', EMPTY_STATE.autoBackupPath),
   theme: migrateLegacyData('os_theme', EMPTY_STATE.theme),
@@ -127,6 +133,10 @@ export const useStore = create(
       setWorkouts: (updater) => set((state) => ({ workouts: typeof updater === 'function' ? updater(state.workouts) : updater })),
       setLanguages: (updater) => set((state) => ({ languages: typeof updater === 'function' ? updater(state.languages) : updater })),
       setTrips: (updater) => set((state) => ({ trips: typeof updater === 'function' ? updater(state.trips) : updater })),
+      setCanvasNodes: (updater) => set((state) => ({ canvasNodes: typeof updater === 'function' ? updater(state.canvasNodes) : updater })),
+      setCanvasEdges: (updater) => set((state) => ({ canvasEdges: typeof updater === 'function' ? updater(state.canvasEdges) : updater })),
+      addKnowledgeDocument: (doc) => set((state) => ({ aiKnowledgeBase: [...(state.aiKnowledgeBase || []), doc] })),
+      deleteKnowledgeDocument: (id) => set((state) => ({ aiKnowledgeBase: (state.aiKnowledgeBase || []).filter(d => d.id !== id) })),
       setAutoBackupPath: (path) => set({ autoBackupPath: path }),
       toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
       setAccentColor: (color) => set({ accentColor: color }),

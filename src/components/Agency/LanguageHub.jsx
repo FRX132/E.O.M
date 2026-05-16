@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useStore } from '../store';
+import { useStore } from '../../store';
 import LanguageModal from './LanguageModal';
 
 const LanguageIcon = () => (

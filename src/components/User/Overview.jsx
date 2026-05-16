@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import './Styles/Overview.css';
-import { useStore } from '../store';
+import '../Styles/Overview.css';
+import { useStore } from '../../store';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { calculateRank, SKILL_DEF } from '../constants';
-import { LIFE_RULES } from '../data/lifeRules';
+import { calculateRank, SKILL_DEF } from '../../constants';
+import { LIFE_RULES } from '../../data/lifeRules';
 
 export default function Overview({ navigate }) {
   const habits = useStore(state => state.habits) || [];
@@ -22,7 +22,7 @@ export default function Overview({ navigate }) {
   const [clockStyle, setClockStyle] = useState(0); // 0: 24h with sec, 1: 24h minimal, 2: 12h AM/PM
   const [calendarStyle, setCalendarStyle] = useState(0); // 0: Month Grid, 1: Weekly Strip
   const [overviewLayout, setOverviewLayout] = useState(0); // 0: Default, 1: Minimal, 2: Glass, 3: Brutal
-  
+
   const LAYOUT_NAMES = ["Default Premium", "Minimal Clean", "Glassmorphism", "Neo-Brutalism"];
 
   const rankStats = calculateRank(profile.xp || 0);
@@ -41,10 +41,10 @@ export default function Overview({ navigate }) {
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64Content = reader.result;
-      
+
       const currentData = localStorage.getItem('life_os_storage') || '';
       const estimatedTotalSize = currentData.length + base64Content.length;
-      
+
       if (estimatedTotalSize > 4 * 1024 * 1024) {
         alert("⚠️ STORAGE LIMIT REACHED: This image is too large or your database is too full. Please use a smaller image to ensure your data can be saved.");
         return;
@@ -70,24 +70,24 @@ export default function Overview({ navigate }) {
   const completedToday = todayHabitsList.filter(h => h.done).length;
   const habitXpEarned = completedToday * 50;
   const habitXpMax = todayHabitsList.length * 50;
-  const habitProgress = todayHabitsList.length > 0 
-    ? Math.round((completedToday / todayHabitsList.length) * 100) 
+  const habitProgress = todayHabitsList.length > 0
+    ? Math.round((completedToday / todayHabitsList.length) * 100)
     : 0;
 
   // Calculate monthly expenses
   const monthlyTotal = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
-  
+
   // Calculate total wealth / assets
   const totalWealth = assets.reduce((sum, a) => sum + (a.amount || 0), 0);
   const netWorth = totalWealth - monthlyTotal; // Simplified net worth logic
 
   // Progress metrics for the 5 databases
-  const goalProg = goals.week.length > 0 ? Math.round((goals.week.filter(g=>g.done).length / goals.week.length) * 100) : 0;
-  const fridgeProg = fridge.length > 0 ? Math.round((fridge.filter(f=>f.status !== 'Not in stock').length / fridge.length) * 100) : 0;
+  const goalProg = goals.week.length > 0 ? Math.round((goals.week.filter(g => g.done).length / goals.week.length) * 100) : 0;
+  const fridgeProg = fridge.length > 0 ? Math.round((fridge.filter(f => f.status !== 'Not in stock').length / fridge.length) * 100) : 0;
   const expenseProg = totalWealth > 0 ? Math.max(0, Math.round(100 - (monthlyTotal / totalWealth) * 100)) : 100;
-  const targetProg = targets.length > 0 ? Math.round((targets.filter(t=>t.status === 'Completed').length / targets.length) * 100) : 0;
-  const bookProg = books.length > 0 ? Math.round((books.filter(b=>b.status === 'Finished').length / books.length) * 100) : 0;
-  const movieProg = movies.length > 0 ? Math.round((movies.filter(m=>m.status === 'Watched').length / movies.length) * 100) : 0;
+  const targetProg = targets.length > 0 ? Math.round((targets.filter(t => t.status === 'Completed').length / targets.length) * 100) : 0;
+  const bookProg = books.length > 0 ? Math.round((books.filter(b => b.status === 'Finished').length / books.length) * 100) : 0;
+  const movieProg = movies.length > 0 ? Math.round((movies.filter(m => m.status === 'Watched').length / movies.length) * 100) : 0;
 
   const progressItems = [
     { label: 'Expense Tracker', pct: expenseProg, color: 'var(--blue-text)' },
@@ -134,7 +134,7 @@ export default function Overview({ navigate }) {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return diffDays >= 0 && diffDays <= 7;
     })
-    .sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate));
+    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
   // Get low fridge items
   const lowFridge = fridge.filter(f => f.status === 'Not in stock').slice(0, 3);
@@ -143,7 +143,7 @@ export default function Overview({ navigate }) {
   const year = time.getFullYear();
   const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
   const totalDays = isLeapYear ? 366 : 365;
-  
+
   const start = new Date(year, 0, 0);
   const diff = time - start;
   const oneDay = 1000 * 60 * 60 * 24;
@@ -157,7 +157,7 @@ export default function Overview({ navigate }) {
   const seconds = time.getSeconds().toString().padStart(2, '0');
   const hours12 = (time.getHours() % 12 || 12).toString().padStart(2, '0');
   const ampm = time.getHours() >= 12 ? 'PM' : 'AM';
-  
+
   const displayHours = clockStyle === 2 ? hours12 : hours;
 
   const dateStr = time.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -173,7 +173,7 @@ export default function Overview({ navigate }) {
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
     const gearButton = (
-      <button 
+      <button
         onClick={() => setCalendarStyle(s => (s + 1) % 2)}
         style={{ position: 'absolute', top: '-15px', right: '-20px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '5px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s, background 0.2s', zIndex: 10 }}
         onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-main)'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
@@ -192,15 +192,15 @@ export default function Overview({ navigate }) {
       const currentDay = today.getDay() === 0 ? 6 : today.getDay() - 1; // Mon=0, Sun=6
       const monday = new Date(today);
       monday.setDate(today.getDate() - currentDay);
-      
+
       const days = [];
       const weekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
-      
+
       for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
         const isToday = d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
-        
+
         days.push(
           <div key={i} className={`cal-day ${isToday ? 'today' : ''}`} style={{ display: 'flex', flexDirection: 'column', padding: '10px 5px', gap: '5px', aspectRatio: 'auto', height: '100%', justifyContent: 'center' }}>
             <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>{weekdays[i]}</span>
@@ -263,19 +263,19 @@ export default function Overview({ navigate }) {
 
   return (
     <div className={`overview-container layout-theme-${overviewLayout}`}>
-      
+
       {/* Floating Theme Toggle */}
       <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 999 }}>
-        <button 
+        <button
           onClick={() => setOverviewLayout(s => (s + 1) % 4)}
-          style={{ 
-            background: 'var(--primary)', 
-            color: '#fff', 
-            border: 'none', 
-            padding: '12px 20px', 
-            borderRadius: '30px', 
-            boxShadow: '0 10px 25px rgba(0,0,0,0.4)', 
-            cursor: 'pointer', 
+          style={{
+            background: 'var(--primary)',
+            color: '#fff',
+            border: 'none',
+            padding: '12px 20px',
+            borderRadius: '30px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+            cursor: 'pointer',
             fontWeight: 700,
             display: 'flex',
             alignItems: 'center',
@@ -295,14 +295,14 @@ export default function Overview({ navigate }) {
           <div className="hero-overlay"></div>
           <label className="change-cover-btn" style={{ opacity: 0.8, cursor: 'pointer' }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-camera" viewBox="0 0 16 16">
-              <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4z"/>
-              <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
+              <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4z" />
+              <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0" />
             </svg>
             Change Cover
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handleImageUpload} 
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
               style={{ display: 'none' }}
             />
           </label>
@@ -325,7 +325,7 @@ export default function Overview({ navigate }) {
               </p>
             </div>
           </div>
-          
+
           <div className="hero-stats">
             <div className="rank-badge-container">
               <div className="rank-label">CURRENT RANK</div>
@@ -372,8 +372,8 @@ export default function Overview({ navigate }) {
         <div className="year-progress-container" style={{ marginTop: '20px', padding: '10px' }}>
           <div className="dots-grid">
             {dots.map(d => (
-              <div 
-                key={d} 
+              <div
+                key={d}
                 className={`dot ${d <= dayOfYear ? 'active' : ''}`}
                 title={`Day ${d}`}
               />
@@ -384,7 +384,7 @@ export default function Overview({ navigate }) {
 
       <div className="time-date-row">
         <div className="overview-card clock-card" style={{ position: 'relative' }}>
-          <button 
+          <button
             onClick={() => setClockStyle(s => (s + 1) % 3)}
             style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', transition: 'color 0.2s, background 0.2s' }}
             onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-main)'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
@@ -416,7 +416,7 @@ export default function Overview({ navigate }) {
           <div className="card-header">
             <span className="card-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-list" viewBox="0 0 16 16">
-                <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
               </svg>
             </span>
             <h3>Daily Habits</h3>
@@ -443,7 +443,7 @@ export default function Overview({ navigate }) {
           <div className="card-header">
             <span className="card-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-wallet" viewBox="0 0 16 16">
-                <path d="M0 3a2 2 0 0 1 2-2h13.5a.5.5 0 0 1 0 1H15v2a1 1 0 0 1 1 1v8.5a1.5 1.5 0 0 1-1.5 1.5h-12A2.5 2.5 0 0 1 0 12.5V3zm1 1.732V12.5A1.5 1.5 0 0 0 2.5 14h12a.5.5 0 0 0 .5-.5V5H2a1.99 1.99 0 0 1-1-.268zM1 3a1 1 0 0 0 1 1h12V2H2a1 1 0 0 0-1 1z"/>
+                <path d="M0 3a2 2 0 0 1 2-2h13.5a.5.5 0 0 1 0 1H15v2a1 1 0 0 1 1 1v8.5a1.5 1.5 0 0 1-1.5 1.5h-12A2.5 2.5 0 0 1 0 12.5V3zm1 1.732V12.5A1.5 1.5 0 0 0 2.5 14h12a.5.5 0 0 0 .5-.5V5H2a1.99 1.99 0 0 1-1-.268zM1 3a1 1 0 0 0 1 1h12V2H2a1 1 0 0 0-1 1z" />
               </svg>
             </span>
             <h3>Finances & Wallet</h3>
@@ -485,16 +485,16 @@ export default function Overview({ navigate }) {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value) => `€${value.toLocaleString()}`}
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(20,20,20,0.8)', 
-                        border: '1px solid rgba(255,255,255,0.1)', 
-                        borderRadius: '8px', 
+                      contentStyle={{
+                        backgroundColor: 'rgba(20,20,20,0.8)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '8px',
                         color: '#fff',
                         backdropFilter: 'blur(10px)'
-                      }} 
-                      itemStyle={{ color: '#fff', fontWeight: 'bold' }} 
+                      }}
+                      itemStyle={{ color: '#fff', fontWeight: 'bold' }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -508,8 +508,8 @@ export default function Overview({ navigate }) {
           <div className="card-header">
             <span className="card-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-geo-alt" viewBox="0 0 16 16">
-                <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
-                <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10" />
+                <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
               </svg>
             </span>
             <h3>Active Goals</h3>
@@ -532,7 +532,7 @@ export default function Overview({ navigate }) {
           <div className="card-header">
             <span className="card-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-fork-knife" viewBox="0 0 16 16">
-                <path d="M13 .5c0-.276-.226-.506-.498-.465-1.703.257-2.94 2.012-3 8.462a.5.5 0 0 0 .498.5c.56.01 1 .13 1 1.003v5.5a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5zM4.25 0a.25.25 0 0 1 .25.25v5.122a.128.128 0 0 0 .256.006l.233-5.14A.25.25 0 0 1 5.24 0h.522a.25.25 0 0 1 .25.238l.233 5.14a.128.128 0 0 0 .256-.006V.25A.25.25 0 0 1 6.75 0h.29a.5.5 0 0 1 .498.458l.423 5.07a1.69 1.69 0 0 1-1.059 1.711l-.053.022a.92.92 0 0 0-.58.884L6.47 15a.971.971 0 1 1-1.942 0l.202-6.855a.92.92 0 0 0-.58-.884l-.053-.022a1.69 1.69 0 0 1-1.059-1.712L3.462.458A.5.5 0 0 1 3.96 0z"/>
+                <path d="M13 .5c0-.276-.226-.506-.498-.465-1.703.257-2.94 2.012-3 8.462a.5.5 0 0 0 .498.5c.56.01 1 .13 1 1.003v5.5a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5zM4.25 0a.25.25 0 0 1 .25.25v5.122a.128.128 0 0 0 .256.006l.233-5.14A.25.25 0 0 1 5.24 0h.522a.25.25 0 0 1 .25.238l.233 5.14a.128.128 0 0 0 .256-.006V.25A.25.25 0 0 1 6.75 0h.29a.5.5 0 0 1 .498.458l.423 5.07a1.69 1.69 0 0 1-1.059 1.711l-.053.022a.92.92 0 0 0-.58.884L6.47 15a.971.971 0 1 1-1.942 0l.202-6.855a.92.92 0 0 0-.58-.884l-.053-.022a1.69 1.69 0 0 1-1.059-1.712L3.462.458A.5.5 0 0 1 3.96 0z" />
               </svg>
             </span>
             <h3>Fridge Status</h3>
@@ -578,30 +578,30 @@ export default function Overview({ navigate }) {
       </div>
 
       <div className="overview-footer-grid">
-          <div className="overview-card objective-card">
-            <div className="card-header">
-              <span className="card-icon">🎯</span>
-              <h3>Primary Objective</h3>
-            </div>
-            <div className="card-content">
-              <p className="objective-text">
-                {profile.goals?.split('\n')[0] || "No objective set."}
-              </p>
-            </div>
+        <div className="overview-card objective-card">
+          <div className="card-header">
+            <span className="card-icon">🎯</span>
+            <h3>Primary Objective</h3>
           </div>
+          <div className="card-content">
+            <p className="objective-text">
+              {profile.goals?.split('\n')[0] || "No objective set."}
+            </p>
+          </div>
+        </div>
 
-          <div className="overview-card rule-card">
-            <div className="card-header">
-              <span className="card-icon">📜</span>
-              <h3>Daily Rule</h3>
-            </div>
-            <div className="card-content">
-              <div className="rule-badge">Life Rule #{ruleNumber}</div>
-              <p className="rule-text">
-                {currentRule}
-              </p>
-            </div>
+        <div className="overview-card rule-card">
+          <div className="card-header">
+            <span className="card-icon">📜</span>
+            <h3>Daily Rule</h3>
           </div>
+          <div className="card-content">
+            <div className="rule-badge">Life Rule #{ruleNumber}</div>
+            <p className="rule-text">
+              {currentRule}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

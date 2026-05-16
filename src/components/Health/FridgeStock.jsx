@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { useStore } from '../store';
+import { useStore } from '../../store';
 
 const CATEGORIES = ['Dairy & Eggs', 'Fruits', 'Vegetables', 'Meat', 'Snacks', 'Bakery', 'Beverages'];
 const STATUSES = ['In stock', 'Not in stock'];
 
 const FridgeIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M4 11h2v-1H4v1zm0-3h2V7H4v1zm0-3h2V4H4v1z"/>
-    <path d="M2.5 0A1.5 1.5 0 0 0 1 1.5v13A1.5 1.5 0 0 0 2.5 16h11a1.5 1.5 0 0 0 1.5-1.5v-13A1.5 1.5 0 0 0 13.5 0h-11zM14 1.5v4.5H2v-4.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5zm0 5.5v7.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V7h12z"/>
+    <path d="M4 11h2v-1H4v1zm0-3h2V7H4v1zm0-3h2V4H4v1z" />
+    <path d="M2.5 0A1.5 1.5 0 0 0 1 1.5v13A1.5 1.5 0 0 0 2.5 16h11a1.5 1.5 0 0 0 1.5-1.5v-13A1.5 1.5 0 0 0 13.5 0h-11zM14 1.5v4.5H2v-4.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5zm0 5.5v7.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V7h12z" />
   </svg>
 );
 
@@ -46,7 +46,7 @@ export default function FridgeStock() {
   const updateRow = (id, field, value) => {
     setFood(food.map(f => f.id === id ? { ...f, [field]: value } : f));
   };
-  
+
   const deleteRow = (id) => {
     setFood(food.filter(f => f.id !== id));
   };
@@ -61,7 +61,7 @@ export default function FridgeStock() {
           <FridgeIcon />
         </div>
         <h1 className="premium-title">Fridge Stock</h1>
-        <p className="premium-subtitle">Track what you have and what's running out.<br/>Avoid waste and shop smarter.</p>
+        <p className="premium-subtitle">Track what you have and what's running out.<br />Avoid waste and shop smarter.</p>
       </div>
 
       <div className="notion-block">
@@ -100,14 +100,14 @@ export default function FridgeStock() {
               {filteredFood.map((item) => (
                 <tr key={item.id}>
                   <td>
-                    <input 
-                      value={item.name} 
+                    <input
+                      value={item.name}
                       onChange={(e) => updateRow(item.id, 'name', e.target.value)}
                       style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%', outline: 'none' }}
                     />
                   </td>
                   <td>
-                    <select 
+                    <select
                       value={item.status}
                       onChange={(e) => updateRow(item.id, 'status', e.target.value)}
                       className={`pill ${PILL_COLORS[item.status]}`}
@@ -117,7 +117,7 @@ export default function FridgeStock() {
                     </select>
                   </td>
                   <td>
-                    <select 
+                    <select
                       value={item.category}
                       onChange={(e) => updateRow(item.id, 'category', e.target.value)}
                       className={`pill ${PILL_COLORS[item.category] || 'yellow'}`}
@@ -127,18 +127,18 @@ export default function FridgeStock() {
                     </select>
                   </td>
                   <td>
-                    <input 
+                    <input
                       type="number"
-                      value={item.cal} 
+                      value={item.cal}
                       onChange={(e) => updateRow(item.id, 'cal', parseFloat(e.target.value) || 0)}
                       style={{ background: 'transparent', border: 'none', color: 'inherit', maxWidth: '60px', outline: 'none', marginLeft: '4px' }}
                       step="0.1"
                     />
                   </td>
                   <td>
-                    €<input 
+                    €<input
                       type="number"
-                      value={item.price} 
+                      value={item.price}
                       onChange={(e) => updateRow(item.id, 'price', parseFloat(e.target.value) || 0)}
                       style={{ background: 'transparent', border: 'none', color: 'inherit', maxWidth: '60px', outline: 'none', marginLeft: '4px' }}
                       step="0.01"

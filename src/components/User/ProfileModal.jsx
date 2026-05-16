@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStore } from '../store';
+import { useStore } from '../../store';
 
 export default function ProfileModal({ isOpen, onClose }) {
   const profile = useStore(state => state.profile);

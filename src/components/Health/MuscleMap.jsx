@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { useStore } from '../store';
-import maleAnatomy from '../data/male_anatomy.json';
-import femaleAnatomy from '../data/female_anatomy.json';
+import { useStore } from '../../store';
+import maleAnatomy from '../../data/male_anatomy.json';
+import femaleAnatomy from '../../data/female_anatomy.json';
 
 export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
   const profile = useStore(state => state.profile);
   const [view, setView] = useState('front'); // 'front' or 'back'
-  
+
   // Set gender based on profile, defaulting to male if 'Other' or undefined
-  const [gender, setGender] = useState(() => 
+  const [gender, setGender] = useState(() =>
     profile.gender?.toLowerCase() === 'female' ? 'female' : 'male'
   );
 
@@ -24,7 +24,7 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
 
   const MusclePath = ({ slug, paths, label }) => {
     const isSelected = selectedMuscle === slug;
-    
+
     // Flatten paths with their respective transforms
     const allPaths = [];
     if (paths.common) {
@@ -42,8 +42,8 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
         id={slug}
         className="muscle-group"
         onClick={() => onSelectMuscle(slug)}
-        style={{ 
-          cursor: 'pointer', 
+        style={{
+          cursor: 'pointer',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           filter: isSelected ? 'drop-shadow(0 0 12px var(--primary))' : 'none',
         }}
@@ -67,10 +67,10 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
 
   return (
     <div className="muscle-map-container" style={{ position: 'relative', width: '100%', maxWidth: '800px', margin: '0 auto' }}>
-      
+
       {/* View & Gender Toggles */}
-      <div style={{ 
-        display: 'flex', 
+      <div style={{
+        display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         gap: '15px',
@@ -86,7 +86,7 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
           backdropFilter: 'blur(10px)'
         }}>
           {['male', 'female'].map(g => (
-            <button 
+            <button
               key={g}
               onClick={() => setGender(g)}
               style={{
@@ -108,16 +108,16 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
         </div>
 
         {/* View Toggle */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '6px', 
+        <div style={{
+          display: 'flex',
+          gap: '6px',
           background: 'rgba(255,255,255,0.03)',
           padding: '4px',
           borderRadius: '14px',
           border: '1px solid var(--border-color)',
           backdropFilter: 'blur(10px)'
         }}>
-          <button 
+          <button
             onClick={() => setView('front')}
             style={{
               padding: '10px 30px',
@@ -132,7 +132,7 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
               boxShadow: view === 'front' ? '0 4px 15px rgba(var(--primary-rgb), 0.4)' : 'none'
             }}
           >Anatomy Front</button>
-          <button 
+          <button
             onClick={() => setView('back')}
             style={{
               padding: '10px 30px',
@@ -151,16 +151,16 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
       </div>
 
       {/* The Map */}
-      <div style={{ 
-        position: 'relative', 
-        background: 'radial-gradient(circle at center, rgba(var(--primary-rgb, 230, 30, 30), 0.05) 0%, transparent 80%)', 
-        borderRadius: '40px', 
+      <div style={{
+        position: 'relative',
+        background: 'radial-gradient(circle at center, rgba(var(--primary-rgb, 230, 30, 30), 0.05) 0%, transparent 80%)',
+        borderRadius: '40px',
         padding: '30px',
         border: '1px solid rgba(255,255,255,0.02)',
         boxShadow: 'inset 0 0 50px rgba(0,0,0,0.2)'
       }}>
-        <svg 
-          viewBox={gender === 'female' 
+        <svg
+          viewBox={gender === 'female'
             ? (view === 'front' ? "100 200 600 1200" : "800 200 600 1200")
             : (view === 'front' ? "50 50 650 1350" : "780 50 620 1350")
           }
@@ -168,10 +168,10 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
         >
           <defs>
             <filter id="glow">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <feGaussianBlur stdDeviation="3" result="coloredBlur" />
               <feMerge>
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
           </defs>
@@ -179,7 +179,7 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
           {/* Render Paths from JSON */}
           <g filter="url(#glow)">
             {(view === 'front' ? anatomyData.front : anatomyData.back).map((muscle) => (
-              <MusclePath 
+              <MusclePath
                 key={`${gender}-${view}-${muscle.slug}`}
                 slug={muscle.slug}
                 paths={muscle.path}

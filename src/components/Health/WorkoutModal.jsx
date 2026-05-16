@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Styles/GoalModal.css';
+import '../Styles/GoalModal.css';
 
 export const EXERCISE_DATABASE = {
   chest: [

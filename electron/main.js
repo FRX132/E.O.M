@@ -3,10 +3,10 @@ import fs from 'fs';
 import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import pdfParse from 'pdf-parse';
 
 const require = createRequire(import.meta.url);
 const { autoUpdater } = require('electron-updater');
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -45,7 +45,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  
+
   // Set up native IPC bindings before creating the window
   ipcMain.handle('save-backup', async (event, dataStr) => {
     const { filePath } = await dialog.showSaveDialog({
@@ -97,6 +97,31 @@ app.whenReady().then(() => {
     }
     return null;
   });
+
+  ipcMain.handle('parse-pdf', async () => {
+    const { filePaths } = await dialog.showOpenDialog({
+      title: 'Select PDF Document',
+      properties: ['openFile'],
+      filters: [{ name: 'PDF Documents', extensions: ['pdf'] }]
+    });
+
+    if (filePaths && filePaths.length > 0) {
+      try {
+        const dataBuffer = fs.readFileSync(filePaths[0]);
+        const data = await pdfParse(dataBuffer);
+        return {
+          success: true,
+          text: data.text,
+          fileName: path.basename(filePaths[0])
+        };
+      } catch (err) {
+        console.error("Error parsing PDF:", err);
+        return { success: false, error: err.message };
+      }
+    }
+    return { success: false, error: 'No file selected' };
+  });
+
   createWindow();
 
   // ----- Auto-Updater Logic -----

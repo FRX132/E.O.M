@@ -1,11 +1,11 @@
 import React from 'react';
-import { useStore } from '../store';
-import { SKILL_DEF } from '../constants';
-import './Styles/HabitTracker.css';
+import { useStore } from '../../store';
+import { SKILL_DEF } from '../../constants';
+import '../Styles/HabitTracker.css';
 
 const ListIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-    <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+    <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
   </svg>
 );
 
@@ -70,7 +70,7 @@ export default function HabitTracker() {
           <ListIcon />
         </div>
         <h1 className="premium-title">Habit Tracker</h1>
-        <p className="premium-subtitle">Build consistent habits without overthinking.<br/>Track progress daily and stay accountable.</p>
+        <p className="premium-subtitle">Build consistent habits without overthinking.<br />Track progress daily and stay accountable.</p>
       </div>
 
       <div className="notion-block">
@@ -92,10 +92,10 @@ export default function HabitTracker() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
                   {day.habits.map(habit => (
                     <div key={habit.id} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <input 
-                        type="checkbox" 
-                        checked={habit.done} 
-                        onChange={() => toggleHabit(day.id, habit.id)} 
+                      <input
+                        type="checkbox"
+                        checked={habit.done}
+                        onChange={() => toggleHabit(day.id, habit.id)}
                         style={{ cursor: 'pointer' }}
                       />
                       <span style={{ fontSize: '0.8rem', opacity: habit.done ? 0.6 : 1, textDecoration: habit.done ? 'line-through' : 'none' }}>
@@ -109,24 +109,24 @@ export default function HabitTracker() {
                     const skill = SKILL_DEF.find(s => s.id === q.skillId);
                     return (
                       <div key={q.skillId} className="quest-roadmap-item">
-                         <input 
-                          type="checkbox" 
-                          onChange={() => toggleHabit(day.id, `quest-${q.skillId}`)} 
+                        <input
+                          type="checkbox"
+                          onChange={() => toggleHabit(day.id, `quest-${q.skillId}`)}
                           style={{ cursor: 'pointer', marginTop: '3px' }}
                         />
-                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                           <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary)' }}>
-                             {skill?.icon} {skill?.name} Unlock Quest
-                           </span>
-                           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                             Progress: {q.progress} / {q.total}
-                           </span>
-                         </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary)' }}>
+                            {skill?.icon} {skill?.name} Unlock Quest
+                          </span>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                            Progress: {q.progress} / {q.total}
+                          </span>
+                        </div>
                       </div>
                     );
                   })}
                 </div>
-                
+
                 <div style={{ marginTop: '20px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 600 }}>
                     <span>{xp} XP</span>

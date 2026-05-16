@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Styles/GoalModal.css';
+import '../Styles/GoalModal.css';
 
 export default function MediaModal({ isOpen, onClose, onSave, initialData, type = 'Book' }) {
   const [mediaData, setMediaData] = useState({
@@ -79,6 +79,7 @@ export default function MediaModal({ isOpen, onClose, onSave, initialData, type 
               <span className="mac-row-label">{type === 'Book' ? 'Author' : 'Genre'}</span>
               <input 
                 className="mac-input" 
+                style={{ textAlign: 'right' }}
                 placeholder={type === 'Book' ? 'e.g. James Clear' : 'e.g. Sci-Fi'} 
                 value={mediaData.subtitle}
                 onChange={(e) => setMediaData({ ...mediaData, subtitle: e.target.value })}
@@ -116,6 +117,7 @@ export default function MediaModal({ isOpen, onClose, onSave, initialData, type 
               <span className="mac-row-label">Image URL</span>
               <input 
                 className="mac-input" 
+                style={{ textAlign: 'right' }}
                 placeholder="Paste URL here..." 
                 value={mediaData.img}
                 onChange={(e) => setMediaData({ ...mediaData, img: e.target.value })}

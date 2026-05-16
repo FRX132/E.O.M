@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // Styling
-import './Styles/GoalModal.css';
+import '../Styles/GoalModal.css';
 
 export default function BigTargetModal({ isOpen, onClose, onSave, initialData }) {
   const [targetData, setTargetData] = useState({
