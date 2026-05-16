@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../../store';
 import BigTargetModal from './BigTargetModal';
+import MarkdownViewer from '../Functions/MarkdownViewer';
 
 const TrophyIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-trophy" viewBox="0 0 16 16">
@@ -95,6 +96,15 @@ export default function BigTargets() {
               <div style={{ width: '100%', height: '140px', backgroundImage: `url(${project.img})`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
               <div style={{ padding: '16px' }}>
                 <h3 style={{ fontSize: '1rem', marginBottom: '16px', lineHeight: 1.3 }}>{project.title}</h3>
+
+                {project.notes && (
+                  <div style={{ marginBottom: '12px', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical', overflow: 'hidden' }} onClick={(e) => e.stopPropagation()}>
+                    <MarkdownViewer 
+                      content={project.notes} 
+                      onUpdate={(newNotes) => setProjects(projects.map(p => p.id === project.id ? { ...p, notes: newNotes } : p))}
+                    />
+                  </div>
+                )}
 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
                   <span className={`pill ${PILL_COLORS[project.category] || 'blue'}`}>{project.category}</span>

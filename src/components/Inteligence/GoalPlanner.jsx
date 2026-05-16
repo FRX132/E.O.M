@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../../store';
 import GoalModal from './GoalModal';
 import { SKILL_DEF } from '../../constants';
+import MarkdownViewer from '../Functions/MarkdownViewer';
 
 const GoalIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-crosshair" viewBox="0 0 16 16">
@@ -16,6 +17,8 @@ export default function GoalPlanner() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [activeCol, setActiveCol] = useState('week');
+  const [editingGoal, setEditingGoal] = useState(null);
+  const [activeTab, setActiveTab] = useState('active');
 
   const addXP = useStore(state => state.addXP);
 
@@ -43,22 +46,44 @@ export default function GoalPlanner() {
   };
 
   const openAddModal = (col) => {
+    setEditingGoal(null);
+    setActiveCol(col);
+    setModalOpen(true);
+  };
+
+  const openEditModal = (col, goal) => {
+    setEditingGoal({ ...goal, list: col });
     setActiveCol(col);
     setModalOpen(true);
   };
 
   const handleSaveGoal = (goalData) => {
-    const { list, ...rest } = goalData;
-    const newGoal = {
-      id: window.crypto.randomUUID(),
-      done: false,
-      ...rest
-    };
+    const { list, id, ...rest } = goalData;
 
-    setGoals({
-      ...goals,
-      [list]: [...goals[list], newGoal]
-    });
+    if (id) {
+      // It's an update
+      const filteredGoals = {
+        week: goals.week.filter(g => g.id !== id),
+        month: goals.month.filter(g => g.id !== id),
+        year: goals.year.filter(g => g.id !== id)
+      };
+      setGoals({
+        ...filteredGoals,
+        [list]: [...filteredGoals[list], { id, ...rest }]
+      });
+    } else {
+      // It's new
+      const newGoal = {
+        id: window.crypto.randomUUID(),
+        done: false,
+        ...rest
+      };
+
+      setGoals({
+        ...goals,
+        [list]: [...goals[list], newGoal]
+      });
+    }
   };
 
   const deleteGoal = (col, id) => {
@@ -66,61 +91,84 @@ export default function GoalPlanner() {
     setGoals({ ...goals, [col]: goals[col].filter(g => g.id !== id) });
   };
 
-  const renderColumn = (colKey, title) => (
-    <div style={{ flex: 1, minWidth: '220px' }}>
-      <h3 style={{ color: 'var(--orange-text)', fontSize: '0.9rem', marginBottom: '16px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>
-        {title}
-      </h3>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {goals[colKey].map(g => (
-          <div key={g.id} style={{ display: 'flex', flexDirection: 'column', gap: '4px', opacity: g.done ? 0.6 : 1, background: 'var(--bg-card-alt)', padding: '8px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-              <input
-                type="checkbox"
-                checked={g.done}
-                onChange={() => toggleGoal(colKey, g.id)}
-                style={{ marginTop: '4px', cursor: 'pointer' }}
-              />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '0.85rem', fontWeight: 500, textDecoration: g.done ? 'line-through' : 'none' }}>{g.text}</div>
-                {g.notes && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>{g.notes}</div>}
+  const renderColumn = (colKey, title) => {
+    const visibleGoals = goals[colKey].filter(g => activeTab === 'active' ? !g.done : g.done);
+    return (
+      <div style={{ flex: 1, minWidth: '220px' }}>
+        <h3 style={{ color: 'var(--orange-text)', fontSize: '0.9rem', marginBottom: '16px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>
+          {title} <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>({visibleGoals.length})</span>
+        </h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {visibleGoals.map(g => (
+            <div key={g.id} style={{ display: 'flex', flexDirection: 'column', gap: '4px', opacity: g.done ? 0.6 : 1, background: 'var(--bg-card-alt)', padding: '8px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                <input
+                  type="checkbox"
+                  checked={g.done}
+                  onChange={() => toggleGoal(colKey, g.id)}
+                  style={{ marginTop: '4px', cursor: 'pointer' }}
+                />
+                <div style={{ flex: 1 }}>
+                  <div 
+                    style={{ fontSize: '0.85rem', fontWeight: 500, textDecoration: g.done ? 'line-through' : 'none', cursor: 'pointer', transition: 'color 0.2s' }}
+                    onClick={() => openEditModal(colKey, g)}
+                    onMouseOver={(e) => e.target.style.color = 'var(--primary)'}
+                    onMouseOut={(e) => e.target.style.color = ''}
+                  >
+                    {g.text}
+                  </div>
+                  {g.notes && (
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                      <MarkdownViewer 
+                        content={g.notes} 
+                        onUpdate={(newNotes) => setGoals({ 
+                          ...goals, 
+                          [colKey]: goals[colKey].map(goal => goal.id === g.id ? { ...goal, notes: newNotes } : goal) 
+                        })} 
+                      />
+                    </div>
+                  )}
+                </div>
+                <button onClick={() => deleteGoal(colKey, g.id)} style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>✕</button>
               </div>
-              <button onClick={() => deleteGoal(colKey, g.id)} style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>✕</button>
-            </div>
 
-            <div style={{ display: 'flex', gap: '8px', marginLeft: '24px', flexWrap: 'wrap' }}>
-              {g.priority && g.priority !== 'None' && (
-                <span className={`pill ${g.priority === 'High' ? 'red' : (g.priority === 'Medium' ? 'orange' : 'blue')}`} style={{ fontSize: '0.65rem' }}>
-                  {g.priority}
-                </span>
-              )}
-              {g.hasDate && (
-                <span style={{ fontSize: '0.65rem', color: 'var(--blue-text)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  📅 {new Date(g.date).toLocaleDateString()} {g.hasTime ? g.time : ''}
-                </span>
-              )}
-              {g.isUrgent && <span style={{ fontSize: '0.65rem', color: 'var(--red-text)' }}>⚠️ Urgent</span>}
+              <div style={{ display: 'flex', gap: '8px', marginLeft: '24px', flexWrap: 'wrap' }}>
+                {g.priority && g.priority !== 'None' && (
+                  <span className={`pill ${g.priority === 'High' ? 'red' : (g.priority === 'Medium' ? 'orange' : 'blue')}`} style={{ fontSize: '0.65rem' }}>
+                    {g.priority}
+                  </span>
+                )}
+                {g.hasDate && (
+                  <span style={{ fontSize: '0.65rem', color: 'var(--blue-text)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    📅 {new Date(g.date).toLocaleDateString()} {g.hasTime ? g.time : ''}
+                  </span>
+                )}
+                {g.isUrgent && <span style={{ fontSize: '0.65rem', color: 'var(--red-text)' }}>⚠️ Urgent</span>}
+              </div>
             </div>
-          </div>
-        ))}
-        <button
-          onClick={() => openAddModal(colKey)}
-          style={{
-            color: 'var(--text-muted)',
-            fontSize: '0.8rem',
-            textAlign: 'left',
-            marginTop: '8px',
-            padding: '8px',
-            borderRadius: '6px',
-            border: '1px dashed var(--border-color)',
-            width: '100%'
-          }}
-        >
-          + Add goal
-        </button>
+          ))}
+          {activeTab === 'active' && (
+            <button
+              onClick={() => openAddModal(colKey)}
+              style={{
+                color: 'var(--text-muted)',
+                fontSize: '0.8rem',
+                textAlign: 'left',
+                marginTop: '8px',
+                padding: '8px',
+                borderRadius: '6px',
+                border: '1px dashed var(--border-color)',
+                width: '100%',
+                cursor: 'pointer'
+              }}
+            >
+              + Add goal
+            </button>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="premium-container">
@@ -133,8 +181,24 @@ export default function GoalPlanner() {
       </div>
 
       <div className="notion-block">
-        <div className="notion-header">
-          📍 Goal planning
+        <div className="notion-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>📍 Goal planning</span>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button 
+              className={`mac-btn ${activeTab === 'active' ? 'mac-btn-add' : 'mac-btn-cancel'}`}
+              onClick={() => setActiveTab('active')}
+              style={{ fontSize: '0.8rem', padding: '4px 12px' }}
+            >
+              Active
+            </button>
+            <button 
+              className={`mac-btn ${activeTab === 'done' ? 'mac-btn-add' : 'mac-btn-cancel'}`}
+              onClick={() => setActiveTab('done')}
+              style={{ fontSize: '0.8rem', padding: '4px 12px' }}
+            >
+              Done
+            </button>
+          </div>
         </div>
 
         <div style={{ padding: '30px', display: 'flex', gap: '40px', flexWrap: 'wrap' }}>
@@ -149,6 +213,7 @@ export default function GoalPlanner() {
         onClose={() => setModalOpen(false)}
         onSave={handleSaveGoal}
         initialColumn={activeCol}
+        initialData={editingGoal}
       />
 
       <div className="notion-block" style={{ marginTop: '40px', borderTop: '2px solid var(--primary)30' }}>

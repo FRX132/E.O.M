@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../../store';
 
-const CATEGORIES = ['Dairy & Eggs', 'Fruits', 'Vegetables', 'Meat', 'Snacks', 'Bakery', 'Beverages'];
+const DEFAULT_CATEGORIES = ['Dairy & Eggs', 'Fruits', 'Vegetables', 'Meat', 'Snacks', 'Bakery', 'Beverages', 'Öle', 'Gewürze'];
 const STATUSES = ['In stock', 'Not in stock'];
 
 const FridgeIcon = () => (
@@ -51,8 +51,11 @@ export default function FridgeStock() {
     setFood(food.filter(f => f.id !== id));
   };
 
-  const tabs = ['All', 'Dairy & Eggs', 'Fruits', 'Vegetables', 'Meat', '5 more...'];
-  const filteredFood = activeTab === 'All' || activeTab.includes('more') ? food : food.filter(f => f.category === activeTab);
+  // Dynamically calculate all categories including custom ones
+  const allCategories = Array.from(new Set([...DEFAULT_CATEGORIES, ...food.map(f => f.category).filter(Boolean)]));
+  const tabs = ['All', ...allCategories];
+  
+  const filteredFood = activeTab === 'All' ? food : food.filter(f => f.category === activeTab);
 
   return (
     <div className="premium-container">
@@ -97,6 +100,9 @@ export default function FridgeStock() {
               </tr>
             </thead>
             <tbody>
+              <datalist id="category-list">
+                {allCategories.map(c => <option key={c} value={c} />)}
+              </datalist>
               {filteredFood.map((item) => (
                 <tr key={item.id}>
                   <td>
@@ -117,14 +123,14 @@ export default function FridgeStock() {
                     </select>
                   </td>
                   <td>
-                    <select
+                    <input
+                      list="category-list"
                       value={item.category}
                       onChange={(e) => updateRow(item.id, 'category', e.target.value)}
                       className={`pill ${PILL_COLORS[item.category] || 'yellow'}`}
-                      style={{ border: 'none', appearance: 'none', outline: 'none' }}
-                    >
-                      {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
+                      style={{ border: 'none', outline: 'none', width: '120px', fontWeight: 500 }}
+                      placeholder="Category..."
+                    />
                   </td>
                   <td>
                     <input

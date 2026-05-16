@@ -5,6 +5,7 @@ import '../Styles/GoalModal.css';
 export default function BigTargetModal({ isOpen, onClose, onSave, initialData }) {
   const [targetData, setTargetData] = useState({
     title: '',
+    notes: '',
     category: 'Work',
     img: ''
   });
@@ -13,11 +14,12 @@ export default function BigTargetModal({ isOpen, onClose, onSave, initialData })
     if (initialData) {
       setTargetData({
         title: initialData.title || '',
+        notes: initialData.notes || '',
         category: initialData.category || 'Work',
         img: initialData.img || ''
       });
     } else {
-      setTargetData({ title: '', category: 'Work', img: '' });
+      setTargetData({ title: '', notes: '', category: 'Work', img: '' });
     }
   }, [initialData, isOpen]);
 
@@ -31,13 +33,14 @@ export default function BigTargetModal({ isOpen, onClose, onSave, initialData })
 
     onSave({
       title: targetData.title,
+      notes: targetData.notes,
       category: targetData.category,
       img: finalImg,
       date: initialData?.date || new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
       status: initialData?.status || 'Not started'
     });
 
-    setTargetData({ title: '', category: 'Work', img: '' });
+    setTargetData({ title: '', notes: '', category: 'Work', img: '' });
     onClose();
   };
 
@@ -59,6 +62,15 @@ export default function BigTargetModal({ isOpen, onClose, onSave, initialData })
                 value={targetData.title}
                 onChange={(e) => setTargetData({ ...targetData, title: e.target.value })}
                 autoFocus
+              />
+            </div>
+            <div className="mac-row" style={{ minHeight: '60px' }}>
+              <textarea 
+                className="mac-input" 
+                placeholder="Notes / Description" 
+                style={{ resize: 'none', height: '100%', paddingTop: '8px' }}
+                value={targetData.notes}
+                onChange={(e) => setTargetData({ ...targetData, notes: e.target.value })}
               />
             </div>
             <div className="mac-row">

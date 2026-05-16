@@ -1,0 +1,75 @@
+.markdown-viewer {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.markdown-viewer h1, 
+.markdown-viewer h2, 
+.markdown-viewer h3, 
+.markdown-viewer h4 {
+    margin-top: 12px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.markdown-viewer h1 { font-size: 1.2rem; }
+.markdown-viewer h2 { font-size: 1.1rem; }
+.markdown-viewer h3 { font-size: 1rem; }
+
+.markdown-viewer ul, .markdown-viewer ol {
+    margin-top: 0;
+    margin-bottom: 8px;
+    padding-left: 0;
+}
+
+.markdown-viewer li {
+    margin-bottom: 4px;
+}
+
+.markdown-viewer pre {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 6px;
+    overflow-x: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.markdown-viewer code {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.8em;
+}
+
+.markdown-viewer blockquote {
+    border-left: 3px solid var(--primary);
+    padding-left: 12px;
+    margin-left: 0;
+    color: var(--text-muted);
+}
+
+.markdown-viewer table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+}
+
+.markdown-viewer th, .markdown-viewer td {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 6px 12px;
+    text-align: left;
+}
+
+.markdown-viewer th {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Remove default margin from checkboxes inside markdown */
+.markdown-viewer input[type="checkbox"] {
+    margin: 0;
+    margin-right: 8px;
+    vertical-align: middle;
+    transform: translateY(-1px);
+}

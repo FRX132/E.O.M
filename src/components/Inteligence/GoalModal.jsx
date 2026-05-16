@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../Styles/GoalModal.css';
 
-export default function GoalModal({ isOpen, onClose, onSave, initialColumn }) {
-  const [goalData, setGoalData] = useState({
+export default function GoalModal({ isOpen, onClose, onSave, initialColumn, initialData }) {
+  const getDefaultState = () => ({
+    id: null,
     text: '',
     notes: '',
     url: '',
@@ -17,25 +18,24 @@ export default function GoalModal({ isOpen, onClose, onSave, initialColumn }) {
     list: initialColumn || 'week'
   });
 
+  const [goalData, setGoalData] = useState(getDefaultState());
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialData) {
+        setGoalData({ ...initialData, list: initialData.list || initialColumn || 'week' });
+      } else {
+        setGoalData(getDefaultState());
+      }
+    }
+  }, [isOpen, initialData, initialColumn]);
+
   if (!isOpen) return null;
 
   const handleSave = () => {
     if (!goalData.text) return;
     onSave(goalData);
-    setGoalData({
-      text: '',
-      notes: '',
-      url: '',
-      hasDate: false,
-      date: new Date().toISOString().split('T')[0],
-      hasTime: false,
-      time: '12:00',
-      isUrgent: false,
-      priority: 'None',
-      difficulty: 'Easy',
-      minutes: 10,
-      list: initialColumn || 'week'
-    });
+    setGoalData(getDefaultState());
     onClose();
   };
 
@@ -43,7 +43,7 @@ export default function GoalModal({ isOpen, onClose, onSave, initialColumn }) {
     <div className="mac-modal-overlay" onClick={onClose}>
       <div className="mac-modal" onClick={(e) => e.stopPropagation()}>
         <div className="mac-modal-header">
-          <span>📍</span> New Goal
+          <span>📍</span> {initialData ? 'Goal bearbeiten' : 'Neues Goal'}
         </div>
 
         <div className="mac-modal-content">
@@ -200,7 +200,7 @@ export default function GoalModal({ isOpen, onClose, onSave, initialColumn }) {
             onClick={handleSave}
             disabled={!goalData.text}
           >
-            Hinzufügen
+            {initialData ? 'Speichern' : 'Hinzufügen'}
           </button>
         </div>
       </div>
