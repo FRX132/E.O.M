@@ -5,7 +5,7 @@ env.useBrowserCache = true;
 
 class PipelineSingleton {
     static task = 'text-generation';
-    static model = 'Xenova/TinyLlama-1.1B-Chat-v1.0';
+    static model = 'Xenova/LaMini-GPT-124M'; // Extremely small model (124M) to fix memory allocation issues
     static instance = null;
 
     static async getInstance(progress_callback = null) {
@@ -39,18 +39,18 @@ self.addEventListener('message', async (event) => {
                 self.postMessage({ status: 'progress', data: x });
             });
 
-            const systemContext = context ? `Here is the user's data: ${context}. Answer based on this data if relevant.` : "You answer concisely.";
-            const prompt = `<|system|>\nYou are a helpful AI assistant running locally on the user's device. ${systemContext}</s>\n<|user|>\n${text}</s>\n<|assistant|>\n`;
+            const systemContext = context ? `Context: ${context}\n\n` : "";
+            const prompt = `Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n### Instruction:\n${systemContext}${text}\n\n### Response:\n`;
 
             let output = await generator(prompt, {
-                max_new_tokens: 150,
+                max_new_tokens: 100,
                 temperature: 0.7,
                 do_sample: true,
             });
 
             let generatedText = output[0].generated_text;
-            if (generatedText.includes("<|assistant|>\n")) {
-                generatedText = generatedText.split("<|assistant|>\n")[1].trim();
+            if (generatedText.includes("### Response:\n")) {
+                generatedText = generatedText.split("### Response:\n")[1].trim();
             }
 
             self.postMessage({

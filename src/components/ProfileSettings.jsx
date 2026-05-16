@@ -139,6 +139,25 @@ export default function ProfileSettings() {
     if (e.target) e.target.value = null;
   };
 
+  const autoBackupPath = useStore(state => state.autoBackupPath);
+
+  const handleSelectAutoBackupFolder = async () => {
+    if (window.electronAPI && window.electronAPI.selectAutoBackupFolder) {
+      const folderPath = await window.electronAPI.selectAutoBackupFolder();
+      if (folderPath) {
+        useStore.getState().setAutoBackupPath(folderPath);
+        alert(`Auto-backup enabled for:\n${folderPath}\n\nThe app will now continuously save changes to EOM_AutoBackup.json in this folder.`);
+      }
+    } else {
+      alert("Auto-backup folder selection is only available in the desktop app.");
+    }
+  };
+
+  const handleDisableAutoBackup = () => {
+    useStore.getState().setAutoBackupPath(null);
+    alert("Auto-backup disabled.");
+  };
+
   return (
     <div className="premium-container">
       <div className="premium-header-container">
@@ -744,6 +763,45 @@ export default function ProfileSettings() {
               />
             </label>
           )}
+        </div>
+
+        {/* Auto-Backup Directory Section */}
+        <div style={{ marginTop: '20px', padding: '15px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-main)' }}>🔄 Live Auto-Backup Directory</h4>
+            <span style={{ fontSize: '0.75rem', color: autoBackupPath ? 'var(--green-text)' : 'var(--text-muted)' }}>
+              {autoBackupPath ? 'Active' : 'Disabled'}
+            </span>
+          </div>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px', lineHeight: '1.4' }}>
+            Choose a folder (e.g., Desktop or Dropbox) where the app will continuously write a live backup file (`EOM_AutoBackup.json`) whenever you make changes.
+          </p>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <button 
+              onClick={handleSelectAutoBackupFolder}
+              className="notion-button secondary"
+              style={{ padding: '6px 14px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31zM2.19 4a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4H2.19zm4.69-1.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707z"/></svg>
+              Choose Folder
+            </button>
+
+            {autoBackupPath && (
+              <>
+                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '6px 10px', borderRadius: '4px', fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--text-main)', border: '1px solid rgba(255,255,255,0.05)', wordBreak: 'break-all', flex: 1, minWidth: '200px' }}>
+                  {autoBackupPath}
+                </div>
+                <button 
+                  onClick={handleDisableAutoBackup}
+                  className="notion-button secondary"
+                  style={{ padding: '6px 12px', fontSize: '0.8rem', color: 'var(--red-text)', borderColor: 'var(--red-text)', background: 'transparent' }}
+                >
+                  Disable
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
       </div>

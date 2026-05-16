@@ -147,7 +147,7 @@ export default function ExpenseTracker() {
       </div>
 
       {/* --- Top Stats & Charts --- */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
+      <div className="finance-stats-grid" style={{ display: 'grid', gap: '20px', marginBottom: '30px' }}>
         {/* Budget Progress limits */}
         <div className="premium-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -234,7 +234,7 @@ export default function ExpenseTracker() {
         </div>
 
         {/* Yearly Bar Chart */}
-        <div className="notion-block" style={{ padding: '20px', height: '200px' }}>
+        <div className="notion-block" style={{ padding: '20px', height: '200px', minHeight: '200px', minWidth: 0 }}>
            <ResponsiveContainer width="100%" height="100%">
             <BarChart data={monthlyTotals}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
@@ -306,7 +306,7 @@ export default function ExpenseTracker() {
       )}
 
       {viewMode === 'expenses' ? (
-        <div className="notion-block">
+        <div className="notion-block" style={{ minWidth: 0 }}>
           <div className="notion-header" style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>💸 Ledger</span>
             <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{filteredExpenses.length} entries</span>
@@ -321,7 +321,7 @@ export default function ExpenseTracker() {
             </button>
           </div>
 
-          <div style={{ overflowX: 'auto', padding: '0 20px 20px' }}>
+          <div className="notion-table-wrapper" style={{ overflowX: 'auto', padding: '0 20px 20px', minWidth: 0 }}>
             <table className="notion-table" style={{ minWidth: '800px' }}>
               <thead>
                 <tr>

@@ -60,6 +60,31 @@ app.whenReady().then(() => {
     return false;
   });
 
+  ipcMain.handle('select-auto-backup-folder', async () => {
+    const { filePaths } = await dialog.showOpenDialog({
+      title: 'Select Auto-Backup Folder',
+      properties: ['openDirectory']
+    });
+    if (filePaths && filePaths.length > 0) {
+      return filePaths[0];
+    }
+    return null;
+  });
+
+  ipcMain.handle('auto-backup-save', async (event, folderPath, dataStr) => {
+    try {
+      if (fs.existsSync(folderPath)) {
+        const fullPath = path.join(folderPath, 'EOM_AutoBackup.json');
+        fs.writeFileSync(fullPath, dataStr, 'utf-8');
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error("Auto backup failed:", e);
+      return false;
+    }
+  });
+
   ipcMain.handle('load-backup', async () => {
     const { filePaths } = await dialog.showOpenDialog({
       title: 'Load Backup',

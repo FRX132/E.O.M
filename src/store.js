@@ -62,6 +62,7 @@ const EMPTY_STATE = {
   trips: [], // Added for Trip Mode
   skills: ['core'], // Core skill is unlocked by default!
   isAuthenticated: false,
+  autoBackupPath: null,
   theme: 'dark',
   accentColor: '#d48f48',
   designSettings: {
@@ -100,6 +101,7 @@ const initialState = {
   languages: migrateLegacyData('os_languages', EMPTY_STATE.languages),
   trips: migrateLegacyData('os_trips', EMPTY_STATE.trips), // Added for Trip Mode
   isAuthenticated: migrateLegacyData('os_is_authenticated', false),
+  autoBackupPath: migrateLegacyData('os_auto_backup_path', EMPTY_STATE.autoBackupPath),
   theme: migrateLegacyData('os_theme', EMPTY_STATE.theme),
   accentColor: migrateLegacyData('os_accent_color', EMPTY_STATE.accentColor),
   designSettings: migrateLegacyData('os_design_settings', EMPTY_STATE.designSettings),
@@ -125,6 +127,7 @@ export const useStore = create(
       setWorkouts: (updater) => set((state) => ({ workouts: typeof updater === 'function' ? updater(state.workouts) : updater })),
       setLanguages: (updater) => set((state) => ({ languages: typeof updater === 'function' ? updater(state.languages) : updater })),
       setTrips: (updater) => set((state) => ({ trips: typeof updater === 'function' ? updater(state.trips) : updater })),
+      setAutoBackupPath: (path) => set({ autoBackupPath: path }),
       toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
       setAccentColor: (color) => set({ accentColor: color }),
       setDesignSettings: (newSettings) => set((state) => ({
@@ -258,3 +261,17 @@ export const useStore = create(
     }
   )
 );
+
+// Automatic Background Backup Hook
+useStore.subscribe((state) => {
+  if (state.autoBackupPath && window.electronAPI && window.electronAPI.autoBackupSave) {
+    // Small delay to prevent blocking the main UI thread during rapid state changes (e.g. typing)
+    clearTimeout(window._autoBackupTimeout);
+    window._autoBackupTimeout = setTimeout(() => {
+      const backupStr = localStorage.getItem('life_os_storage');
+      if (backupStr) {
+        window.electronAPI.autoBackupSave(state.autoBackupPath, backupStr);
+      }
+    }, 1000);
+  }
+});

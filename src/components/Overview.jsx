@@ -21,6 +21,9 @@ export default function Overview({ navigate }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [clockStyle, setClockStyle] = useState(0); // 0: 24h with sec, 1: 24h minimal, 2: 12h AM/PM
   const [calendarStyle, setCalendarStyle] = useState(0); // 0: Month Grid, 1: Weekly Strip
+  const [overviewLayout, setOverviewLayout] = useState(0); // 0: Default, 1: Minimal, 2: Glass, 3: Brutal
+  
+  const LAYOUT_NAMES = ["Default Premium", "Minimal Clean", "Glassmorphism", "Neo-Brutalism"];
 
   const rankStats = calculateRank(profile.xp || 0);
 
@@ -259,7 +262,33 @@ export default function Overview({ navigate }) {
   };
 
   return (
-    <div className="overview-container">
+    <div className={`overview-container layout-theme-${overviewLayout}`}>
+      
+      {/* Floating Theme Toggle */}
+      <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 999 }}>
+        <button 
+          onClick={() => setOverviewLayout(s => (s + 1) % 4)}
+          style={{ 
+            background: 'var(--primary)', 
+            color: '#fff', 
+            border: 'none', 
+            padding: '12px 20px', 
+            borderRadius: '30px', 
+            boxShadow: '0 10px 25px rgba(0,0,0,0.4)', 
+            cursor: 'pointer', 
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'transform 0.2s'
+          }}
+          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+        >
+          <span>🎨</span> {LAYOUT_NAMES[overviewLayout]}
+        </button>
+      </div>
+
       <div className="overview-hero">
         <div className="hero-cover">
           <img src={profile.heroImage || DEFAULT_HERO} alt="Cover" />

@@ -17,6 +17,7 @@ export default function HabitTracker() {
 
   const activeQuests = useStore(state => state.activeQuests || []);
   const updateQuestProgress = useStore(state => state.updateQuestProgress);
+  const addXP = useStore(state => state.addXP);
 
   const toggleHabit = (dayId, habitId) => {
     // Check if it's a quest habit
@@ -24,7 +25,20 @@ export default function HabitTracker() {
       const skillId = habitId.replace('quest-', '');
       // Prevent double updates if already triggering
       updateQuestProgress(skillId);
+      addXP(100); // Bonus XP for quest progress
       return;
+    }
+
+    const day = days.find(d => d.id === dayId);
+    if (day) {
+      const habit = day.habits.find(h => h.id === habitId);
+      if (habit) {
+        if (!habit.done) {
+          addXP(50);
+        } else {
+          addXP(-50); // Remove XP if unchecked to prevent exploit
+        }
+      }
     }
 
     setDays(days.map(d => {

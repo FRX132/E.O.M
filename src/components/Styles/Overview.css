@@ -861,3 +861,70 @@
     gap: 15px;
   }
 }
+
+/* ================= OVERVIEW LAYOUT THEMES ================= */
+
+/* Theme 1: Minimal */
+.layout-theme-1 .hero-cover {
+  opacity: 0;
+  pointer-events: none;
+}
+.layout-theme-1 .overview-hero {
+  min-height: 150px;
+  height: auto;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 40px;
+}
+.layout-theme-1 .hero-content {
+  position: relative;
+  padding: 40px;
+  background: transparent;
+}
+.layout-theme-1 .overview-card {
+  box-shadow: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+}
+
+/* Theme 2: Glassmorphism */
+.layout-theme-2 {
+  background-image: radial-gradient(circle at 50% 0%, rgba(var(--primary-rgb), 0.15) 0%, transparent 50%);
+}
+.layout-theme-2 .overview-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+:root[data-theme="dark"] .layout-theme-2 .overview-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.layout-theme-2 .card-icon {
+  background: rgba(var(--primary-rgb), 0.2);
+  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.3);
+}
+
+/* Theme 3: Neo-Brutalism */
+.layout-theme-3 .overview-card {
+  background: var(--bg-card);
+  border: 3px solid var(--text-main);
+  border-radius: 0;
+  box-shadow: 6px 6px 0px var(--text-main);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.layout-theme-3 .overview-card:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0px var(--text-main);
+}
+.layout-theme-3 .progress-circle {
+  border: 4px solid var(--text-main);
+  box-shadow: 4px 4px 0px var(--text-main);
+}
+.layout-theme-3 .card-icon {
+  border: 2px solid var(--text-main);
+  border-radius: 0;
+  background: var(--primary);
+  color: #fff;
+}

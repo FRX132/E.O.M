@@ -17,7 +17,8 @@
   gap: var(--compact-gap);
   flex-shrink: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .sidebar.collapsed {
@@ -206,6 +207,21 @@
 
   .dashboard-content {
     padding: 70px 15px 20px 15px;
+  }
+
+  .finance-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .notion-block, .premium-card {
+    min-width: 0;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .notion-table-wrapper {
+    overflow-x: auto;
+    max-width: 100%;
   }
 
   .sidebar-toggle {
