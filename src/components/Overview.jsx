@@ -19,6 +19,8 @@ export default function Overview({ navigate }) {
 
   const [time, setTime] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [clockStyle, setClockStyle] = useState(0); // 0: 24h with sec, 1: 24h minimal, 2: 12h AM/PM
+  const [calendarStyle, setCalendarStyle] = useState(0); // 0: Month Grid, 1: Weekly Strip
 
   const rankStats = calculateRank(profile.xp || 0);
 
@@ -150,6 +152,11 @@ export default function Overview({ navigate }) {
   const hours = time.getHours().toString().padStart(2, '0');
   const minutes = time.getMinutes().toString().padStart(2, '0');
   const seconds = time.getSeconds().toString().padStart(2, '0');
+  const hours12 = (time.getHours() % 12 || 12).toString().padStart(2, '0');
+  const ampm = time.getHours() >= 12 ? 'PM' : 'AM';
+  
+  const displayHours = clockStyle === 2 ? hours12 : hours;
+
   const dateStr = time.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   // Life Rule Selection (Daily rotation)
@@ -159,6 +166,60 @@ export default function Overview({ navigate }) {
 
   // Calendar Render Logic
   const renderCalendar = () => {
+    const today = new Date();
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    const gearButton = (
+      <button 
+        onClick={() => setCalendarStyle(s => (s + 1) % 2)}
+        style={{ position: 'absolute', top: '-15px', right: '-20px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '5px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s, background 0.2s', zIndex: 10 }}
+        onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-main)'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
+        onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}
+        title="Toggle Calendar Style"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+          <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+        </svg>
+      </button>
+    );
+
+    if (calendarStyle === 1) {
+      // Weekly strip view
+      const currentDay = today.getDay() === 0 ? 6 : today.getDay() - 1; // Mon=0, Sun=6
+      const monday = new Date(today);
+      monday.setDate(today.getDate() - currentDay);
+      
+      const days = [];
+      const weekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+      
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        const isToday = d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+        
+        days.push(
+          <div key={i} className={`cal-day ${isToday ? 'today' : ''}`} style={{ display: 'flex', flexDirection: 'column', padding: '10px 5px', gap: '5px', aspectRatio: 'auto', height: '100%', justifyContent: 'center' }}>
+            <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>{weekdays[i]}</span>
+            <span style={{ fontWeight: isToday ? 700 : 500, fontSize: '1.1rem' }}>{d.getDate()}</span>
+          </div>
+        );
+      }
+
+      return (
+        <div className="calendar-widget" style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          {gearButton}
+          <div className="cal-header" style={{ marginBottom: '15px', justifyContent: 'flex-start' }}>
+            <h4 style={{ margin: 0 }}>This Week</h4>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px', textAlign: 'center', flex: 1 }}>
+            {days}
+          </div>
+        </div>
+      );
+    }
+
+    // Default Monthly Grid
     const calYear = currentMonth.getFullYear();
     const calMonth = currentMonth.getMonth();
     const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
@@ -166,13 +227,10 @@ export default function Overview({ navigate }) {
     const startDay = firstDay === 0 ? 6 : firstDay - 1; // Mon=0, Sun=6
 
     const days = [];
-    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
     for (let i = 0; i < startDay; i++) {
       days.push(<div key={`empty-${i}`} className="cal-day empty"></div>);
     }
 
-    const today = new Date();
     for (let i = 1; i <= daysInMonth; i++) {
       const isToday = today.getDate() === i && today.getMonth() === calMonth && today.getFullYear() === calYear;
       days.push(
@@ -183,7 +241,8 @@ export default function Overview({ navigate }) {
     }
 
     return (
-      <div className="calendar-widget">
+      <div className="calendar-widget" style={{ position: 'relative' }}>
+        {gearButton}
         <div className="cal-header">
           <button className="cal-nav" onClick={() => changeMonth(-1)}>‹</button>
           <h4>{monthNames[calMonth]} {calYear}</h4>
@@ -295,10 +354,24 @@ export default function Overview({ navigate }) {
       </div>
 
       <div className="time-date-row">
-        <div className="overview-card clock-card">
-          <div className="clock-content">
-            <div className="time-display">
-              {hours}<span className="colon">:</span>{minutes}<span className="colon">:</span>{seconds}
+        <div className="overview-card clock-card" style={{ position: 'relative' }}>
+          <button 
+            onClick={() => setClockStyle(s => (s + 1) % 3)}
+            style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', transition: 'color 0.2s, background 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-main)'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}
+            title="Change Clock Style"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+              <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+            </svg>
+          </button>
+          <div className="clock-content" style={{ marginTop: '10px' }}>
+            <div className="time-display" style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center' }}>
+              {displayHours}<span className="colon">:</span>{minutes}
+              {clockStyle === 0 && <><span className="colon">:</span>{seconds}</>}
+              {clockStyle === 2 && <span style={{ fontSize: '0.4em', marginLeft: '8px', opacity: 0.8 }}>{ampm}</span>}
             </div>
             <div className="date-display">{dateStr}</div>
           </div>

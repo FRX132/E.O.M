@@ -55,6 +55,7 @@ const EMPTY_STATE = {
   fridge: [],
   targets: [],
   books: [],
+  habit: [],
   movies: [],
   workouts: [],
   languages: [],
@@ -126,8 +127,8 @@ export const useStore = create(
       setTrips: (updater) => set((state) => ({ trips: typeof updater === 'function' ? updater(state.trips) : updater })),
       toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
       setAccentColor: (color) => set({ accentColor: color }),
-      setDesignSettings: (newSettings) => set((state) => ({ 
-        designSettings: { ...state.designSettings, ...newSettings } 
+      setDesignSettings: (newSettings) => set((state) => ({
+        designSettings: { ...state.designSettings, ...newSettings }
       })),
       setFinanceSettings: (newSettings) => set((state) => ({
         financeSettings: { ...state.financeSettings, ...newSettings }
@@ -143,16 +144,16 @@ export const useStore = create(
           font: config.font ?? state.designSettings.font
         }
       })),
-      
+
       // XP & Quest Actions
       addXP: (amount) => set((state) => {
         const amt = Number(amount) || 0;
         const currentXP = state.profile?.xp || 0;
-        return { 
-          profile: { ...state.profile, xp: Math.max(0, currentXP + amt) } 
+        return {
+          profile: { ...state.profile, xp: Math.max(0, currentXP + amt) }
         };
       }),
-      
+
       startQuest: (skillId, duration) => set((state) => ({
         activeQuests: [...state.activeQuests, { skillId, progress: 0, total: duration }]
       })),
@@ -171,7 +172,7 @@ export const useStore = create(
         }
 
         return {
-          activeQuests: state.activeQuests.map(q => 
+          activeQuests: state.activeQuests.map(q =>
             q.skillId === skillId ? { ...q, progress: newProgress } : q
           )
         };
@@ -181,7 +182,7 @@ export const useStore = create(
         activeQuests: state.activeQuests.filter(q => q.skillId !== skillId),
         skills: state.skills.includes(skillId) ? state.skills : [...state.skills, skillId]
       })),
-      
+
       syncHabits: (skillDefs) => set((state) => {
         let needsUpdate = false;
         let updatedHabits = [...state.habits];
@@ -189,27 +190,27 @@ export const useStore = create(
         // 1. Rollover & Roadmap Check
         const today = new Date();
         const futureDays = 7; // Look 7 days ahead
-        
+
         for (let i = 0; i <= futureDays; i++) {
           const d = new Date(today);
           d.setDate(today.getDate() + i);
           const id = d.toISOString().split('T')[0];
           const name = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-          
+
           if (!updatedHabits.find(h => h.id === id)) {
             needsUpdate = true;
             const newDay = { id, date: name, habits: [] };
             updatedHabits.push(newDay);
           }
         }
-        
+
         // Sort by date and keep a window (past 1 day + future 7 days)
         updatedHabits.sort((a, b) => a.id.localeCompare(b.id));
-        
+
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
         const yesterdayId = yesterday.toISOString().split('T')[0];
-        
+
         updatedHabits = updatedHabits.filter(h => h.id >= yesterdayId);
         if (updatedHabits.length > 10) updatedHabits = updatedHabits.slice(0, 10);
 
@@ -224,9 +225,9 @@ export const useStore = create(
           const missingHabits = habitsThatShouldExist.filter(h => !existingIds.has(h.id));
           if (missingHabits.length > 0) {
             needsUpdate = true;
-            return { 
-              ...day, 
-              habits: [...day.habits, ...missingHabits.map(h => ({ ...h, done: false }))] 
+            return {
+              ...day,
+              habits: [...day.habits, ...missingHabits.map(h => ({ ...h, done: false }))]
             };
           }
           return day;
@@ -241,7 +242,7 @@ export const useStore = create(
         if (state.profile.username === username && state.profile.password === password) {
           return { isAuthenticated: true };
         }
-        return {}; 
+        return {};
       }),
       register: (userData) => set((state) => ({
         profile: { ...state.profile, ...userData },

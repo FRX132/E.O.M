@@ -1,0 +1,21 @@
+branch prüfne mit:
+git checkout
+
+
+Du änderst deinen Code (z.B. in der ExpenseTracker.jsx), 
+speicherst und machst einen Commit:
+
+bash: git add .
+      git commit -m "Budget Fehler behoben"
+
+
+Wenn alles fertig ist, gehst du zurück auf deinen Haupt-Branch
+git checkout main
+
+
+Du verschmilzt deinen Fix mit dem Haupt-Code:
+git merge budget-fix
+
+
+Du löschst den Zweig wieder, da er erledigt ist:
+bash: git branch -d budget-fix
