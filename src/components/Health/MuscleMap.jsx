@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../../store';
-import maleAnatomy from '../../data/male_anatomy.json';
-import femaleAnatomy from '../../data/female_anatomy.json';
+import maleAnatomy from '../../data/Sports/male_anatomy.json';
+import femaleAnatomy from '../../data/Sports/female_anatomy.json';
 
 export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
   const profile = useStore(state => state.profile);

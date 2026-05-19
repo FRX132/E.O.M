@@ -8,9 +8,9 @@ export default function MarkdownViewer({ content, onUpdate }) {
 
   const handleCheckboxChange = (index) => {
     if (!onUpdate) return;
-    
+
     let checkboxCount = 0;
-    
+
     const updatedContent = content.replace(/([*+-])\s+\[([ xX])\]/g, (match, bullet, checkedState) => {
       if (checkboxCount === index) {
         const newState = (checkedState === ' ' || checkedState === '') ? 'x' : ' ';
@@ -28,16 +28,17 @@ export default function MarkdownViewer({ content, onUpdate }) {
 
   return (
     <div className="markdown-viewer">
-      <ReactMarkdown 
+      <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
+          // eslint-disable-next-line no-unused-vars
           input({ node, checked, ...props }) {
             if (props.type === 'checkbox') {
               const currentIndex = checkboxIndex++;
               return (
-                <input 
-                  type="checkbox" 
-                  checked={checked} 
+                <input
+                  type="checkbox"
+                  checked={checked}
                   onChange={(e) => {
                     handleCheckboxChange(currentIndex);
                   }}

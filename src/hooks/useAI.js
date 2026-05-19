@@ -6,13 +6,10 @@ export function useAI() {
     const [progress, setProgress] = useState(null);
     const [output, setOutput] = useState('');
     const [error, setError] = useState(null);
-
-    // Speichert die Worker-Instanz
     const worker = useRef(null);
 
+
     useEffect(() => {
-        // Initialisiert den Web Worker
-        // Wir nutzen Vites '?worker' Syntax, damit es sauber gebundlet wird
         worker.current = new Worker(new URL('../workers/aiWorker.js', import.meta.url), {
             type: 'module'
         });
@@ -22,26 +19,21 @@ export function useAI() {
 
             switch (status) {
                 case 'progress':
-                    // Wird aufgerufen während das Modell herunterlädt (beim 1. Start)
                     setProgress(data);
                     break;
                 case 'ready':
-                    // Modell ist geladen und bereit
                     setIsReady(true);
                     setProgress(null);
                     break;
                 case 'processing':
-                    // KI rechnet gerade
                     setIsProcessing(true);
                     setError(null);
                     break;
                 case 'complete':
-                    // KI ist fertig
                     setOutput(output);
                     setIsProcessing(false);
                     break;
                 case 'error':
-                    // Ein Fehler ist aufgetreten
                     setError(error);
                     setIsProcessing(false);
                     break;
@@ -51,21 +43,17 @@ export function useAI() {
         };
 
         worker.current.addEventListener('message', onMessageReceived);
-
-        // Optional: Lade das Modell direkt beim Start der App im Hintergrund
         worker.current.postMessage({ type: 'load' });
 
         return () => {
-            // Cleanup wenn die Component unmountet wird
             worker.current.removeEventListener('message', onMessageReceived);
             worker.current.terminate();
         };
     }, []);
 
-    // Funktion um Text an die KI zu senden
     const generateText = useCallback((text, context) => {
         if (worker.current) {
-            setOutput(''); // Reset output
+            setOutput('');
             worker.current.postMessage({ type: 'generate', text, context });
         }
     }, []);

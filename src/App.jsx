@@ -25,6 +25,7 @@ import AIAssistant from './components/Functions/AIAssistant';
 import ProjectCanvas from './components/Functions/ProjectCanvas';
 import Journal from './components/Agency/Journal';
 import Editor from './components/Functions/Editor';
+import TradingTerminal from './components/User/TradingTerminal';
 import { SKILL_DEF } from './constants';
 
 
@@ -171,6 +172,7 @@ function App() {
     'Finance & Goals': true,
     'Health & Fitness': false,
     'Knowledge & Agency': false,
+    'Trading': false,
     'Functions': false
   });
 
@@ -250,6 +252,7 @@ function App() {
         { path: '/expenses', label: 'Expense Tracker', icon: <WalletIcon /> },
         { path: '/targets', label: 'Big Targets', icon: <TrophyIcon /> },
         { path: '/goals', label: 'Goal Planner', icon: <GoalIcon /> },
+        { path: '/trading', label: 'Trading Terminal', icon: <span>📈</span> },
       ]
     },
     {
@@ -441,6 +444,7 @@ function App() {
             <Route path="/languages" element={<LanguageHub />} />
             <Route path="/books" element={<BookList />} />
             <Route path="/movies" element={<MovieList />} />
+            <Route path="/trading" element={<TradingTerminal navigate={navigate} />} />
             <Route path="/journal" element={<Journal />} />
             <Route path="/trips" element={<TripMode />} />
             <Route path="/canvas" element={<ProjectCanvas />} />
