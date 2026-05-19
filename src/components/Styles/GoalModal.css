@@ -15,14 +15,17 @@
 .mac-modal {
   width: 480px;
   max-width: 90vw;
+  min-width: 320px;
+  min-height: 200px;
   background: var(--bg-card);
   border-radius: 12px;
-  overflow: hidden;
+  overflow: auto;
   box-shadow: var(--shadow-float);
   color: var(--text-main);
   font-family: var(--font-main);
   border: 1px solid var(--border-color);
   animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  resize: both;
 }
 
 @keyframes modalFadeIn {

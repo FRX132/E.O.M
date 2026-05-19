@@ -16,12 +16,22 @@ export default function Overview({ navigate }) {
   const movies = useStore(state => state.movies) || [];
   const profile = useStore(state => state.profile) || { username: '', goals: '', heroImage: '' };
   const setProfile = useStore(state => state.setProfile);
+  const currency = profile.currencySymbol || '€';
+  const overviewSettings = useStore(state => state.overviewSettings);
+  const setOverviewSettings = useStore(state => state.setOverviewSettings);
 
   const [time, setTime] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [clockStyle, setClockStyle] = useState(0); // 0: 24h with sec, 1: 24h minimal, 2: 12h AM/PM
   const [calendarStyle, setCalendarStyle] = useState(0); // 0: Month Grid, 1: Weekly Strip
   const [overviewLayout, setOverviewLayout] = useState(0); // 0: Default, 1: Minimal, 2: Glass, 3: Brutal
+  const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
+
+  const settings = overviewSettings || {
+    visibleWidgets: { clock: true, calendar: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true },
+    widgetTitles: { clock: "Clock", calendar: "Calendar", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats" },
+    visibleStatsBars: { expenses: true, goals: true, habits: true, fridge: true, targets: true, library: true, cinema: true, quests: true }
+  };
 
   const LAYOUT_NAMES = ["Default Premium", "Minimal Clean", "Glassmorphism", "Neo-Brutalism"];
 
@@ -90,21 +100,21 @@ export default function Overview({ navigate }) {
   const movieProg = movies.length > 0 ? Math.round((movies.filter(m => m.status === 'Watched').length / movies.length) * 100) : 0;
 
   const progressItems = [
-    { label: 'Expense Tracker', pct: expenseProg, color: 'var(--blue-text)' },
-    { label: 'Goal Planner', pct: goalProg, color: 'var(--red-text)' },
-    { label: 'Habit Tracker', pct: habitProgress, color: 'var(--purple-text)', explicitDisplay: `${habitXpEarned} / ${habitXpMax} XP` },
-    { label: 'Fridge Stock', pct: fridgeProg, color: 'var(--green-text)' },
-    { label: 'Big Targets', pct: targetProg, color: 'var(--orange-text)' },
-    { label: 'Library', pct: bookProg, color: '#3182ce' },
-    { label: 'Cinema', pct: movieProg, color: '#e53e3e' },
+    (settings.visibleStatsBars?.expenses !== false) && { label: 'Expense Tracker', pct: expenseProg, color: 'var(--blue-text)' },
+    (settings.visibleStatsBars?.goals !== false) && { label: 'Goal Planner', pct: goalProg, color: 'var(--red-text)' },
+    (settings.visibleStatsBars?.habits !== false) && { label: 'Habit Tracker', pct: habitProgress, color: 'var(--purple-text)', explicitDisplay: `${habitXpEarned} / ${habitXpMax} XP` },
+    (settings.visibleStatsBars?.fridge !== false) && { label: 'Fridge Stock', pct: fridgeProg, color: 'var(--green-text)' },
+    (settings.visibleStatsBars?.targets !== false) && { label: 'Big Targets', pct: targetProg, color: 'var(--orange-text)' },
+    (settings.visibleStatsBars?.library !== false) && { label: 'Library', pct: bookProg, color: '#3182ce' },
+    (settings.visibleStatsBars?.cinema !== false) && { label: 'Cinema', pct: movieProg, color: '#e53e3e' },
     // Add Active Quests to synchronization
-    ...(useStore.getState().activeQuests || []).map(q => ({
+    ...((settings.visibleStatsBars?.quests !== false ? (useStore.getState().activeQuests || []) : []).map(q => ({
       label: `QUEST: ${q.skillId}`,
       pct: q.progress && q.total ? Math.round((q.progress / q.total) * 100) : 0,
       color: 'var(--primary)',
       explicitDisplay: `${(q.total || 0) - (q.progress || 0)}d left`
-    }))
-  ];
+    })))
+  ].filter(Boolean);
 
   // Calculate expenses by category for the chart
   const expensesByCategory = expenses.reduce((acc, exp) => {
@@ -264,8 +274,8 @@ export default function Overview({ navigate }) {
   return (
     <div className={`overview-container layout-theme-${overviewLayout}`}>
 
-      {/* Floating Theme Toggle */}
-      <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 999 }}>
+      {/* Floating Theme & Customization Toggle */}
+      <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 999, display: 'flex', gap: '10px' }}>
         <button
           onClick={() => setOverviewLayout(s => (s + 1) % 4)}
           style={{
@@ -286,6 +296,29 @@ export default function Overview({ navigate }) {
           onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
         >
           <span>🎨</span> {LAYOUT_NAMES[overviewLayout]}
+        </button>
+
+        <button
+          onClick={() => setIsCustomizeOpen(true)}
+          style={{
+            background: 'rgba(30, 30, 35, 0.9)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: '#fff',
+            padding: '12px 20px',
+            borderRadius: '30px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+            cursor: 'pointer',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'transform 0.2s'
+          }}
+          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+        >
+          <span>⚙️</span> Customize Page
         </button>
       </div>
 
@@ -347,34 +380,12 @@ export default function Overview({ navigate }) {
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="premium-card" style={{ marginBottom: '25px', padding: 0 }}>
-        <div className="notion-tabs" style={{ marginBottom: '0', padding: '12px 20px', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
-          <div className="notion-header" style={{ padding: 0, background: 'transparent', border: 'none', color: '#fff' }}>
-            <span className="card-icon">📊</span>
-            Subsystem Synchronization
-          </div>
-        </div>
-        <div className="card-content sync-grid">
-          {progressItems.map((item, idx) => (
-            <div key={idx} className="sync-item">
-              <div className="sync-info">
-                <span className="sync-label">{item.label}</span>
-                <span className="sync-value" style={{ color: item.color }}>{item.explicitDisplay || `${item.pct}%`}</span>
-              </div>
-              <div className="sync-bar-outer">
-                <div className="sync-bar-inner" style={{ width: `${item.pct}%`, background: item.color }} />
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="year-progress-container" style={{ marginTop: '20px', padding: '10px' }}>
-          <div className="dots-grid">
+        <div className="hero-year-progress">
+          <div className="hero-dots-grid">
             {dots.map(d => (
               <div
                 key={d}
-                className={`dot ${d <= dayOfYear ? 'active' : ''}`}
+                className={`hero-dot ${d <= dayOfYear ? 'active' : ''}`}
                 title={`Day ${d}`}
               />
             ))}
@@ -382,174 +393,212 @@ export default function Overview({ navigate }) {
         </div>
       </div>
 
-      <div className="time-date-row">
-        <div className="overview-card clock-card" style={{ position: 'relative' }}>
-          <button
-            onClick={() => setClockStyle(s => (s + 1) % 3)}
-            style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', transition: 'color 0.2s, background 0.2s' }}
-            onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-main)'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}
-            title="Change Clock Style"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
-              <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
-            </svg>
-          </button>
-          <div className="clock-content" style={{ marginTop: '10px' }}>
-            <div className="time-display" style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center' }}>
-              {displayHours}<span className="colon">:</span>{minutes}
-              {clockStyle === 0 && <><span className="colon">:</span>{seconds}</>}
-              {clockStyle === 2 && <span style={{ fontSize: '0.4em', marginLeft: '8px', opacity: 0.8 }}>{ampm}</span>}
+      {settings.visibleWidgets?.sync !== false && (
+        <div className="premium-card" style={{ marginBottom: '25px', padding: 0 }}>
+          <div className="notion-tabs" style={{ marginBottom: '0', padding: '12px 20px', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
+            <div className="notion-header" style={{ padding: 0, background: 'transparent', border: 'none', color: '#fff' }}>
+              <span className="card-icon">📊</span>
+              {settings.widgetTitles?.sync || "Stats"}
             </div>
-            <div className="date-display">{dateStr}</div>
+          </div>
+          <div className="card-content sync-grid">
+            {progressItems.map((item, idx) => (
+              <div key={idx} className="sync-item">
+                <div className="sync-info">
+                  <span className="sync-label">{item.label}</span>
+                  <span className="sync-value" style={{ color: item.color }}>{item.explicitDisplay || `${item.pct}%`}</span>
+                </div>
+                <div className="sync-bar-outer">
+                  <div className="sync-bar-inner" style={{ width: `${item.pct}%`, background: item.color }} />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
+      )}
 
-        <div className="overview-card calendar-card">
-          {renderCalendar()}
+      {(settings.visibleWidgets?.clock !== false || settings.visibleWidgets?.calendar !== false) && (
+        <div className="time-date-row">
+          {settings.visibleWidgets?.clock !== false && (
+            <div className="overview-card clock-card" style={{ position: 'relative' }}>
+              <button
+                onClick={() => setClockStyle(s => (s + 1) % 3)}
+                style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', transition: 'color 0.2s, background 0.2s' }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-main)'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}
+                title="Change Clock Style"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+                  <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+                </svg>
+              </button>
+              <div className="clock-content" style={{ marginTop: '10px' }}>
+                <div className="time-display" style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center' }}>
+                  {displayHours}<span className="colon">:</span>{minutes}
+                  {clockStyle === 0 && <><span className="colon">:</span>{seconds}</>}
+                  {clockStyle === 2 && <span style={{ fontSize: '0.4em', marginLeft: '8px', opacity: 0.8 }}>{ampm}</span>}
+                </div>
+                <div className="date-display">{dateStr}</div>
+              </div>
+            </div>
+          )}
+
+          {settings.visibleWidgets?.calendar !== false && (
+            <div className="overview-card calendar-card">
+              {renderCalendar()}
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       <div className="overview-grid">
-        <div className="overview-card habit-card">
-          <div className="card-header">
-            <span className="card-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-list" viewBox="0 0 16 16">
-                <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
-              </svg>
-            </span>
-            <h3>Daily Habits</h3>
-          </div>
-          <div className="card-content" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div className="progress-circle-wrapper">
-              <div className="progress-circle-container">
-                <div className="progress-circle" style={{ '--progress': `${habitProgress}%` }}>
-                  <div className="progress-inner">
-                    <span className="xp-value">{habitXpEarned}</span>
-                    <span className="xp-label">XP EARNED</span>
+        {settings.visibleWidgets?.habits !== false && (
+          <div className="overview-card habit-card">
+            <div className="card-header">
+              <span className="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-list" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
+                </svg>
+              </span>
+              <h3>{settings.widgetTitles?.habits || "Daily Habits"}</h3>
+            </div>
+            <div className="card-content" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div className="progress-circle-wrapper">
+                <div className="progress-circle-container">
+                  <div className="progress-circle" style={{ '--progress': `${habitProgress}%` }}>
+                    <div className="progress-inner">
+                      <span className="xp-value">{habitXpEarned}</span>
+                      <span className="xp-label">XP EARNED</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div style={{ marginTop: 'auto', textAlign: 'center' }}>
-              <span className="stat-label">{completedToday} of {todayHabitsList.length} habits completed</span>
-            </div>
-          </div>
-          <button className="card-action" onClick={() => navigate('/habits')}>View Tracker</button>
-        </div>
-
-        <div className="overview-card finance-card">
-          <div className="card-header">
-            <span className="card-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-wallet" viewBox="0 0 16 16">
-                <path d="M0 3a2 2 0 0 1 2-2h13.5a.5.5 0 0 1 0 1H15v2a1 1 0 0 1 1 1v8.5a1.5 1.5 0 0 1-1.5 1.5h-12A2.5 2.5 0 0 1 0 12.5V3zm1 1.732V12.5A1.5 1.5 0 0 0 2.5 14h12a.5.5 0 0 0 .5-.5V5H2a1.99 1.99 0 0 1-1-.268zM1 3a1 1 0 0 0 1 1h12V2H2a1 1 0 0 0-1 1z" />
-              </svg>
-            </span>
-            <h3>Finances & Wallet</h3>
-          </div>
-          <div className="card-content finance-content">
-            <div className="finance-stats">
-              <div className="expense-stat">
-                <span className="total-amount">€{totalWealth.toLocaleString()}</span>
-                <span className="stat-label">Total Assets</span>
+              <div style={{ marginTop: 'auto', textAlign: 'center' }}>
+                <span className="stat-label">{completedToday} of {todayHabitsList.length} habits completed</span>
               </div>
-              <div className="recent-expenses">
-                <div className="mini-expense">
-                  <span>Net Worth</span>
-                  <span className="mini-amount" style={{ color: netWorth >= 0 ? 'var(--green-text)' : 'var(--red-text)' }}>
-                    €{netWorth.toLocaleString()}
-                  </span>
+            </div>
+            <button className="card-action" onClick={() => navigate('/habits')}>View Tracker</button>
+          </div>
+        )}
+
+        {settings.visibleWidgets?.finances !== false && (
+          <div className="overview-card finance-card">
+            <div className="card-header">
+              <span className="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-wallet" viewBox="0 0 16 16">
+                  <path d="M0 3a2 2 0 0 1 2-2h13.5a.5.5 0 0 1 0 1H15v2a1 1 0 0 1 1 1v8.5a1.5 1.5 0 0 1-1.5 1.5h-12A2.5 2.5 0 0 1 0 12.5V3zm1 1.732V12.5A1.5 1.5 0 0 0 2.5 14h12a.5.5 0 0 0 .5-.5V5H2a1.99 1.99 0 0 1-1-.268zM1 3a1 1 0 0 0 1 1h12V2H2a1 1 0 0 0-1 1z" />
+                </svg>
+              </span>
+              <h3>{settings.widgetTitles?.finances || "Finances & Wallet"}</h3>
+            </div>
+            <div className="card-content finance-content">
+              <div className="finance-stats">
+                <div className="expense-stat">
+                  <span className="total-amount">{currency}{totalWealth.toLocaleString()}</span>
+                  <span className="stat-label">Total Assets</span>
                 </div>
-                <div className="mini-expense">
-                  <span>Total Expenses</span>
-                  <span className="mini-amount" style={{ color: 'var(--red-text)' }}>-€{monthlyTotal.toLocaleString()}</span>
+                <div className="recent-expenses">
+                  <div className="mini-expense">
+                    <span>Net Worth</span>
+                    <span className="mini-amount" style={{ color: netWorth >= 0 ? 'var(--green-text)' : 'var(--red-text)' }}>
+                      {currency}{netWorth.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="mini-expense">
+                    <span>Total Expenses</span>
+                    <span className="mini-amount" style={{ color: 'var(--red-text)' }}>-{currency}{monthlyTotal.toLocaleString()}</span>
+                  </div>
                 </div>
               </div>
+              {chartData.length > 0 && (
+                <div className="finance-chart-container">
+                  <ResponsiveContainer width="100%" height={200} minWidth={0} minHeight={0}>
+                    <PieChart>
+                      <Pie
+                        data={chartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius="60%"
+                        outerRadius="90%"
+                        paddingAngle={5}
+                        dataKey="value"
+                        stroke="none"
+                      >
+                        {chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value) => `${currency}${value.toLocaleString()}`}
+                        contentStyle={{
+                          backgroundColor: 'rgba(20,20,20,0.8)',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: '8px',
+                          color: '#fff',
+                          backdropFilter: 'blur(10px)'
+                        }}
+                        itemStyle={{ color: '#fff', fontWeight: 'bold' }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
             </div>
-            {chartData.length > 0 && (
-              <div className="finance-chart-container">
-                <ResponsiveContainer width="100%" height={200} minWidth={0} minHeight={0}>
-                  <PieChart>
-                    <Pie
-                      data={chartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius="60%"
-                      outerRadius="90%"
-                      paddingAngle={5}
-                      dataKey="value"
-                      stroke="none"
-                    >
-                      {chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(value) => `€${value.toLocaleString()}`}
-                      contentStyle={{
-                        backgroundColor: 'rgba(20,20,20,0.8)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '8px',
-                        color: '#fff',
-                        backdropFilter: 'blur(10px)'
-                      }}
-                      itemStyle={{ color: '#fff', fontWeight: 'bold' }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            )}
+            <button className="card-action" onClick={() => navigate('/expenses')}>Manage Finances</button>
           </div>
-          <button className="card-action" onClick={() => navigate('/expenses')}>Manage Finances</button>
-        </div>
+        )}
 
-        <div className="overview-card goals-card">
-          <div className="card-header">
-            <span className="card-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-geo-alt" viewBox="0 0 16 16">
-                <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10" />
-                <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-              </svg>
-            </span>
-            <h3>Active Goals</h3>
+        {settings.visibleWidgets?.goals !== false && (
+          <div className="overview-card goals-card">
+            <div className="card-header">
+              <span className="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-geo-alt" viewBox="0 0 16 16">
+                  <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10" />
+                  <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                </svg>
+              </span>
+              <h3>{settings.widgetTitles?.goals || "Active Goals"}</h3>
+            </div>
+            <div className="card-content">
+              <ul className="mini-list">
+                {activeGoals.map(goal => (
+                  <li key={goal.id}>
+                    <span className="bullet">○</span>
+                    {goal.text}
+                  </li>
+                ))}
+                {activeGoals.length === 0 && <li className="empty-msg">All weekly goals done!</li>}
+              </ul>
+            </div>
+            <button className="card-action" onClick={() => navigate('/goals')}>Plan Goals</button>
           </div>
-          <div className="card-content">
-            <ul className="mini-list">
-              {activeGoals.map(goal => (
-                <li key={goal.id}>
-                  <span className="bullet">○</span>
-                  {goal.text}
-                </li>
-              ))}
-              {activeGoals.length === 0 && <li className="empty-msg">All weekly goals done!</li>}
-            </ul>
-          </div>
-          <button className="card-action" onClick={() => navigate('/goals')}>Plan Goals</button>
-        </div>
+        )}
 
-        <div className="overview-card fridge-card">
-          <div className="card-header">
-            <span className="card-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-fork-knife" viewBox="0 0 16 16">
-                <path d="M13 .5c0-.276-.226-.506-.498-.465-1.703.257-2.94 2.012-3 8.462a.5.5 0 0 0 .498.5c.56.01 1 .13 1 1.003v5.5a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5zM4.25 0a.25.25 0 0 1 .25.25v5.122a.128.128 0 0 0 .256.006l.233-5.14A.25.25 0 0 1 5.24 0h.522a.25.25 0 0 1 .25.238l.233 5.14a.128.128 0 0 0 .256-.006V.25A.25.25 0 0 1 6.75 0h.29a.5.5 0 0 1 .498.458l.423 5.07a1.69 1.69 0 0 1-1.059 1.711l-.053.022a.92.92 0 0 0-.58.884L6.47 15a.971.971 0 1 1-1.942 0l.202-6.855a.92.92 0 0 0-.58-.884l-.053-.022a1.69 1.69 0 0 1-1.059-1.712L3.462.458A.5.5 0 0 1 3.96 0z" />
-              </svg>
-            </span>
-            <h3>Fridge Status</h3>
+        {settings.visibleWidgets?.fridge !== false && (
+          <div className="overview-card fridge-card">
+            <div className="card-header">
+              <span className="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-fork-knife" viewBox="0 0 16 16">
+                  <path d="M13 .5c0-.276-.226-.506-.498-.465-1.703.257-2.94 2.012-3 8.462a.5.5 0 0 0 .498.5c.56.01 1 .13 1 1.003v5.5a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5zM4.25 0a.25.25 0 0 1 .25.25v5.122a.128.128 0 0 0 .256.006l.233-5.14A.25.25 0 0 1 5.24 0h.522a.25.25 0 0 1 .25.238l.233 5.14a.128.128 0 0 0 .256-.006V.25A.25.25 0 0 1 6.75 0h.29a.5.5 0 0 1 .498.458l.423 5.07a1.69 1.69 0 0 1-1.059 1.711l-.053.022a.92.92 0 0 0-.58.884L6.47 15a.971.971 0 1 1-1.942 0l.202-6.855a.92.92 0 0 0-.58-.884l-.053-.022a1.69 1.69 0 0 1-1.059-1.712L3.462.458A.5.5 0 0 1 3.96 0z" />
+                </svg>
+              </span>
+              <h3>{settings.widgetTitles?.fridge || "Fridge Status"}</h3>
+            </div>
+            <div className="card-content">
+              <ul className="mini-list">
+                {lowFridge.map(item => (
+                  <li key={item.id} className="low-stock">
+                    <span className="bullet">✕</span>
+                    {item.name}
+                  </li>
+                ))}
+                {lowFridge.length === 0 && <li className="empty-msg">Everything in stock!</li>}
+              </ul>
+            </div>
+            <button className="card-action" onClick={() => navigate('/fridge')}>Review Stock</button>
           </div>
-          <div className="card-content">
-            <ul className="mini-list">
-              {lowFridge.map(item => (
-                <li key={item.id} className="low-stock">
-                  <span className="bullet">✕</span>
-                  {item.name}
-                </li>
-              ))}
-              {lowFridge.length === 0 && <li className="empty-msg">Everything in stock!</li>}
-            </ul>
-          </div>
-          <button className="card-action" onClick={() => navigate('/fridge')}>Review Stock</button>
-        </div>
+        )}
 
         {upcomingBills.length > 0 && (
           <div className="overview-card bill-alert-card scale-in" style={{ border: '1px solid rgba(var(--primary-rgb), 0.3)', background: 'rgba(var(--primary-rgb), 0.05)' }}>
@@ -565,7 +614,7 @@ export default function Overview({ navigate }) {
                     <li key={bill.id} style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span>{bill.name}</span>
                       <span style={{ fontWeight: 700, fontSize: '0.8rem', opacity: 0.8 }}>
-                        {daysLeft === 0 ? 'DUE TODAY' : `In ${daysLeft}d`} • €{bill.amount}
+                        {daysLeft === 0 ? 'DUE TODAY' : `In ${daysLeft}d`} • {currency}{bill.amount}
                       </span>
                     </li>
                   );
@@ -577,32 +626,225 @@ export default function Overview({ navigate }) {
         )}
       </div>
 
-      <div className="overview-footer-grid">
-        <div className="overview-card objective-card">
-          <div className="card-header">
-            <span className="card-icon">🎯</span>
-            <h3>Primary Objective</h3>
-          </div>
-          <div className="card-content">
-            <p className="objective-text">
-              {profile.goals?.split('\n')[0] || "No objective set."}
-            </p>
-          </div>
-        </div>
+      {(settings.visibleWidgets?.objective !== false || settings.visibleWidgets?.rule !== false) && (
+        <div className="overview-footer-grid">
+          {settings.visibleWidgets?.objective !== false && (
+            <div className="overview-card objective-card">
+              <div className="card-header">
+                <span className="card-icon">🎯</span>
+                <h3>{settings.widgetTitles?.objective || "Primary Objective"}</h3>
+              </div>
+              <div className="card-content">
+                <p className="objective-text">
+                  {profile.goals?.split('\n')[0] || "No objective set."}
+                </p>
+              </div>
+            </div>
+          )}
 
-        <div className="overview-card rule-card">
-          <div className="card-header">
-            <span className="card-icon">📜</span>
-            <h3>Daily Rule</h3>
-          </div>
-          <div className="card-content">
-            <div className="rule-badge">Life Rule #{ruleNumber}</div>
-            <p className="rule-text">
-              {currentRule}
-            </p>
+          {settings.visibleWidgets?.rule !== false && (
+            <div className="overview-card rule-card">
+              <div className="card-header">
+                <span className="card-icon">📜</span>
+                <h3>{settings.widgetTitles?.rule || "Daily Rule"}</h3>
+              </div>
+              <div className="card-content">
+                <div className="rule-badge">Life Rule #{ruleNumber}</div>
+                <p className="rule-text">
+                  {currentRule}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Customize Panel Modal Overlay */}
+      {isCustomizeOpen && (
+        <div className="mac-modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(10px)', zIndex: 10000 }} onClick={() => setIsCustomizeOpen(false)}>
+          <div className="mac-modal" style={{ width: '560px', maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+            <div className="mac-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--border-color)' }}>
+              <span style={{ fontWeight: 700 }}>⚙️ Customize Overview Dashboard</span>
+              <button onClick={() => setIsCustomizeOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+            </div>
+            
+            <div style={{ padding: '20px' }}>
+              <div style={{ fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, marginBottom: '15px' }}>Widget Visibility & Titles</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {[
+                  { key: 'clock', label: 'Clock Widget', defaultTitle: 'Clock' },
+                  { key: 'calendar', label: 'Calendar Widget', defaultTitle: 'Calendar' },
+                  { key: 'sync', label: 'Stats Widget', defaultTitle: 'Stats' },
+                  { key: 'habits', label: 'Daily Habits Card', defaultTitle: 'Daily Habits' },
+                  { key: 'finances', label: 'Finances & Wallet Card', defaultTitle: 'Finances & Wallet' },
+                  { key: 'goals', label: 'Active Goals Card', defaultTitle: 'Active Goals' },
+                  { key: 'fridge', label: 'Fridge Status Card', defaultTitle: 'Fridge Status' },
+                  { key: 'objective', label: 'Primary Objective Card', defaultTitle: 'Primary Objective' },
+                  { key: 'rule', label: 'Daily Rule Card', defaultTitle: 'Daily Rule' }
+                ].map(widget => (
+                  <div key={widget.key} style={{ display: 'flex', alignItems: 'center', gap: '15px', background: 'var(--bg-card-alt)', padding: '10px 15px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                    <label className="mac-switch" style={{ position: 'relative', display: 'inline-block', width: '40px', height: '22px', flexShrink: 0 }}>
+                      <input 
+                        type="checkbox"
+                        checked={settings.visibleWidgets?.[widget.key] !== false}
+                        onChange={(e) => {
+                          const newVisible = { ...settings.visibleWidgets, [widget.key]: e.target.checked };
+                          setOverviewSettings({ ...settings, visibleWidgets: newVisible });
+                        }}
+                        style={{ opacity: 0, width: 0, height: 0 }}
+                      />
+                      <span className="mac-slider" style={{
+                        position: 'absolute',
+                        cursor: 'pointer',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: settings.visibleWidgets?.[widget.key] !== false ? 'var(--primary)' : '#444',
+                        transition: '0.4s',
+                        borderRadius: '34px'
+                      }}>
+                        <span style={{
+                          position: 'absolute',
+                          content: '""',
+                          height: '16px',
+                          width: '16px',
+                          left: '3px',
+                          bottom: '3px',
+                          backgroundColor: 'white',
+                          transition: '0.4s',
+                          borderRadius: '50%',
+                          transform: settings.visibleWidgets?.[widget.key] !== false ? 'translateX(18px)' : 'translateX(0)'
+                        }}></span>
+                      </span>
+                    </label>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{widget.label}</div>
+                      <input 
+                        className="mac-input"
+                        style={{ borderBottom: '1px solid var(--border-light)', padding: '4px 0', fontSize: '0.9rem', color: 'var(--text-main)', width: '100%', background: 'transparent', borderTop: 'none', borderLeft: 'none', borderRight: 'none', outline: 'none' }}
+                        value={settings.widgetTitles?.[widget.key] ?? widget.defaultTitle}
+                        onChange={(e) => {
+                          const newTitles = { ...settings.widgetTitles, [widget.key]: e.target.value };
+                          setOverviewSettings({ ...settings, widgetTitles: newTitles });
+                        }}
+                        placeholder={widget.defaultTitle}
+                        disabled={settings.visibleWidgets?.[widget.key] === false}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div style={{ fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, marginTop: '25px', marginBottom: '15px' }}>Stats Progress Bars Visibility</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '10px' }}>
+                {[
+                  { key: 'expenses', label: 'Expense Tracker' },
+                  { key: 'goals', label: 'Goal Planner' },
+                  { key: 'habits', label: 'Habit Tracker' },
+                  { key: 'fridge', label: 'Fridge Stock' },
+                  { key: 'targets', label: 'Big Targets' },
+                  { key: 'library', label: 'Library' },
+                  { key: 'cinema', label: 'Cinema' },
+                  { key: 'quests', label: 'Active Quests' }
+                ].map(bar => (
+                  <div key={bar.key} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg-card-alt)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                    <label className="mac-switch" style={{ position: 'relative', display: 'inline-block', width: '34px', height: '18px', flexShrink: 0 }}>
+                      <input 
+                        type="checkbox"
+                        checked={settings.visibleStatsBars?.[bar.key] !== false}
+                        onChange={(e) => {
+                          const newVisibleBars = { ...settings.visibleStatsBars, [bar.key]: e.target.checked };
+                          setOverviewSettings({ ...settings, visibleStatsBars: newVisibleBars });
+                        }}
+                        style={{ opacity: 0, width: 0, height: 0 }}
+                      />
+                      <span className="mac-slider" style={{
+                        position: 'absolute',
+                        cursor: 'pointer',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: settings.visibleStatsBars?.[bar.key] !== false ? 'var(--primary)' : '#444',
+                        transition: '0.4s',
+                        borderRadius: '34px'
+                      }}>
+                        <span style={{
+                          position: 'absolute',
+                          content: '""',
+                          height: '12px',
+                          width: '12px',
+                          left: '3px',
+                          bottom: '3px',
+                          backgroundColor: 'white',
+                          transition: '0.4s',
+                          borderRadius: '50%',
+                          transform: settings.visibleStatsBars?.[bar.key] !== false ? 'translateX(16px)' : 'translateX(0)'
+                        }}></span>
+                      </span>
+                    </label>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-main)', fontWeight: 500 }}>{bar.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, marginTop: '25px', marginBottom: '15px' }}>Primary Objective Content</div>
+              <div className="mac-input-group" style={{ margin: '0', background: 'var(--bg-card-alt)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '10px' }}>
+                <textarea 
+                  className="mac-input"
+                  placeholder="Enter your primary objective..."
+                  style={{ resize: 'vertical', minHeight: '60px', width: '100%', border: 'none', background: 'transparent', color: 'var(--text-main)', outline: 'none' }}
+                  value={profile.goals || ''}
+                  onChange={(e) => setProfile({ goals: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="mac-modal-footer" style={{ display: 'flex', gap: '10px', padding: '16px 20px', borderTop: '1px solid var(--border-color)', justifyContent: 'flex-end' }}>
+              <button 
+                className="mac-btn mac-btn-cancel" 
+                onClick={() => {
+                  if (confirm("Reset overview customization to defaults?")) {
+                    setOverviewSettings({
+                      visibleWidgets: { clock: true, calendar: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true },
+                      widgetTitles: { clock: "Clock", calendar: "Calendar", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats" },
+                      visibleStatsBars: { expenses: true, goals: true, habits: true, fridge: true, targets: true, library: true, cinema: true, quests: true }
+                    });
+                  }
+                }}
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-main)',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem'
+                }}
+              >
+                Reset to Defaults
+              </button>
+              <button 
+                className="mac-btn mac-btn-add" 
+                onClick={() => setIsCustomizeOpen(false)}
+                style={{
+                  background: 'var(--primary)',
+                  border: 'none',
+                  color: '#fff',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  fontWeight: 600
+                }}
+              >
+                Done
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

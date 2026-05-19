@@ -7,7 +7,8 @@ export default function MediaModal({ isOpen, onClose, onSave, initialData, type 
     subtitle: '', // Author for books, Genre for movies
     status: type === 'Book' ? 'Reading' : 'Watchlist',
     rating: 0,
-    img: ''
+    img: '',
+    notes: ''
   });
 
   useEffect(() => {
@@ -17,7 +18,8 @@ export default function MediaModal({ isOpen, onClose, onSave, initialData, type 
         subtitle: initialData.subtitle || '',
         status: initialData.status || (type === 'Book' ? 'Reading' : 'Watchlist'),
         rating: initialData.rating || 0,
-        img: initialData.img || ''
+        img: initialData.img || '',
+        notes: initialData.notes || ''
       });
     } else {
       setMediaData({
@@ -25,7 +27,8 @@ export default function MediaModal({ isOpen, onClose, onSave, initialData, type 
         subtitle: '',
         status: type === 'Book' ? 'Reading' : 'Watchlist',
         rating: 0,
-        img: ''
+        img: '',
+        notes: ''
       });
     }
   }, [initialData, isOpen, type]);
@@ -124,6 +127,18 @@ export default function MediaModal({ isOpen, onClose, onSave, initialData, type 
               />
             </div>
           </div>
+
+          <div className="mac-section-title">Notes / Notizen</div>
+          <div className="mac-input-group" style={{ padding: '10px' }}>
+            <textarea
+              className="mac-input"
+              style={{ width: '100%', minHeight: '100px', background: 'transparent', border: 'none', resize: 'vertical', color: 'var(--text-main)', outline: 'none', fontSize: '14px', lineHeight: '1.4' }}
+              placeholder={type === 'Book' ? 'Key insights, quotes, or summaries...' : 'Thoughts, episode progress, key characters, or watch logs...'}
+              value={mediaData.notes || ''}
+              onChange={(e) => setMediaData({ ...mediaData, notes: e.target.value })}
+            />
+          </div>
+
           <p style={{ margin: '0 20px 20px', fontSize: '11px', color: 'var(--text-muted)' }}>
             Tip: Use high-quality vertical images for best look.
           </p>

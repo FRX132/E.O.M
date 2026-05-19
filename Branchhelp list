@@ -19,3 +19,70 @@ git merge budget-fix
 
 Du löschst den Zweig wieder, da er erledigt ist:
 bash: git branch -d budget-fix
+
+
+
+
+           1.   Using -a would
+                conflate <remote>
+                with any local
+                branches you happen
+                to have been prefixed
+                with the same
+                <remote> pattern.
+           2.   for-each-ref can take
+                a wide range of
+                options. See
+                git-for-each-ref(1)
+
+       Patterns will normally need quoting.
+
+NOTES
+       If you are creating a branch that you want to switch to
+       immediately, it is easier to use the git switch command
+       with its -c option to do the same thing with a single
+       command.
+
+       The options --contains, --no-contains, --merged and
+       --no-merged serve four related but different purposes:
+
+       •   --contains <commit> is used to find all branches
+           which will need special attention if <commit> were
+           to be rebased or amended, since those branches
+           contain the specified <commit>.
+
+       •   --no-contains <commit> is the inverse of that, i.e.
+           branches that don’t contain the specified <commit>.
+
+       •   --merged is used to find all branches which can be
+           safely deleted, since those branches are fully
+           contained by HEAD.
+
+       •   --no-merged is used to find branches which are
+           candidates for merging into HEAD, since those
+           branches are not fully contained by HEAD.
+
+       When combining multiple --contains and --no-contains
+       filters, only references that contain at least one of
+       the --contains commits and contain none of the
+       --no-contains commits are shown.
+
+       When combining multiple --merged and --no-merged
+       filters, only references that are reachable from at
+       least one of the --merged commits and from none of the
+       --no-merged commits are shown.
+
+SEE ALSO
+       git-check-ref-format(1), git-fetch(1), git-remote(1),
+       "Understanding history: What is a branch?"[1] in the
+       Git User’s Manual.
+
+GIT
+       Part of the git(1) suite
+
+NOTES
+        1. "Understanding history: What is a branch?"
+           git-htmldocs/user-manual.html#what-is-a-branch
+
+Git 2.52.0                2025-11-17             GIT-BRANCH(1)
+(END)

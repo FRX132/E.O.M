@@ -106,6 +106,11 @@ export default function BookList() {
                       {'★'.repeat(book.rating)}{'☆'.repeat(5 - book.rating)}
                     </div>
                   </div>
+                  {book.notes && (
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-light)', marginTop: '8px', paddingTop: '8px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebKitLineClamp: 2, WebKitBoxOrient: 'vertical' }}>
+                      📝 {book.notes}
+                    </div>
+                  )}
                 </div>
                 <button
                   onClick={(e) => deleteBook(e, book.id)}

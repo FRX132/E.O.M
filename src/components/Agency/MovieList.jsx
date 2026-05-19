@@ -119,6 +119,11 @@ export default function MovieList() {
                       {'★'.repeat(movie.rating)}{'☆'.repeat(5 - movie.rating)}
                     </div>
                   </div>
+                  {movie.notes && (
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-light)', marginTop: '10px', paddingTop: '8px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebKitLineClamp: 2, WebKitBoxOrient: 'vertical' }}>
+                      📝 {movie.notes}
+                    </div>
+                  )}
                 </div>
                 <button
                   onClick={(e) => deleteMovie(e, movie.id)}

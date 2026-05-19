@@ -45,7 +45,8 @@ const EMPTY_STATE = {
     profilePicture: '',
     backgroundImage: '',
     heroImage: '',
-    xp: 0
+    xp: 0,
+    currencySymbol: '€'
   },
   activeQuests: [], // [{ skillId, progress: 0, daysLeft: duration }]
   expenses: [],
@@ -92,6 +93,40 @@ const EMPTY_STATE = {
       monthly: 2000,
       yearly: 24000
     }
+  },
+  overviewSettings: {
+    visibleWidgets: {
+      clock: true,
+      calendar: true,
+      habits: true,
+      finances: true,
+      goals: true,
+      fridge: true,
+      objective: true,
+      rule: true,
+      sync: true
+    },
+    widgetTitles: {
+      clock: "Clock",
+      calendar: "Calendar",
+      habits: "Daily Habits",
+      finances: "Finances & Wallet",
+      goals: "Active Goals",
+      fridge: "Fridge Status",
+      objective: "Primary Objective",
+      rule: "Daily Rule",
+      sync: "Stats"
+    },
+    visibleStatsBars: {
+      expenses: true,
+      goals: true,
+      habits: true,
+      fridge: true,
+      targets: true,
+      library: true,
+      cinema: true,
+      quests: true
+    }
   }
 };
 
@@ -128,6 +163,7 @@ const initialState = {
   accentColor: migrateLegacyData('os_accent_color', EMPTY_STATE.accentColor),
   designSettings: migrateLegacyData('os_design_settings', EMPTY_STATE.designSettings),
   financeSettings: migrateLegacyData('os_finance_settings', EMPTY_STATE.financeSettings),
+  overviewSettings: migrateLegacyData('os_overview_settings', EMPTY_STATE.overviewSettings),
 };
 
 export const useStore = create(
@@ -169,6 +205,9 @@ export const useStore = create(
     })),
     setFinanceSettings: (newSettings) => set((state) => ({
       financeSettings: { ...state.financeSettings, ...newSettings }
+    })),
+    setOverviewSettings: (newSettings) => set((state) => ({
+      overviewSettings: { ...state.overviewSettings, ...newSettings }
     })),
     applyDesignPreset: (config) => set((state) => ({
       accentColor: config.accent || state.accentColor,

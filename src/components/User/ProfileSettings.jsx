@@ -426,6 +426,21 @@ export default function ProfileSettings() {
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{accentColor.toUpperCase()}</span>
               </div>
             </div>
+            <div>
+              <label className="form-label" style={{ marginBottom: '12px' }}>System Currency Symbol</label>
+              <select
+                name="currencySymbol"
+                value={profile.currencySymbol || '€'}
+                onChange={handleChange}
+                className="notion-input"
+                style={{ height: '40px', padding: '0 15px', borderRadius: '8px', cursor: 'pointer' }}
+              >
+                <option value="€">EUR (€)</option>
+                <option value="£">GBP (£)</option>
+                <option value="$">USD / Dollar ($)</option>
+                <option value="¥">Yen/Yuan (¥)</option>
+              </select>
+            </div>
             <div style={{ flexBasis: '100%', marginTop: '10px' }}>
               <button
                 className={`notion-button ${useStore.getState().designSettings.enabled ? '' : 'secondary'}`}

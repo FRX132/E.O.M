@@ -119,11 +119,15 @@ export default function ProfileModal({ isOpen, onClose }) {
           border-radius: 24px;
           width: 90%;
           max-width: 480px;
+          min-width: 320px;
+          min-height: 200px;
           padding: 30px;
           box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255,255,255,0.02);
           position: relative;
           color: white;
           animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          resize: both;
+          overflow: auto;
         }
 
         .modal-header {

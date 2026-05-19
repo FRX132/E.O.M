@@ -253,6 +253,51 @@
   padding: 12px;
 }
 
+.hero-year-progress {
+  position: absolute;
+  bottom: 12px;
+  left: 40px;
+  right: 40px;
+  z-index: 10;
+  background: rgba(10, 10, 12, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 12px;
+  border-radius: var(--border-radius-custom, 8px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+}
+
+.hero-dots-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  justify-content: center;
+}
+
+.hero-dot {
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 1px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-dot.active {
+  background: var(--primary);
+  box-shadow: 0 0 6px var(--primary);
+}
+
+:root[data-theme="light"] .hero-year-progress {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+:root[data-theme="light"] .hero-dot {
+  background: rgba(0, 0, 0, 0.15);
+}
+
 .dots-grid {
   display: flex;
   flex-wrap: wrap;
@@ -301,10 +346,13 @@
   padding: 24px;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.3s;
   position: relative;
-  overflow: hidden;
+  overflow: auto;
   box-shadow: var(--shadow-md);
+  resize: both;
+  min-width: 250px;
+  min-height: 150px;
 }
 
 .overview-card:hover {
@@ -794,19 +842,39 @@
     grid-template-columns: 1fr;
     padding: 0 20px;
   }
+  .hero-year-progress {
+    left: 20px;
+    right: 20px;
+  }
 }
 
 @media (max-width: 900px) {
   .overview-hero {
     height: auto;
-    min-height: 450px;
+    min-height: auto;
   }
   .hero-content {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    width: 100%;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 0 20px 40px 20px;
+    padding: 80px 20px 20px 20px;
     gap: 30px;
+    box-sizing: border-box;
+  }
+  .hero-year-progress {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    margin: 15px 20px 20px 20px;
+    z-index: 10;
+  }
+  .layout-theme-1 .hero-year-progress {
+    margin: 0 20px 20px 20px;
   }
 
   .hero-stats {
@@ -927,4 +995,28 @@
   border-radius: 0;
   background: var(--primary);
   color: #fff;
+}
+
+/* Custom Header Year Progress theme variations */
+.layout-theme-1 .hero-year-progress {
+  position: relative;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  margin: 0 40px 20px 40px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.layout-theme-3 .hero-year-progress {
+  border: 3px solid var(--text-main);
+  border-radius: 0;
+  box-shadow: 4px 4px 0px var(--text-main);
+  background: var(--bg-card);
+}
+
+.layout-theme-3 .hero-dot {
+  border-radius: 0;
 }

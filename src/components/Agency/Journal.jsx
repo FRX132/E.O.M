@@ -80,7 +80,7 @@ export default function Journal() {
       <div style={{ display: 'flex', flex: 1, gap: '20px', minHeight: 0 }}>
         
         {/* LEFT PANEL: LIST */}
-        <div className="premium-card" style={{ width: '300px', display: 'flex', flexDirection: 'column', padding: '16px', gap: '12px' }}>
+        <div className="premium-card" style={{ width: '300px', minWidth: '180px', maxWidth: '600px', resize: 'horizontal', overflow: 'auto', display: 'flex', flexDirection: 'column', padding: '16px', gap: '12px' }}>
           <button 
             onClick={handleCreateNew} 
             className="pill blue" 

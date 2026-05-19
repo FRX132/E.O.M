@@ -28,6 +28,8 @@ const PILL_COLORS = {
 export default function FridgeStock() {
   const food = useStore(state => state.fridge);
   const setFood = useStore(state => state.setFridge);
+  const profile = useStore(state => state.profile || {});
+  const currency = profile.currencySymbol || '€';
 
   const [activeTab, setActiveTab] = useState('All');
 
@@ -142,7 +144,7 @@ export default function FridgeStock() {
                     />
                   </td>
                   <td>
-                    €<input
+                    {currency}<input
                       type="number"
                       value={item.price}
                       onChange={(e) => updateRow(item.id, 'price', parseFloat(e.target.value) || 0)}

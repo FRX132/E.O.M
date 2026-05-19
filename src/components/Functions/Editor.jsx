@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../../store';
 import MarkdownViewer from './MarkdownViewer';
 
@@ -16,6 +16,37 @@ export default function Editor() {
   const [activeFileId, setActiveFileId] = useState(files.length > 0 ? files[0].id : null);
   const [search, setSearch] = useState('');
   const [isPreview, setIsPreview] = useState(false);
+  const [isHelperOpen, setIsHelperOpen] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [collapsedFolders, setCollapsedFolders] = useState({});
+
+  const [folders, setFolders] = useState(() => {
+    const existing = files.map(f => f.folder).filter(Boolean);
+    const defaults = ['Inbox', 'Personal', 'Work', 'Obsidian'];
+    return Array.from(new Set([...defaults, ...existing]));
+  });
+
+  // Pre-load default Obsidian Handbuch file if database is empty
+  useEffect(() => {
+    if (files.length === 0) {
+      const defaultFile = {
+        id: 1,
+        name: 'Obsidian Handbuch.md',
+        folder: 'Obsidian',
+        content: `# 📓 Obsidian & Markdown Handbuch\n\nWillkommen in deinem E.O.M Notizen-Workspace! Hier findest du eine Übersicht über die wichtigsten Markdown-Formatierungen, die du auch in Obsidian verwenden kannst.\n\n## 1. Überschriften (Headings)\nVerwende \`#\` gefolgt von einem Leerzeichen für Überschriften:\n# Überschrift 1 (H1)\n## Überschrift 2 (H2)\n### Überschrift 3 (H3)\n\n## 2. Textformatierung\n* *Kursiv* (\`*Kursiv*\` oder \`_Kursiv_\`)\n* **Fett** (\`**Fett**\` oder \`__Fett__\`)\n* ***Fett & Kursiv*** (\`***Fett & Kursiv***\`)\n* ~~Durchgestrichen~~ (\`~~Durchgestrichen~~\`)\n* ==Markiert (Obsidian Highlight)== (\`==Markiert==\`)\n\n## 3. Listen (Lists)\n### Unsortiert:\n- Punkt 1\n- Punkt 2\n  - Unterpunkt 2a\n\n### Sortiert:\n1. Erster Punkt\n2. Zweiter Punkt\n\n### Aufgabenliste (Task List):\n- [ ] Offene Aufgabe\n- [x] Erledigte Aufgabe\n\n## 4. Links & Bilder\n* Externer Link: [Google](https://google.com) (\`[Google](https://google.com)\`)\n* Interner Wikilink (Obsidian-Style): [[Titel einer anderen Notiz]] (\`[[Titel einer anderen Notiz]]\`)\n* Bild: \`![Bild Beschreibung](URL)\`\n\n## 5. Code & Zitate\n### Inline-Code:\nVerwende Backticks: \`const temp = 24.5;\`\n\n### Code-Block:\n\`\`\`javascript\n// Syntax-Highlighting für JS\nfunction greet() {\n  console.log("Hallo Welt!");\n}\n\`\`\`\n\n### Zitate (Blockquotes):\n> "Die Grenzen meiner Sprache bedeuten die Grenzen meiner Welt." — Ludwig Wittgenstein\n\n## 6. Tabellen (Tables)\n| Feature | Syntax | Beispiel |\n| :--- | :---: | ---: |\n| Fett | \`**text**\` | **Fett** |\n| Code | \\\`code\\\` | \\\`Code\\\` |\n\n## 7. Mathematische Formeln (LaTeX)\n* Inline: $E = mc^2$ (\`$E = mc^2$\`)\n`,
+        timestamp: Date.now()
+      };
+      setFiles([defaultFile]);
+      setActiveFileId(1);
+    }
+  }, [files, setFiles]);
+
+  // Keep activeFileId stable when files list changes
+  useEffect(() => {
+    if (files.length > 0 && !activeFileId) {
+      setActiveFileId(files[0].id);
+    }
+  }, [files, activeFileId]);
 
   const activeFile = files.find(f => f.id === activeFileId);
 
@@ -28,11 +59,34 @@ export default function Editor() {
       id: Date.now(),
       name: 'untitled.md',
       content: '',
+      folder: 'Inbox',
       timestamp: Date.now(),
     };
     setFiles([newFile, ...files]);
     setActiveFileId(newFile.id);
     setIsPreview(false);
+  };
+
+  const handleCreateFileInFolder = (folderName) => {
+    const newFile = {
+      id: Date.now(),
+      name: 'untitled.md',
+      content: '',
+      folder: folderName,
+      timestamp: Date.now(),
+    };
+    setFiles([newFile, ...files]);
+    setActiveFileId(newFile.id);
+    setIsPreview(false);
+  };
+
+  const handleCreateFolder = () => {
+    const cleanFolder = newFolderName.trim();
+    if (!cleanFolder) return;
+    if (!folders.includes(cleanFolder)) {
+      setFolders([...folders, cleanFolder]);
+    }
+    setNewFolderName('');
   };
 
   const handleUpdate = (field, value) => {
@@ -48,6 +102,13 @@ export default function Editor() {
     setActiveFileId(updatedFiles.length > 0 ? updatedFiles[0].id : null);
   };
 
+  const toggleFolder = (folderName) => {
+    setCollapsedFolders(prev => ({
+      ...prev,
+      [folderName]: !prev[folderName]
+    }));
+  };
+
   const formatDate = (ts) => {
     const d = new Date(ts);
     return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -60,20 +121,52 @@ export default function Editor() {
           <CodeIcon />
         </div>
         <h1 className="premium-title">Editor</h1>
-        <p className="premium-subtitle">Standalone text and code editor.<br />Draft notes, scripts, or markdown documents.</p>
+        <p className="premium-subtitle">Standalone text and markdown editor with folders.<br />Draft notes, wikis, and organize your files.</p>
       </div>
 
       <div style={{ display: 'flex', flex: 1, gap: '20px', minHeight: 0 }}>
         
         {/* LEFT PANEL: FILE TREE */}
-        <div className="premium-card" style={{ width: '280px', display: 'flex', flexDirection: 'column', padding: '16px', gap: '12px' }}>
-          <button 
-            onClick={handleCreateNew} 
-            className="pill blue" 
-            style={{ width: '100%', justifyContent: 'center', padding: '10px' }}
-          >
-            + New File
-          </button>
+        <div className="premium-card" style={{ width: '280px', minWidth: '220px', maxWidth: '400px', resize: 'horizontal', overflow: 'auto', display: 'flex', flexDirection: 'column', padding: '16px', gap: '12px' }}>
+          
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <button 
+              onClick={handleCreateNew} 
+              className="pill blue" 
+              style={{ flex: 1, justifyContent: 'center', padding: '8px', fontSize: '0.8rem' }}
+            >
+              + New File
+            </button>
+          </div>
+
+          {/* New Folder Creator */}
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <input
+              type="text"
+              placeholder="New folder..."
+              value={newFolderName}
+              onChange={(e) => setNewFolderName(e.target.value)}
+              style={{
+                flex: 1,
+                background: 'var(--bg-input)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-main)',
+                padding: '6px 10px',
+                borderRadius: '6px',
+                outline: 'none',
+                fontSize: '0.8rem'
+              }}
+              onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()}
+            />
+            <button 
+              onClick={handleCreateFolder}
+              className="pill blue"
+              style={{ padding: '6px 10px', minWidth: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              +
+            </button>
+          </div>
+
           <input 
             type="text" 
             placeholder="Search files..." 
@@ -89,63 +182,145 @@ export default function Editor() {
               fontSize: '0.85rem'
             }}
           />
-          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '4px', paddingRight: '4px' }}>
-            {filteredFiles.map(file => (
-              <div 
-                key={file.id}
-                onClick={() => setActiveFileId(file.id)}
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  background: activeFileId === file.id ? 'var(--primary)' : 'transparent',
-                  color: activeFileId === file.id ? '#fff' : 'var(--text-main)',
-                  cursor: 'pointer',
-                  transition: 'all 0.1s ease',
-                  fontSize: '0.9rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                <span style={{ opacity: 0.6, fontSize: '1rem' }}>📄</span>
-                <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {file.name}
+
+          {/* Collapsible Folders Tree */}
+          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingRight: '4px' }}>
+            {folders.map(folder => {
+              const folderFiles = filteredFiles.filter(f => (f.folder || 'Inbox') === folder);
+              const isCollapsed = collapsedFolders[folder];
+              
+              return (
+                <div key={folder} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <div 
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'space-between',
+                      padding: '6px 8px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      background: 'rgba(255,255,255,0.02)',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      color: 'var(--text-muted)',
+                      transition: 'background 0.2s'
+                    }}
+                    onClick={() => toggleFolder(folder)}
+                    className="folder-header"
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span>{isCollapsed ? '📁' : '📂'}</span>
+                      <span>{folder}</span>
+                      <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>({folderFiles.length})</span>
+                    </div>
+                    
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCreateFileInFolder(folder);
+                      }}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--primary)',
+                        cursor: 'pointer',
+                        fontSize: '1.1rem',
+                        padding: '0 4px',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                      title={`Create file in ${folder}`}
+                    >
+                      +
+                    </button>
+                  </div>
+                  
+                  {!isCollapsed && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '12px', borderLeft: '1px solid var(--border-color)', marginLeft: '8px', marginTop: '4px' }}>
+                      {folderFiles.map(file => (
+                        <div 
+                          key={file.id}
+                          onClick={() => setActiveFileId(file.id)}
+                          style={{
+                            padding: '6px 10px',
+                            borderRadius: '6px',
+                            background: activeFileId === file.id ? 'var(--primary)' : 'transparent',
+                            color: activeFileId === file.id ? '#fff' : 'var(--text-main)',
+                            cursor: 'pointer',
+                            transition: 'all 0.1s ease',
+                            fontSize: '0.85rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}
+                        >
+                          <span>📄</span>
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</span>
+                        </div>
+                      ))}
+                      {folderFiles.length === 0 && (
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic', padding: '4px 10px' }}>
+                          Empty
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
-            {filteredFiles.length === 0 && (
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textAlign: 'center', marginTop: '20px' }}>
-                No files found.
-              </div>
-            )}
+              );
+            })}
           </div>
         </div>
 
-        {/* RIGHT PANEL: WORKSPACE */}
+        {/* CENTER PANEL: WORKSPACE */}
         <div className="premium-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '0', overflow: 'hidden' }}>
           {activeFile ? (
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               
               {/* Toolbar */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 20px', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-card-alt)' }}>
-                <input 
-                  type="text"
-                  value={activeFile.name}
-                  onChange={(e) => handleUpdate('name', e.target.value)}
-                  placeholder="untitled.txt"
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'var(--text-main)',
-                    fontSize: '1.1rem',
-                    fontWeight: 600,
-                    outline: 'none',
-                    width: '300px'
-                  }}
-                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <input 
+                    type="text"
+                    value={activeFile.name}
+                    onChange={(e) => handleUpdate('name', e.target.value)}
+                    placeholder="untitled.md"
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'var(--text-main)',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      outline: 'none',
+                      width: '180px'
+                    }}
+                  />
+                  
+                  {/* Folder Selector Dropdown */}
+                  <select
+                    value={activeFile.folder || 'Inbox'}
+                    onChange={(e) => handleUpdate('folder', e.target.value)}
+                    style={{
+                      background: 'var(--bg-card)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-main)',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem',
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {folders.map(folder => (
+                      <option key={folder} value={folder}>{folder}</option>
+                    ))}
+                  </select>
+                </div>
                 
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginRight: '8px' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginRight: '8px' }} className="hide-mobile">
                     {formatDate(activeFile.timestamp)}
                   </span>
                   
@@ -156,6 +331,15 @@ export default function Editor() {
                   >
                     {isPreview ? 'Code' : 'Preview'}
                   </button>
+
+                  <button 
+                    onClick={() => setIsHelperOpen(!isHelperOpen)} 
+                    className={`pill ${isHelperOpen ? 'blue' : ''}`}
+                    style={{ fontSize: '0.8rem' }}
+                  >
+                    📖 Manual
+                  </button>
+
                   <button onClick={handleDelete} className="pill red" style={{ fontSize: '0.8rem' }}>Delete</button>
                 </div>
               </div>
@@ -193,11 +377,68 @@ export default function Editor() {
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifySelf: 'center', height: '100%', color: 'var(--text-muted)' }}>
               Select a file or create a new one.
             </div>
           )}
         </div>
+
+        {/* RIGHT PANEL: MARKDOWN GUIDE */}
+        {isHelperOpen && (
+          <div className="premium-card" style={{ width: '320px', overflowY: 'auto', display: 'flex', flexDirection: 'column', padding: '16px', gap: '12px', borderLeft: '1px solid var(--border-color)', background: 'var(--bg-card-alt)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>
+              <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--primary)' }}>📖 Obsidian Manual</span>
+              <button 
+                onClick={() => setIsHelperOpen(false)} 
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1rem', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', fontSize: '0.8rem', lineHeight: '1.4' }}>
+              <div>
+                <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '4px' }}>Headers</strong>
+                <pre style={{ background: 'var(--bg-main)', padding: '6px', borderRadius: '4px', margin: 0 }}># Title H1<br/>## Title H2<br/>### Title H3</pre>
+              </div>
+              
+              <div>
+                <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '4px' }}>Emphasis</strong>
+                <pre style={{ background: 'var(--bg-main)', padding: '6px', borderRadius: '4px', margin: 0 }}>**Bold Text**<br/>*Italic Text*<br/>~~Strikethrough~~<br/>==Highlight==</pre>
+              </div>
+
+              <div>
+                <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '4px' }}>Wikilinks & Links</strong>
+                <pre style={{ background: 'var(--bg-main)', padding: '6px', borderRadius: '4px', margin: 0 }}>[[Internal Note]]<br/>[Link Text](https://...)</pre>
+              </div>
+
+              <div>
+                <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '4px' }}>Task List</strong>
+                <pre style={{ background: 'var(--bg-main)', padding: '6px', borderRadius: '4px', margin: 0 }}>- [ ] Todo Item<br/>- [x] Completed Item</pre>
+              </div>
+
+              <div>
+                <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '4px' }}>Code Block</strong>
+                <pre style={{ background: 'var(--bg-main)', padding: '6px', borderRadius: '4px', margin: 0 }}>\`\`\`javascript<br/>const a = 1;<br/>\`\`\`</pre>
+              </div>
+
+              <div>
+                <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '4px' }}>Quotes</strong>
+                <pre style={{ background: 'var(--bg-main)', padding: '6px', borderRadius: '4px', margin: 0 }}>&gt; This is a blockquote.</pre>
+              </div>
+
+              <div>
+                <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '4px' }}>Tables</strong>
+                <pre style={{ background: 'var(--bg-main)', padding: '6px', borderRadius: '4px', margin: 0 }}>| Col 1 | Col 2 |<br/>|---|---|<br/>| Val 1 | Val 2 |</pre>
+              </div>
+
+              <div>
+                <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '4px' }}>Math (LaTeX)</strong>
+                <pre style={{ background: 'var(--bg-main)', padding: '6px', borderRadius: '4px', margin: 0 }}>$E = mc^2$<br/><br/>$$<br/>a^2 + b^2 = c^2<br/>$$</pre>
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

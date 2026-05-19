@@ -407,3 +407,9 @@ button {
 .react-flow__background {
   opacity: 0.8;
 }
+
+/* Enable resizing on all modal content windows */
+.mac-modal, .profile-modal-content, .modal-content, .media-modal-content {
+  resize: both !important;
+  overflow: auto !important;
+}

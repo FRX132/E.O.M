@@ -10,7 +10,7 @@ const Icon = ({ d, size = 18 }) => (
 );
 
 // ── Risk Calculator Tab ────────────────────────────────
-function RiskCalc() {
+function RiskCalc({ currency }) {
   const [capital, setCapital] = useState('');
   const [risk, setRisk] = useState('');
   const [entry, setEntry] = useState('');
@@ -26,7 +26,7 @@ function RiskCalc() {
       <div className="risk-calc">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {[
-            { label: 'Capital (€)', val: capital, set: setCapital, ph: 'e.g. 10000' },
+            { label: `Capital (${currency})`, val: capital, set: setCapital, ph: 'e.g. 10000' },
             { label: 'Risk %', val: risk, set: setRisk, ph: 'e.g. 1' },
             { label: 'Entry Price', val: entry, set: setEntry, ph: 'e.g. 150.00' },
             { label: 'Stop Loss', val: stop, set: setStop, ph: 'e.g. 147.00' },
@@ -40,9 +40,9 @@ function RiskCalc() {
         <div className="risk-result-panel">
           <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--primary)' }}>📊 Position Sizing</h3>
           {[
-            { label: 'Risk Amount', value: `€${riskAmt.toFixed(2)}` },
+            { label: 'Risk Amount', value: `${currency}${riskAmt.toFixed(2)}` },
             { label: 'Position Size', value: `${posSize.toFixed(2)} shares` },
-            { label: 'Stop Distance', value: `€${diff.toFixed(2)}` },
+            { label: 'Stop Distance', value: `${currency}${diff.toFixed(2)}` },
             { label: 'Risk/Entry Ratio', value: `${rr.toFixed(2)}%` },
           ].map(r => (
             <div className="risk-result-row" key={r.label}>
@@ -57,7 +57,7 @@ function RiskCalc() {
 }
 
 // ── Trade Journal Tab ─────────────────────────────────
-function TradeJournal() {
+function TradeJournal({ currency }) {
   const trades = useStore(s => s.trades || []);
   const setTrades = useStore(s => s.setTrades);
 
@@ -76,7 +76,7 @@ function TradeJournal() {
     <div>
       <div className="trading-stats-row" style={{ marginBottom: 24 }}>
         {[
-          { label: 'Total P&L', value: `€${totalPnl.toFixed(2)}`, cls: totalPnl >= 0 ? 'positive' : 'negative' },
+          { label: 'Total P&L', value: `${currency}${totalPnl.toFixed(2)}`, cls: totalPnl >= 0 ? 'positive' : 'negative' },
           { label: 'Trades', value: trades.length },
           { label: 'Win Rate', value: `${wr}%`, cls: wr >= 50 ? 'positive' : 'negative' },
           { label: 'Wins', value: wins },
@@ -94,7 +94,7 @@ function TradeJournal() {
         <table className="trading-table">
           <thead>
             <tr>
-              {['Symbol', 'Type', 'Entry', 'Exit', 'Size', 'P&L (€)', 'Date', 'Notes', ''].map(h => <th key={h}>{h}</th>)}
+              {['Symbol', 'Type', 'Entry', 'Exit', 'Size', `P&L (${currency})`, 'Date', 'Notes', ''].map(h => <th key={h}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
@@ -287,7 +287,7 @@ function AnalyseTool() {
 }
 
 // ── Finance Link Tab ───────────────────────────────────
-function FinanceLink({ navigate }) {
+function FinanceLink({ navigate, currency }) {
   const trades = useStore(s => s.trades || []);
   const expenses = useStore(s => s.expenses || []);
   const setExpenses = useStore(s => s.setExpenses);
@@ -325,7 +325,7 @@ function FinanceLink({ navigate }) {
         </div>
         <div className="risk-result-row">
           <span className="label">Total P&L</span>
-          <span className="value" style={{ color: totalPnl >= 0 ? 'var(--green-text)' : 'var(--red-text)' }}>€{totalPnl.toFixed(2)}</span>
+          <span className="value" style={{ color: totalPnl >= 0 ? 'var(--green-text)' : 'var(--red-text)' }}>{currency}{totalPnl.toFixed(2)}</span>
         </div>
         <div className="risk-result-row">
           <span className="label">Expense Entries</span>
@@ -356,17 +356,19 @@ const TABS = [
 
 export default function TradingTerminal({ navigate }) {
   const [tab, setTab] = useState('journal');
+  const profile = useStore(state => state.profile || {});
+  const currency = profile.currencySymbol || '€';
 
   const renderTab = () => {
     switch (tab) {
-      case 'journal': return <TradeJournal />;
+      case 'journal': return <TradeJournal currency={currency} />;
       case 'trends': return <TrendAnalyser />;
       case 'analyse': return <AnalyseTool />;
       case 'plan': return <TradingPlan />;
-      case 'risk': return <RiskCalc />;
+      case 'risk': return <RiskCalc currency={currency} />;
       case 'strategies': return <Strategies />;
       case 'watchlist': return <Watchlist />;
-      case 'finance': return <FinanceLink navigate={navigate} />;
+      case 'finance': return <FinanceLink navigate={navigate} currency={currency} />;
       default: return null;
     }
   };

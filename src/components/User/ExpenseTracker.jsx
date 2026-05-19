@@ -27,6 +27,8 @@ export default function ExpenseTracker() {
   const expenses = useStore(state => state.expenses);
   const assets = useStore(state => state.assets);
   const financeSettings = useStore(state => state.financeSettings);
+  const profile = useStore(state => state.profile || {});
+  const currency = profile.currencySymbol || '€';
 
   const setExpenses = useStore(state => state.setExpenses);
   const setAssets = useStore(state => state.setAssets);
@@ -165,7 +167,7 @@ export default function ExpenseTracker() {
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '5px' }}>{timeframe} Limit</div>
                   {editingLimit === timeframe ? (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <span style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.2rem', marginRight: '4px' }}>€</span>
+                      <span style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.2rem', marginRight: '4px' }}>{currency}</span>
                       <input
                         type="number"
                         autoFocus
@@ -207,7 +209,7 @@ export default function ExpenseTracker() {
                       }}
                       title="Click to edit limit"
                     >
-                      €{limit.toLocaleString()}
+                      {currency}{limit.toLocaleString()}
                     </div>
                   )}
                 </div>
@@ -219,7 +221,7 @@ export default function ExpenseTracker() {
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '5px' }}>
               <span>Monthly Budget Progress</span>
               <span style={{ color: budgetProgressMonthly > 90 ? 'var(--red-text)' : 'inherit' }}>
-                €{currentMonthTotal.toLocaleString()} / €{limits.monthly.toLocaleString()}
+                {currency}{currentMonthTotal.toLocaleString()} / {currency}{limits.monthly.toLocaleString()}
               </span>
             </div>
             <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
@@ -347,7 +349,7 @@ export default function ExpenseTracker() {
                     </td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--text-muted)', marginRight: '4px' }}>€</span>
+                        <span style={{ color: 'var(--text-muted)', marginRight: '4px' }}>{currency}</span>
                         <input
                           type="number"
                           value={expense.amount}
@@ -430,7 +432,7 @@ export default function ExpenseTracker() {
         <div className="notion-block scale-in">
           <div className="notion-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>💳 Capital Assets</span>
-            <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>Total: €{totalWealth.toLocaleString()}</span>
+            <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>Total: {currency}{totalWealth.toLocaleString()}</span>
           </div>
 
           <div style={{ padding: '20px' }}>
@@ -442,7 +444,7 @@ export default function ExpenseTracker() {
                 return (
                   <div key={type} className="premium-card">
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>{type} Balance</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', marginTop: '5px' }}>€{typeTotal.toLocaleString()}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', marginTop: '5px' }}>{currency}{typeTotal.toLocaleString()}</div>
                     <div style={{ position: 'absolute', top: '15px', right: '15px', opacity: 0.2, fontSize: '1.5rem' }}>
                       {type === 'Bank' ? '🏛️' : type === 'Cash' ? '💵' : type === 'Stock' ? '📈' : type === 'Crypto' ? '🪙' : type === 'Investment' ? '🏦' : '📦'}
                     </div>
@@ -483,7 +485,7 @@ export default function ExpenseTracker() {
                     </td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--text-muted)', marginRight: '4px' }}>€</span>
+                        <span style={{ color: 'var(--text-muted)', marginRight: '4px' }}>{currency}</span>
                         <input
                           type="number"
                           value={asset.amount}

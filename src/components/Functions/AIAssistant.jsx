@@ -53,17 +53,26 @@ export default function AIAssistant() {
                 const state = useStore.getState();
 
                 const safeMap = (arr, fn) => Array.isArray(arr) ? arr.map(fn).filter(Boolean).join(', ') : 'None';
+                const safeMapLines = (arr, fn) => Array.isArray(arr) ? arr.map(fn).filter(Boolean).join('\n') : 'None';
 
-                const recentExpenses = Array.isArray(state.expenses) ? state.expenses.slice(-5).map(exp => `${exp.amount}€ for ${exp.category}`).join(', ') : 'None';
+                const currency = state.profile?.currencySymbol || '€';
+                const recentExpenses = Array.isArray(state.expenses) ? state.expenses.slice(-5).map(exp => `${currency}${exp.amount} for ${exp.category}`).join(', ') : 'None';
                 const currentGoals = [...(Array.isArray(state.goals?.week) ? state.goals.week : []), ...(Array.isArray(state.goals?.month) ? state.goals.month : [])].map(g => g?.text).filter(Boolean).join(', ') || 'None';
 
                 const habits = safeMap(state.habits, h => h?.name ? `${h.name} (${h.completedDays}/${h.targetDays} days)` : null);
-                const assets = safeMap(state.assets, a => a?.name ? `${a.name}: ${a.amount}€` : null);
-                const books = safeMap(state.books, b => b?.title);
-                const movies = safeMap(state.movies, m => m?.title);
+                const assets = safeMap(state.assets, a => a?.name ? `${a.name}: ${currency}${a.amount}` : null);
+                const books = safeMapLines(state.books, b => b?.title ? `- ${b.title} by ${b.subtitle || 'Unknown'} [Status: ${b.status}, Rating: ${b.rating}★] ${b.notes ? `(Notes: ${b.notes})` : ''}` : null);
+                const movies = safeMapLines(state.movies, m => m?.title ? `- ${m.title} [Genre/Type: ${m.subtitle || 'Unknown'}, Status: ${m.status}, Rating: ${m.rating}★] ${m.notes ? `(Notes: ${m.notes})` : ''}` : null);
                 const trips = safeMap(state.trips, t => t?.location ? `${t.location} (${t.status})` : null);
                 const unlockedSkills = Array.isArray(state.skills) ? state.skills.join(', ') : 'None';
                 const fridgeItems = safeMap(state.fridge, f => f?.name);
+
+                // Extended contexts
+                const recentJournal = safeMapLines((state.journal || []).slice(-5), j => j?.title ? `- ${j.title} (${j.date || ''}): ${j.content ? j.content.substring(0, 150) + '...' : ''}` : null);
+                const recentNotes = safeMapLines((state.editorFiles || []).slice(-5), n => n?.title ? `- ${n.title} (Folder: ${n.folder || 'Root'}): ${n.content ? n.content.substring(0, 150) + '...' : ''}` : null);
+                const tradingPlanInfo = state.tradingPlan ? `Goals: ${state.tradingPlan.goals || 'None'}, Rules: ${state.tradingPlan.rules || 'None'}, Mindset: ${state.tradingPlan.mindset || 'None'}, Routine: ${state.tradingPlan.routine || 'None'}` : 'None';
+                const recentTrades = safeMap((state.trades || []).slice(-5), t => t?.symbol ? `${t.symbol} (${t.type}, P&L: ${currency}${t.pnl || 0})` : null);
+                const recentWorkouts = safeMap((state.workouts || []).slice(-5), w => w?.name ? `${w.name} (${w.duration || w.date || ''})` : null);
 
                 const contextData = `
 System Context: You are an AI Assistant built into the Life Planner OS. You have full access to the user's life data. Use this data to provide highly personalized advice, motivation, and answers.
@@ -74,11 +83,20 @@ Current Tasks: ${currentGoals}
 Recent Expenses: ${recentExpenses}
 Capital Assets: ${assets}
 Active Habits: ${habits}
-Reading List: ${books}
-Watch List: ${movies}
+Reading Library:
+${books}
+Cinema Watchlist:
+${movies}
 Travel Plans: ${trips}
 Fridge Inventory: ${fridgeItems}
 Unlocked Skills: ${unlockedSkills}
+Recent Workouts: ${recentWorkouts}
+Trading Plan: ${tradingPlanInfo}
+Recent Trades: ${recentTrades}
+Recent Journal Entries:
+${recentJournal}
+Recent Personal Notes:
+${recentNotes}
 -----------------
 
 ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFERENCE DOCUMENT: ${state.aiKnowledgeBase.find(d => d.id === activeDocId).title} ---\n${state.aiKnowledgeBase.find(d => d.id === activeDocId).content.substring(0, 4000)}\n[End of Document]\n-----------------------------` : ''}
