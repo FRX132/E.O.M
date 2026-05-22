@@ -15,7 +15,7 @@ export default function Editor() {
 
   const [activeFileId, setActiveFileId] = useState(files.length > 0 ? files[0].id : null);
   const [search, setSearch] = useState('');
-  const [isPreview, setIsPreview] = useState(false);
+  const [viewMode, setViewMode] = useState('edit'); // 'edit', 'split', 'preview'
   const [isHelperOpen, setIsHelperOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [collapsedFolders, setCollapsedFolders] = useState({});
@@ -76,7 +76,7 @@ export default function Editor() {
     };
     setFiles([newFile, ...files]);
     setActiveFileId(newFile.id);
-    setIsPreview(false);
+    setViewMode('edit');
   };
 
   const handleCreateFileInFolder = (folderName) => {
@@ -89,7 +89,7 @@ export default function Editor() {
     };
     setFiles([newFile, ...files]);
     setActiveFileId(newFile.id);
-    setIsPreview(false);
+    setViewMode('edit');
   };
 
   const handleCreateFolder = () => {
@@ -118,7 +118,7 @@ export default function Editor() {
       }));
       setFiles([...imported, ...files]);
       setActiveFileId(imported[0].id);
-      setIsPreview(false);
+      setViewMode('edit');
     } else if (res.error && res.error !== 'No files selected') {
       alert(`Error importing files: ${res.error}`);
     }
@@ -141,7 +141,7 @@ export default function Editor() {
       }));
       setFiles([...imported, ...files]);
       setActiveFileId(imported[0].id);
-      setIsPreview(false);
+      setViewMode('edit');
     } else if (res.error && res.error !== 'No directory selected') {
       alert(`Error importing folder: ${res.error}`);
     }
@@ -165,6 +165,59 @@ export default function Editor() {
       ...prev,
       [folderName]: !prev[folderName]
     }));
+  };
+
+  const handleCollapseAll = () => {
+    const collapsed = {};
+    folders.forEach(f => {
+      collapsed[f] = true;
+    });
+    setCollapsedFolders(collapsed);
+  };
+
+  const handleExpandAll = () => {
+    setCollapsedFolders({});
+  };
+
+  const handleImportFilesToFolder = async (folderName) => {
+    if (!window.electronAPI || !window.electronAPI.selectFiles) {
+      alert("Electron API is not available.");
+      return;
+    }
+    const res = await window.electronAPI.selectFiles();
+    if (res.success && res.files && res.files.length > 0) {
+      const baseTime = Date.now();
+      const imported = res.files.map((file, idx) => ({
+        id: baseTime + idx,
+        name: file.name,
+        content: file.content,
+        folder: folderName,
+        timestamp: file.timestamp || baseTime
+      }));
+      setFiles([...imported, ...files]);
+      setActiveFileId(imported[0].id);
+      setViewMode('edit');
+    } else if (res.error && res.error !== 'No files selected') {
+      alert(`Error importing files: ${res.error}`);
+    }
+  };
+
+  const handleAppendFileContent = async () => {
+    if (!activeFileId || !activeFile) return;
+    if (!window.electronAPI || !window.electronAPI.selectFiles) {
+      alert("Electron API is not available.");
+      return;
+    }
+    const res = await window.electronAPI.selectFiles();
+    if (res.success && res.files && res.files.length > 0) {
+      let extraContent = '';
+      res.files.forEach(f => {
+        extraContent += `\n\n--- Appended from ${f.name} ---\n${f.content}`;
+      });
+      handleUpdate('content', (activeFile.content || '') + extraContent);
+    } else if (res.error && res.error !== 'No files selected') {
+      alert(`Error appending files: ${res.error}`);
+    }
   };
 
   const formatDate = (ts) => {
@@ -271,6 +324,42 @@ export default function Editor() {
             </button>
           </div>
 
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>Folders</span>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button 
+                onClick={handleExpandAll} 
+                className="pill" 
+                style={{ 
+                  padding: '2px 6px', 
+                  fontSize: '0.65rem', 
+                  cursor: 'pointer', 
+                  background: 'transparent', 
+                  border: '1px solid var(--border-color)', 
+                  color: 'var(--text-main)' 
+                }}
+                title="Expand All Folders"
+              >
+                📂 Expand All
+              </button>
+              <button 
+                onClick={handleCollapseAll} 
+                className="pill" 
+                style={{ 
+                  padding: '2px 6px', 
+                  fontSize: '0.65rem', 
+                  cursor: 'pointer', 
+                  background: 'transparent', 
+                  border: '1px solid var(--border-color)', 
+                  color: 'var(--text-main)' 
+                }}
+                title="Collapse All Folders"
+              >
+                📁 Collapse All
+              </button>
+            </div>
+          </div>
+
           <input 
             type="text" 
             placeholder="Search files..." 
@@ -318,25 +407,46 @@ export default function Editor() {
                       <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>({folderFiles.length})</span>
                     </div>
                     
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCreateFileInFolder(folder);
-                      }}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'var(--primary)',
-                        cursor: 'pointer',
-                        fontSize: '1.1rem',
-                        padding: '0 4px',
-                        display: 'flex',
-                        alignItems: 'center'
-                      }}
-                      title={`Create file in ${folder}`}
-                    >
-                      +
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleImportFilesToFolder(folder);
+                        }}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--text-muted)',
+                          cursor: 'pointer',
+                          fontSize: '0.85rem',
+                          padding: '0 4px',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                        title={`Import files to ${folder}`}
+                      >
+                        📥
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCreateFileInFolder(folder);
+                        }}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--primary)',
+                          cursor: 'pointer',
+                          fontSize: '1.1rem',
+                          padding: '0 4px',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                        title={`Create file in ${folder}`}
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                   
                   {!isCollapsed && (
@@ -428,55 +538,73 @@ export default function Editor() {
                     {formatDate(activeFile.timestamp)}
                   </span>
                   
-                  <button 
-                    onClick={() => setIsPreview(!isPreview)} 
-                    className={`pill ${isPreview ? 'blue' : ''}`}
-                    style={{ fontSize: '0.8rem' }}
-                  >
-                    {isPreview ? 'Code' : 'Preview'}
-                  </button>
+                  {/* Segmented view mode selector */}
+                  <div style={{ display: 'flex', background: 'var(--bg-main)', padding: '2px', borderRadius: '6px', border: '1px solid var(--border-color)', gap: '2px' }}>
+                    <button 
+                      onClick={() => setViewMode('edit')} 
+                      className={`pill ${viewMode === 'edit' ? 'blue' : ''}`}
+                      style={{ fontSize: '0.75rem', padding: '4px 10px', background: viewMode === 'edit' ? 'var(--blue-bg)' : 'transparent', border: 'none', color: viewMode === 'edit' ? 'var(--blue-text)' : 'var(--text-muted)', cursor: 'pointer' }}
+                      title="Editor Mode"
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button 
+                      onClick={() => setViewMode('split')} 
+                      className={`pill ${viewMode === 'split' ? 'blue' : ''}`}
+                      style={{ fontSize: '0.75rem', padding: '4px 10px', background: viewMode === 'split' ? 'var(--blue-bg)' : 'transparent', border: 'none', color: viewMode === 'split' ? 'var(--blue-text)' : 'var(--text-muted)', cursor: 'pointer' }}
+                      title="Split Live Preview Mode"
+                    >
+                      🥞 Split
+                    </button>
+                    <button 
+                      onClick={() => setViewMode('preview')} 
+                      className={`pill ${viewMode === 'preview' ? 'blue' : ''}`}
+                      style={{ fontSize: '0.75rem', padding: '4px 10px', background: viewMode === 'preview' ? 'var(--blue-bg)' : 'transparent', border: 'none', color: viewMode === 'preview' ? 'var(--blue-text)' : 'var(--text-muted)', cursor: 'pointer' }}
+                      title="Preview Mode"
+                    >
+                      👁️ Preview
+                    </button>
+                  </div>
 
                   <button 
                     onClick={() => setIsHelperOpen(!isHelperOpen)} 
                     className={`pill ${isHelperOpen ? 'blue' : ''}`}
-                    style={{ fontSize: '0.8rem' }}
+                    style={{ fontSize: '0.8rem', cursor: 'pointer' }}
                   >
                     📖 Manual
                   </button>
 
-                  <button onClick={handleDelete} className="pill red" style={{ fontSize: '0.8rem' }}>Delete</button>
+                  <button 
+                    onClick={handleAppendFileContent} 
+                    className="pill green" 
+                    style={{ fontSize: '0.8rem', cursor: 'pointer' }}
+                    title="Append file content to this note"
+                  >
+                    ➕ Append File
+                  </button>
+
+                  <button onClick={handleDelete} className="pill red" style={{ fontSize: '0.8rem', cursor: 'pointer' }}>Delete</button>
                 </div>
               </div>
 
               {/* Editor / Viewer Area */}
-              <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-                {isPreview ? (
-                  <div style={{ padding: '24px', flex: 1 }}>
-                    <MarkdownViewer 
-                      content={activeFile.content || '*Empty file.*'}
-                      onUpdate={(newContent) => handleUpdate('content', newContent)}
-                    />
-                  </div>
-                ) : (
+              <div className={`editor-split-workspace ${viewMode === 'split' ? 'split' : ''}`}>
+                {(viewMode === 'edit' || viewMode === 'split') && (
                   <textarea 
                     value={activeFile.content}
                     onChange={(e) => handleUpdate('content', e.target.value)}
                     placeholder="Write code, markdown, or plain text..."
                     spellCheck="false"
-                    style={{
-                      flex: 1,
-                      background: 'transparent',
-                      border: 'none',
-                      color: 'var(--text-main)',
-                      padding: '24px',
-                      fontSize: '0.95rem',
-                      lineHeight: '1.6',
-                      outline: 'none',
-                      resize: 'none',
-                      fontFamily: 'var(--font-mono), monospace',
-                      whiteSpace: 'pre-wrap'
-                    }}
+                    className="editor-textarea"
                   />
+                )}
+                {(viewMode === 'preview' || viewMode === 'split') && (
+                  <div className="editor-preview-panel">
+                    <MarkdownViewer 
+                      content={activeFile.content || '*Empty file.*'}
+                      onUpdate={(newContent) => handleUpdate('content', newContent)}
+                    />
+                  </div>
                 )}
               </div>
             </div>

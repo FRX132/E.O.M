@@ -112,16 +112,39 @@
   --primary: #ff5e00;
   --font-main: 'Inter', sans-serif;
   --border-neon: 2px solid #000000;
+  --neo-shadow-color: #000000;
+  --neo-btn-bg: var(--primary);
+  --neo-btn-text: #ffffff;
+}
+
+/* Overrides for Neo-Brutalism in Dark Mode */
+:root[data-theme="dark"][data-interface-template="neo-brutalism"] {
+  --bg-main: #08090c;
+  --bg-card: #13151b;
+  --bg-header: #1b1e26;
+  --border-color: #ffffff;
+  --border-light: rgba(255, 255, 255, 0.4);
+  --bg-card-alt: #1a1d26;
+  --bg-input: #1b1e26;
+  --card-bg: var(--bg-card);
+  --glass-bg: #13151b;
+  --card-shadow: 6px 6px 0px var(--primary);
+  --text-main: #ffffff;
+  --text-muted: #abb2bf;
+  --border-neon: 2px solid #ffffff;
+  --neo-shadow-color: var(--primary);
+  --neo-btn-bg: var(--primary);
+  --neo-btn-text: #ffffff;
 }
 
 :root[data-interface-template="neo-brutalism"] .notion-block,
 :root[data-interface-template="neo-brutalism"] .overview-card,
 :root[data-interface-template="neo-brutalism"] .premium-card {
-  border: 3px solid #000000 !important;
+  border: 3px solid var(--border-color) !important;
   border-radius: 0px !important;
-  box-shadow: 8px 8px 0px #000000 !important;
-  background-color: #ffffff !important;
-  color: #000000 !important;
+  box-shadow: 8px 8px 0px var(--neo-shadow-color) !important;
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
   transform: translate(-2px, -2px);
   transition: all 0.15s ease;
 }
@@ -130,21 +153,52 @@
 :root[data-interface-template="neo-brutalism"] .overview-card:hover,
 :root[data-interface-template="neo-brutalism"] .premium-card:hover {
   transform: translate(1px, 1px);
-  box-shadow: 4px 4px 0px #000000 !important;
+  box-shadow: 4px 4px 0px var(--neo-shadow-color) !important;
 }
 
-:root[data-interface-template="neo-brutalism"] button {
-  border: 2px solid #000000 !important;
+:root[data-interface-template="neo-brutalism"] button,
+:root[data-interface-template="neo-brutalism"] .pill {
+  border: 2px solid var(--border-color) !important;
   border-radius: 0px !important;
-  box-shadow: 3px 3px 0px #000000 !important;
-  background-color: #ff5e00 !important;
-  color: #ffffff !important;
+  box-shadow: 3px 3px 0px var(--neo-shadow-color) !important;
+  background-color: var(--neo-btn-bg) !important;
+  color: var(--neo-btn-text) !important;
   font-weight: 800 !important;
+  transition: all 0.15s ease;
 }
 
-:root[data-interface-template="neo-brutalism"] button:hover {
+:root[data-interface-template="neo-brutalism"] button:hover,
+:root[data-interface-template="neo-brutalism"] .pill:hover {
   transform: translate(1px, 1px) !important;
-  box-shadow: 1px 1px 0px #000000 !important;
+  box-shadow: 1px 1px 0px var(--neo-shadow-color) !important;
+}
+
+/* Input structures in Neo-Brutalism */
+:root[data-interface-template="neo-brutalism"] input,
+:root[data-interface-template="neo-brutalism"] textarea,
+:root[data-interface-template="neo-brutalism"] select {
+  border: 2px solid var(--border-color) !important;
+  border-radius: 0px !important;
+  background-color: var(--bg-input) !important;
+  color: var(--text-main) !important;
+  box-shadow: none !important;
+}
+
+:root[data-interface-template="neo-brutalism"] input:focus,
+:root[data-interface-template="neo-brutalism"] textarea:focus,
+:root[data-interface-template="neo-brutalism"] select:focus {
+  border-color: var(--primary) !important;
+  outline: none !important;
+}
+
+/* Header & Tabs structures in Neo-Brutalism */
+:root[data-interface-template="neo-brutalism"] .notion-header,
+:root[data-interface-template="neo-brutalism"] .notion-tabs {
+  border-bottom: 3px solid var(--border-color) !important;
+}
+
+:root[data-interface-template="neo-brutalism"] .notion-tab.active {
+  border-bottom: 3px solid var(--primary) !important;
 }
 
 /* ==========================================================================

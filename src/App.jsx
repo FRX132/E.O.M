@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from './store';
 import './App.css';
-import './components/Styles/PremiumLayout.css';
+import './components/Styles/Default.css';
 import './components/Styles/Templates_Interface.css';
 
 // Components

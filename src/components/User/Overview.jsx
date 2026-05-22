@@ -37,7 +37,7 @@ export default function Overview({ navigate }) {
   };
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
 
-  const LAYOUT_NAMES = ["Default Premium", "Minimal Clean", "Glassmorphism", "Neo-Brutalism"];
+  const LAYOUT_NAMES = ["Default", "Minimal Clean", "Glassmorphism", "Neo-Brutalism"];
 
   const rankStats = calculateRank(profile.xp || 0);
 
@@ -640,7 +640,7 @@ export default function Overview({ navigate }) {
               <span style={{ fontWeight: 700 }}>⚙️ Customize Overview Dashboard</span>
               <button onClick={() => setIsCustomizeOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
             </div>
-            
+
             <div style={{ padding: '20px' }}>
               <div style={{ fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, marginBottom: '15px' }}>Widget Visibility & Titles</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -657,7 +657,7 @@ export default function Overview({ navigate }) {
                 ].map(widget => (
                   <div key={widget.key} style={{ display: 'flex', alignItems: 'center', gap: '15px', background: 'var(--bg-card-alt)', padding: '10px 15px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                     <label className="mac-switch" style={{ position: 'relative', display: 'inline-block', width: '40px', height: '22px', flexShrink: 0 }}>
-                      <input 
+                      <input
                         type="checkbox"
                         checked={settings.visibleWidgets?.[widget.key] !== false}
                         onChange={(e) => {
@@ -693,7 +693,7 @@ export default function Overview({ navigate }) {
                     </label>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{widget.label}</div>
-                      <input 
+                      <input
                         className="mac-input"
                         style={{ borderBottom: '1px solid var(--border-light)', padding: '4px 0', fontSize: '0.9rem', color: 'var(--text-main)', width: '100%', background: 'transparent', borderTop: 'none', borderLeft: 'none', borderRight: 'none', outline: 'none' }}
                         value={settings.widgetTitles?.[widget.key] ?? widget.defaultTitle}
@@ -708,7 +708,7 @@ export default function Overview({ navigate }) {
                   </div>
                 ))}
               </div>
-              
+
               <div style={{ fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, marginTop: '25px', marginBottom: '15px' }}>Stats Progress Bars Visibility</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '10px' }}>
                 {[
@@ -723,7 +723,7 @@ export default function Overview({ navigate }) {
                 ].map(bar => (
                   <div key={bar.key} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg-card-alt)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                     <label className="mac-switch" style={{ position: 'relative', display: 'inline-block', width: '34px', height: '18px', flexShrink: 0 }}>
-                      <input 
+                      <input
                         type="checkbox"
                         checked={settings.visibleStatsBars?.[bar.key] !== false}
                         onChange={(e) => {
@@ -764,7 +764,7 @@ export default function Overview({ navigate }) {
 
               <div style={{ fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, marginTop: '25px', marginBottom: '15px' }}>Primary Objective Content</div>
               <div className="mac-input-group" style={{ margin: '0', background: 'var(--bg-card-alt)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '10px' }}>
-                <textarea 
+                <textarea
                   className="mac-input"
                   placeholder="Enter your primary objective..."
                   style={{ resize: 'vertical', minHeight: '60px', width: '100%', border: 'none', background: 'transparent', color: 'var(--text-main)', outline: 'none' }}
@@ -775,8 +775,8 @@ export default function Overview({ navigate }) {
             </div>
 
             <div className="mac-modal-footer" style={{ display: 'flex', gap: '10px', padding: '16px 20px', borderTop: '1px solid var(--border-color)', justifyContent: 'flex-end' }}>
-              <button 
-                className="mac-btn mac-btn-cancel" 
+              <button
+                className="mac-btn mac-btn-cancel"
                 onClick={() => {
                   if (confirm("Reset overview customization to defaults?")) {
                     setOverviewSettings({
@@ -799,8 +799,8 @@ export default function Overview({ navigate }) {
               >
                 Reset to Defaults
               </button>
-              <button 
-                className="mac-btn mac-btn-add" 
+              <button
+                className="mac-btn mac-btn-add"
                 onClick={() => setIsCustomizeOpen(false)}
                 style={{
                   background: 'var(--primary)',

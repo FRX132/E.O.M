@@ -1005,21 +1005,21 @@
 /* Theme 3: Neo-Brutalism */
 .layout-theme-3 .overview-card {
   background: var(--bg-card);
-  border: 3px solid var(--text-main);
+  border: 3px solid var(--border-color);
   border-radius: 0;
-  box-shadow: 6px 6px 0px var(--text-main);
+  box-shadow: 6px 6px 0px var(--neo-shadow-color, var(--text-main));
   transition: transform 0.1s, box-shadow 0.1s;
 }
 .layout-theme-3 .overview-card:hover {
   transform: translate(2px, 2px);
-  box-shadow: 4px 4px 0px var(--text-main);
+  box-shadow: 4px 4px 0px var(--neo-shadow-color, var(--text-main));
 }
 .layout-theme-3 .progress-circle {
-  border: 4px solid var(--text-main);
-  box-shadow: 4px 4px 0px var(--text-main);
+  border: 4px solid var(--border-color);
+  box-shadow: 4px 4px 0px var(--neo-shadow-color, var(--text-main));
 }
 .layout-theme-3 .card-icon {
-  border: 2px solid var(--text-main);
+  border: 2px solid var(--border-color);
   border-radius: 0;
   background: var(--primary);
   color: #fff;
@@ -1039,9 +1039,9 @@
 }
 
 .layout-theme-3 .hero-year-progress {
-  border: 3px solid var(--text-main);
+  border: 3px solid var(--border-color);
   border-radius: 0;
-  box-shadow: 4px 4px 0px var(--text-main);
+  box-shadow: 4px 4px 0px var(--neo-shadow-color, var(--text-main));
   background: var(--bg-card);
 }
 
@@ -1110,33 +1110,33 @@
 /* ================= NEO-BRUTALISM (THEME 3) LAYOUT ADJUSTMENTS ================= */
 .layout-theme-3 .overview-control-btn {
   border-radius: 0 !important;
-  border: 3px solid var(--text-main) !important;
-  box-shadow: 4px 4px 0 var(--text-main) !important;
+  border: 3px solid var(--border-color) !important;
+  box-shadow: 4px 4px 0 var(--neo-shadow-color, var(--text-main)) !important;
   background: var(--bg-card) !important;
   color: var(--text-main) !important;
 }
 
 .layout-theme-3 .overview-control-btn:hover {
   transform: translate(-2px, -2px) !important;
-  box-shadow: 6px 6px 0 var(--text-main) !important;
+  box-shadow: 6px 6px 0 var(--neo-shadow-color, var(--text-main)) !important;
 }
 
 .layout-theme-3 .hero-avatar {
   border-radius: 0 !important;
-  border: 4px solid var(--text-main) !important;
-  box-shadow: 4px 4px 0 var(--text-main) !important;
+  border: 4px solid var(--border-color) !important;
+  box-shadow: 4px 4px 0 var(--neo-shadow-color, var(--text-main)) !important;
 }
 
 .layout-theme-3 .status-badge {
   border-radius: 0 !important;
-  border: 2px solid var(--text-main) !important;
-  box-shadow: 2px 2px 0 var(--text-main) !important;
+  border: 2px solid var(--border-color) !important;
+  box-shadow: 2px 2px 0 var(--neo-shadow-color, var(--text-main)) !important;
   background: var(--bg-card) !important;
 }
 
 .layout-theme-3 .xp-bar-outer {
   border-radius: 0 !important;
-  border: 3px solid var(--text-main) !important;
+  border: 3px solid var(--border-color) !important;
   background: var(--bg-card-alt) !important;
   height: 16px !important;
 }
@@ -1148,14 +1148,14 @@
 }
 
 .layout-theme-3 .premium-card {
-  border: 3px solid var(--text-main) !important;
+  border: 3px solid var(--border-color) !important;
   border-radius: 0 !important;
-  box-shadow: 6px 6px 0px var(--text-main) !important;
+  box-shadow: 6px 6px 0px var(--neo-shadow-color, var(--text-main)) !important;
   background: var(--bg-card) !important;
 }
 
 .layout-theme-3 .notion-tabs {
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
-  border-bottom: 3px solid var(--text-main) !important;
+  border-bottom: 3px solid var(--border-color) !important;
 }
