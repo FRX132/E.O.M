@@ -9,8 +9,8 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--quest-color);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 16px;
   transition: all var(--transition-smooth);
@@ -20,8 +20,8 @@
 
 .quest-card:hover {
   transform: translateX(5px);
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+  background: var(--bg-card-alt);
+  box-shadow: var(--card-shadow);
 }
 
 .quest-card::before {

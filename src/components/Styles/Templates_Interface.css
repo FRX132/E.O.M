@@ -1,0 +1,261 @@
+/* 
+  E.O.M - Custom Interface Styling Templates
+  These templates redefine the entire look and feel of the workspace by overriding core CSS variables and styles.
+*/
+
+/* ==========================================================================
+   1. CYBERPUNK NEON TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="cyberpunk"] {
+  --bg-main: #0a0a0f;
+  --bg-card: #12121c;
+  --bg-header: #1a1a2e;
+  --border-color: #ff007f;
+  --border-light: rgba(0, 240, 255, 0.2);
+  --bg-card-alt: rgba(255, 0, 127, 0.05);
+  --bg-input: #1b1b2f;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(18, 18, 28, 0.85);
+  --card-shadow: 0 0 15px rgba(255, 0, 127, 0.2), 0 0 30px rgba(0, 240, 255, 0.1);
+  --text-main: #00f0ff;
+  --text-muted: #8b8bae;
+  --primary: #ff007f;
+  --font-main: 'JetBrains Mono', monospace;
+  --neon-glow: 0 0 10px rgba(255, 0, 127, 0.6);
+  --border-neon: 1px solid #ff007f;
+  
+  /* Additional overrides for scrollbars & headers */
+  --bs-body-bg: var(--bg-main);
+  --bs-body-color: var(--text-main);
+}
+
+:root[data-interface-template="cyberpunk"] body {
+  background-image: 
+    linear-gradient(rgba(255, 0, 127, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 0, 127, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+:root[data-interface-template="cyberpunk"] .notion-block,
+:root[data-interface-template="cyberpunk"] .overview-card,
+:root[data-interface-template="cyberpunk"] .premium-card {
+  border: 1px solid #ff007f !important;
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.25) !important;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+:root[data-interface-template="cyberpunk"] h1,
+:root[data-interface-template="cyberpunk"] h2,
+:root[data-interface-template="cyberpunk"] h3 {
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* ==========================================================================
+   2. GLASSMORPHISM (AERO GLASS) TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="glassmorphism"] {
+  --bg-main: #0d0f1a;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-header: rgba(255, 255, 255, 0.06);
+  --border-color: rgba(255, 255, 255, 0.09);
+  --border-light: rgba(255, 255, 255, 0.05);
+  --bg-card-alt: rgba(255, 255, 255, 0.02);
+  --bg-input: rgba(255, 255, 255, 0.04);
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(13, 15, 26, 0.5);
+  --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --text-main: #e2e8f0;
+  --text-muted: #94a3b8;
+  --primary: #818cf8;
+  --font-main: 'Outfit', sans-serif;
+  
+  /* Additional glass settings */
+  --glass-blur: 20px;
+}
+
+:root[data-interface-template="glassmorphism"] body {
+  background-image: 
+    radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+    radial-gradient(at 90% 80%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+:root[data-interface-template="glassmorphism"] .notion-block,
+:root[data-interface-template="glassmorphism"] .overview-card,
+:root[data-interface-template="glassmorphism"] .premium-card {
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+/* ==========================================================================
+   3. NEO-BRUTALISM TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="neo-brutalism"] {
+  --bg-main: #f0f0f0;
+  --bg-card: #ffffff;
+  --bg-header: #ffff00;
+  --border-color: #000000;
+  --border-light: #000000;
+  --bg-card-alt: #e6e6e6;
+  --bg-input: #ffffff;
+  --card-bg: var(--bg-card);
+  --glass-bg: #ffffff;
+  --card-shadow: 6px 6px 0px #000000;
+  --text-main: #000000;
+  --text-muted: #555555;
+  --primary: #ff5e00;
+  --font-main: 'Inter', sans-serif;
+  --border-neon: 2px solid #000000;
+}
+
+:root[data-interface-template="neo-brutalism"] .notion-block,
+:root[data-interface-template="neo-brutalism"] .overview-card,
+:root[data-interface-template="neo-brutalism"] .premium-card {
+  border: 3px solid #000000 !important;
+  border-radius: 0px !important;
+  box-shadow: 8px 8px 0px #000000 !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  transform: translate(-2px, -2px);
+  transition: all 0.15s ease;
+}
+
+:root[data-interface-template="neo-brutalism"] .notion-block:hover,
+:root[data-interface-template="neo-brutalism"] .overview-card:hover,
+:root[data-interface-template="neo-brutalism"] .premium-card:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 4px 4px 0px #000000 !important;
+}
+
+:root[data-interface-template="neo-brutalism"] button {
+  border: 2px solid #000000 !important;
+  border-radius: 0px !important;
+  box-shadow: 3px 3px 0px #000000 !important;
+  background-color: #ff5e00 !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+:root[data-interface-template="neo-brutalism"] button:hover {
+  transform: translate(1px, 1px) !important;
+  box-shadow: 1px 1px 0px #000000 !important;
+}
+
+/* ==========================================================================
+   4. RETRO TERMINAL (FALLOUT CRT) TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="retro-terminal"] {
+  --bg-main: #050d06;
+  --bg-card: #081609;
+  --bg-header: #0d260f;
+  --border-color: #39ff14;
+  --border-light: rgba(57, 255, 20, 0.3);
+  --bg-card-alt: rgba(57, 255, 20, 0.05);
+  --bg-input: #050d06;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(8, 22, 9, 0.9);
+  --card-shadow: 0 0 10px rgba(57, 255, 20, 0.15);
+  --text-main: #39ff14;
+  --text-muted: #1e870a;
+  --primary: #39ff14;
+  --font-main: 'JetBrains Mono', monospace;
+}
+
+:root[data-interface-template="retro-terminal"] body::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 99999;
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+}
+
+:root[data-interface-template="retro-terminal"] .notion-block,
+:root[data-interface-template="retro-terminal"] .overview-card,
+:root[data-interface-template="retro-terminal"] .premium-card {
+  border: 1px solid #39ff14 !important;
+  border-radius: 4px !important;
+  box-shadow: inset 0 0 10px rgba(57, 255, 20, 0.2), 0 0 8px rgba(57, 255, 20, 0.1) !important;
+}
+
+:root[data-interface-template="retro-terminal"] h1,
+:root[data-interface-template="retro-terminal"] h2,
+:root[data-interface-template="retro-terminal"] h3,
+:root[data-interface-template="retro-terminal"] span,
+:root[data-interface-template="retro-terminal"] p {
+  text-shadow: 0 0 4px rgba(57, 255, 20, 0.5);
+}
+
+/* ==========================================================================
+   5. NORDIC MINIMALIST (NORD) TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="nordic-minimalist"] {
+  --bg-main: #2e3440;
+  --bg-card: #3b4252;
+  --bg-header: #434c5e;
+  --border-color: #4c566a;
+  --border-light: #3b4252;
+  --bg-card-alt: rgba(216, 222, 233, 0.05);
+  --bg-input: #2e3440;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(59, 66, 82, 0.95);
+  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  --text-main: #eceff4;
+  --text-muted: #d8dee9;
+  --primary: #88c0d0;
+  --font-main: 'Outfit', sans-serif;
+}
+
+:root[data-interface-template="nordic-minimalist"] .notion-block,
+:root[data-interface-template="nordic-minimalist"] .overview-card,
+:root[data-interface-template="nordic-minimalist"] .premium-card {
+  border: 1px solid var(--border-color) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ==========================================================================
+   6. OBSIDIAN GOLD TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="obsidian-gold"] {
+  --bg-main: #050505;
+  --bg-card: #0f0f0f;
+  --bg-header: #151515;
+  --border-color: #d4af37;
+  --border-light: #222222;
+  --bg-card-alt: rgba(212, 175, 55, 0.03);
+  --bg-input: #121212;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(15, 15, 15, 0.95);
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  --text-main: #f3f3f3;
+  --text-muted: #888888;
+  --primary: #d4af37; /* Gold Accent */
+  --font-main: 'Outfit', sans-serif;
+  --neon-glow: 0 0 15px rgba(212, 175, 55, 0.35);
+  --border-neon: 1px solid rgba(212, 175, 55, 0.7);
+}
+
+:root[data-interface-template="obsidian-gold"] .notion-block,
+:root[data-interface-template="obsidian-gold"] .overview-card,
+:root[data-interface-template="obsidian-gold"] .premium-card {
+  border: 1px solid rgba(212, 175, 55, 0.25) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+  background: linear-gradient(145deg, #0d0d0d, #141414) !important;
+}
+
+:root[data-interface-template="obsidian-gold"] .notion-block:hover,
+:root[data-interface-template="obsidian-gold"] .overview-card:hover,
+:root[data-interface-template="obsidian-gold"] .premium-card:hover {
+  border-color: #d4af37 !important;
+  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.15) !important;
+}

@@ -106,7 +106,7 @@
   font-size: 0.9rem;
   color: var(--text-main);
   opacity: 0.85;
-  background: rgba(255,255,255,0.03);
+  background: var(--bg-card-alt);
   padding: 12px;
   border-radius: 10px;
   line-height: 1.5;

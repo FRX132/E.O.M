@@ -22,11 +22,6 @@ export default function MovieList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMovie, setEditingMovie] = useState(null);
 
-
-
-
-
-
   const openAddModal = () => {
     setEditingMovie(null);
     setIsModalOpen(true);

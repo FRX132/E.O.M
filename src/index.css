@@ -3,11 +3,16 @@
 :root {
   --bg-main: #111111;
   --bg-card: #1a1a1a;
-  --bg-header: #422918;
+  --bg-header: #241a13;
   --border-color: #333333;
   --border-light: #2a2a2a;
 
   --bg-card-alt: rgba(255, 255, 255, 0.03);
+  --bg-input: rgba(255, 255, 255, 0.05);
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(26, 26, 26, 0.6);
+  --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  --overlay-bg: rgba(0, 0, 0, 0.45);
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.6);
@@ -47,31 +52,36 @@
 }
 
 :root[data-theme="light"] {
-  --bg-main: #fcfcfc;
+  --bg-main: #f8fafc;
   --bg-card: #ffffff;
-  --bg-header: #f8fafc;
-  --border-color: #f1f5f9;
-  --border-light: #f8fafc;
+  --bg-header: #f1f5f9;
+  --border-color: #e2e8f0;
+  --border-light: #edf2f7;
 
-  --bg-card-alt: rgba(0, 0, 0, 0.02);
+  --bg-card-alt: rgba(0, 0, 0, 0.03);
+  --bg-input: rgba(0, 0, 0, 0.05);
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  --overlay-bg: rgba(0, 0, 0, 0.15);
 
   --text-main: #1a1a1b;
-  --text-muted: #737373;
+  --text-muted: #64748b;
 
   --primary: #c27832;
-  --blue-bg: #f5faff;
-  --blue-text: #0366d6;
-  --green-bg: #f6fcf9;
-  --green-text: #22863a;
-  --red-bg: #fff5f5;
-  --red-text: #d73a49;
-  --orange-bg: #fffaf5;
-  --orange-text: #e36209;
-  --yellow-bg: #fffdf5;
-  --yellow-text: #b08800;
-  --purple-bg: #fbf9ff;
-  --purple-text: #6f42c1;
-  --header-text: #24292e;
+  --blue-bg: #e0f2fe;
+  --blue-text: #0284c7;
+  --green-bg: #dcfce7;
+  --green-text: #16a34a;
+  --red-bg: #fee2e2;
+  --red-text: #dc2626;
+  --orange-bg: #ffedd5;
+  --orange-text: #ea580c;
+  --yellow-bg: #fef9c3;
+  --yellow-text: #ca8a04;
+  --purple-bg: #f3e8ff;
+  --purple-text: #9333ea;
+  --header-text: #0f172a;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
@@ -159,33 +169,7 @@ button {
   background: var(--bg-card);
 }
 
-/* Light mode */
-:root[data-theme="light"] .notion-tabs {
-  background: linear-gradient(135deg, #1a1a1b 0%, #000 100%);
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-}
-
-/* Light mode tabs */
-:root[data-theme="light"] .notion-tabs {
-  background: linear-gradient(135deg, #1a1a1b 0%, #000 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 0px;
-}
-
-/* Light mode tabs */
-:root[data-theme="light"] .notion-tab {
-  color: rgba(255, 255, 255, 0.5);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Light mode tabs active */
-:root[data-theme="light"] .notion-tab.active {
-  color: #fff;
-  border-bottom: 2px solid #fff;
-}
+/* Notion-tabs light mode overrides removed to fallback to clean native variables */
 
 /*Tabs */
 .notion-tab {
@@ -322,7 +306,7 @@ button {
 .notion-input:focus,
 .notion-textarea:focus {
   border-color: var(--primary);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-card);
 }
 
 /* Textarea */

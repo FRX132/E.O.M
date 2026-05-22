@@ -40,10 +40,10 @@
 
 /* Media Card Styles */
 .media-card {
-  background: var(--bg-main);
+  background: var(--bg-card);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  box-shadow: var(--card-shadow);
   border: 1px solid var(--border-light);
   cursor: pointer;
   transition: transform 0.2s;
@@ -103,9 +103,9 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background: rgba(0,0,0,0.5);
+  background: var(--overlay-bg);
   border: none;
-  color: #fff;
+  color: var(--text-main);
   border-radius: 50%;
   width: 24px;
   height: 24px;
@@ -132,7 +132,7 @@
 }
 
 .add-book-card:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-card-alt);
 }
 
 .add-book-icon {

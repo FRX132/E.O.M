@@ -4,6 +4,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from './store';
 import './App.css';
 import './components/Styles/PremiumLayout.css';
+import './components/Styles/Templates_Interface.css';
 
 // Components
 import ExpenseTracker from './components/User/ExpenseTracker';
@@ -200,6 +201,7 @@ function App() {
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute('data-theme', theme);
+    root.setAttribute('data-interface-template', designSettings.enabled ? (designSettings.template || 'default') : 'default');
     root.style.setProperty('--primary', accentColor);
 
     // Convert hex to RGB for semi-transparent variations
@@ -238,6 +240,33 @@ function App() {
     }
 
   }, [theme, accentColor, designSettings]);
+
+  // Automatic URL parameters Cloud Sync loader
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const syncCode = params.get('sync');
+    if (syncCode) {
+      const loadSync = async () => {
+        try {
+          const res = await fetch(`https://jsonbin-zeta.vercel.app/api/bins/${syncCode}`);
+          if (!res.ok) throw new Error('Failed to fetch sync data');
+          const data = await res.json();
+          if (data && data.data) {
+            // Restore Zustand store state
+            useStore.setState(data.data);
+            alert('🎉 Data successfully synchronized from cloud!');
+            // Clean up the URL parameter
+            window.history.replaceState({}, document.title, window.location.pathname);
+            window.location.reload();
+          }
+        } catch (e) {
+          console.error(e);
+          alert('❌ Failed to restore cloud sync database. Make sure the code is correct.');
+        }
+      };
+      loadSync();
+    }
+  }, []);
 
   // Removed 'habits' from dependency to avoid infinite loop
   useEffect(() => {
@@ -336,13 +365,13 @@ function App() {
         <div
           className="user-profile"
           onClick={() => setIsProfileModalOpen(true)}
-          style={{
+          style={profile.backgroundImage ? {
             cursor: 'pointer',
             transition: 'all 0.2s ease',
-            background: profile.backgroundImage ? 'rgba(255,255,255,0.05)' : undefined
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = profile.backgroundImage ? 'rgba(255,255,255,0.05)' : 'transparent'}
+            background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'
+          } : {}}
+          onMouseEnter={profile.backgroundImage ? ((e) => e.currentTarget.style.background = theme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)') : undefined}
+          onMouseLeave={profile.backgroundImage ? ((e) => e.currentTarget.style.background = theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)') : undefined}
         >
           {profile.profilePicture ? (
             <img src={profile.profilePicture} alt="Profile" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
@@ -372,24 +401,11 @@ function App() {
           ))}
         </div>
 
-
         {navGroups.map(group => (
           <div key={group.title} className="nav-menu" style={{ marginBottom: '15px' }}>
             <div
-              className="nav-label"
+              className="nav-folder-header"
               onClick={() => toggleFolder(group.title)}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-                padding: '6px 12px',
-                borderRadius: '6px',
-                background: 'rgba(255,255,255,0.03)',
-                transition: 'background 0.2s',
-                marginBottom: '5px'
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
             >
               {group.title}
               <span style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '2px' }}>{openFolders[group.title] ? '▼' : '▶'}</span>

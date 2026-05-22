@@ -111,13 +111,13 @@ export default function LanguageModal({ isOpen, onClose, onSave, initialData }) 
         </div>
 
         <div className="mac-modal-footer">
-          <button className="mac-btn mac-btn-cancel" onClick={onClose}>Abbrechen</button>
+          <button className="mac-btn mac-btn-cancel" onClick={onClose}>Cancel</button>
           <button 
             className="mac-btn mac-btn-add" 
             onClick={handleSave}
             disabled={!langData.name}
           >
-            {initialData ? 'Speichern' : 'Hinzufügen'}
+            {initialData ? 'Save' : 'Add'}
           </button>
         </div>
       </div>

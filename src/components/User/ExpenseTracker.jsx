@@ -160,7 +160,6 @@ export default function ExpenseTracker() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
             {['Daily', 'Weekly', 'Monthly', 'Yearly'].map(timeframe => {
               const limit = limits[timeframe.toLowerCase()];
-              let value = currentMonthTotal; // For simplicity, we just show Monthly progress currently, or we can calculate real ones.
               // To be accurate, let's just display the limits as configurable inputs.
               return (
                 <div key={timeframe} style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '10px' }}>

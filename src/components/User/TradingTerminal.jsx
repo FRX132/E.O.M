@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useStore } from '../../store';
 import '../Styles/TradingTerminal.css';
 
@@ -9,48 +9,250 @@ const Icon = ({ d, size = 18 }) => (
   </svg>
 );
 
+// ── Forex Pairs Data ───────────────────────────────────
+const FOREX_PAIRS = [
+  { symbol: 'EUR/USD', pipSize: 0.0001, typicalSpread: 1.2 },
+  { symbol: 'GBP/USD', pipSize: 0.0001, typicalSpread: 1.5 },
+  { symbol: 'USD/JPY', pipSize: 0.01, typicalSpread: 1.3 },
+  { symbol: 'AUD/USD', pipSize: 0.0001, typicalSpread: 1.4 },
+  { symbol: 'USD/CAD', pipSize: 0.0001, typicalSpread: 1.6 },
+  { symbol: 'USD/CHF', pipSize: 0.0001, typicalSpread: 1.5 },
+  { symbol: 'EUR/GBP', pipSize: 0.0001, typicalSpread: 1.5 },
+  { symbol: 'EUR/JPY', pipSize: 0.01, typicalSpread: 1.6 },
+  { symbol: 'GBP/JPY', pipSize: 0.01, typicalSpread: 2.0 },
+  { symbol: 'NZD/USD', pipSize: 0.0001, typicalSpread: 1.6 },
+  // Metalle (Gold, Silber)
+  { symbol: 'XAU/USD (Gold)', pipSize: 0.1, typicalSpread: 2.5 },
+  { symbol: 'XAG/USD (Silver)', pipSize: 0.01, typicalSpread: 3.0 },
+  // Öl
+  { symbol: 'WTI/USD (Crude Oil)', pipSize: 0.01, typicalSpread: 3.0 },
+  { symbol: 'BRENT/USD (Brent Oil)', pipSize: 0.01, typicalSpread: 3.0 },
+  // Krypto
+  { symbol: 'BTC/USD (Bitcoin)', pipSize: 1.0, typicalSpread: 15.0 },
+  { symbol: 'ETH/USD (Ethereum)', pipSize: 1.0, typicalSpread: 1.5 },
+];
+
+const getPipValue = (pair, entryPrice, currencySymbol) => {
+  const isAccountEur = currencySymbol === '€';
+  const isAccountGbp = currencySymbol === '£';
+  const isAccountUsd = currencySymbol === '$';
+  
+  const entry = parseFloat(entryPrice) || 1.0;
+  
+  // Metals, Oil, Crypto (priced in USD)
+  if (
+    pair.startsWith('XAU') || 
+    pair.startsWith('XAG') || 
+    pair.startsWith('WTI') || 
+    pair.startsWith('BRENT') || 
+    pair.startsWith('BTC') || 
+    pair.startsWith('ETH')
+  ) {
+    let basePipVal = 10;
+    if (pair.startsWith('XAG')) basePipVal = 50;
+    else if (pair.startsWith('BTC') || pair.startsWith('ETH')) basePipVal = 1;
+    
+    if (isAccountUsd) return basePipVal;
+    if (isAccountEur) return basePipVal / 1.08;
+    if (isAccountGbp) return basePipVal / 1.25;
+    return basePipVal;
+  }
+  
+  // Standard Forex pairs
+  if (pair === 'EUR/USD') {
+    if (isAccountEur) return 10 / (entry || 1.08);
+    if (isAccountUsd) return 10;
+    if (isAccountGbp) return 8.0;
+  }
+  if (pair === 'GBP/USD') {
+    if (isAccountEur) return 10 / (entry || 1.35);
+    if (isAccountUsd) return 10;
+    if (isAccountGbp) return 10 / (entry || 1.25);
+  }
+  if (pair === 'USD/JPY') {
+    const valUsd = 1000 / (entry || 155);
+    if (isAccountUsd) return valUsd;
+    if (isAccountEur) return valUsd / 1.08;
+    if (isAccountGbp) return valUsd / 1.25;
+  }
+  if (pair === 'AUD/USD' || pair === 'NZD/USD') {
+    if (isAccountEur) return 10 / 1.08;
+    if (isAccountUsd) return 10;
+    if (isAccountGbp) return 8.0;
+  }
+  if (pair === 'USD/CAD') {
+    if (isAccountUsd) return 10 / 1.36;
+    if (isAccountEur) return 10 / 1.47;
+    if (isAccountGbp) return 10 / 1.70;
+  }
+  if (pair === 'USD/CHF') {
+    if (isAccountUsd) return 10 / 0.9;
+    if (isAccountEur) return 10 / 0.97;
+    if (isAccountGbp) return 10 / 1.12;
+  }
+  if (pair === 'EUR/GBP') {
+    if (isAccountGbp) return 10;
+    if (isAccountEur) return 10 / (entry || 0.85);
+    if (isAccountUsd) return 12.5;
+  }
+  if (pair === 'EUR/JPY' || pair === 'GBP/JPY') {
+    if (isAccountEur) return 6.0;
+    if (isAccountUsd) return 6.5;
+    if (isAccountGbp) return 5.5;
+  }
+  return 10;
+};
+
 // ── Risk Calculator Tab ────────────────────────────────
 function RiskCalc({ currency }) {
+  const [assetType, setAssetType] = useState('forex'); // Default to Forex
   const [capital, setCapital] = useState('');
   const [risk, setRisk] = useState('');
   const [entry, setEntry] = useState('');
   const [stop, setStop] = useState('');
+  const [selectedPair, setSelectedPair] = useState('EUR/USD');
+  const [spread, setSpread] = useState('1.2');
 
+  const handlePairChange = (val) => {
+    setSelectedPair(val);
+    const pair = FOREX_PAIRS.find(p => p.symbol === val);
+    if (pair) setSpread(String(pair.typicalSpread));
+  };
+
+  // Stock Sizing Settle
   const riskAmt = capital && risk ? (parseFloat(capital) * parseFloat(risk)) / 100 : 0;
   const diff = entry && stop ? Math.abs(parseFloat(entry) - parseFloat(stop)) : 0;
   const posSize = diff > 0 ? riskAmt / diff : 0;
   const rr = entry && stop ? (diff / (parseFloat(stop) || 1)) * 100 : 0;
 
+  // Forex Sizing Settle
+  const pairData = FOREX_PAIRS.find(p => p.symbol === selectedPair) || FOREX_PAIRS[0];
+  const stopLossPips = diff > 0 ? diff / pairData.pipSize : 0;
+  const pipVal = getPipValue(pairData.symbol, entry, currency);
+  const positionLots = (stopLossPips > 0 && pipVal > 0) ? (riskAmt / (stopLossPips * pipVal)) : 0;
+  const positionUnits = positionLots * 100000;
+  const spreadCost = positionLots * parseFloat(spread || 0) * pipVal;
+  const totalRisk = riskAmt + spreadCost;
+
   return (
     <div>
+      <div className="asset-type-selector" style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+        <button 
+          className={`asset-type-btn ${assetType === 'stocks' ? 'active' : ''}`}
+          onClick={() => setAssetType('stocks')}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '8px',
+            fontSize: '0.8rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            background: assetType === 'stocks' ? 'rgba(var(--primary-rgb), 0.15)' : 'rgba(255,255,255,0.04)',
+            border: assetType === 'stocks' ? '1px solid rgba(var(--primary-rgb), 0.4)' : '1px solid transparent',
+            color: assetType === 'stocks' ? 'var(--primary)' : 'var(--text-muted)',
+            transition: 'all 0.2s'
+          }}
+        >
+          📈 Stocks (Aktien)
+        </button>
+        <button 
+          className={`asset-type-btn ${assetType === 'forex' ? 'active' : ''}`}
+          onClick={() => setAssetType('forex')}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '8px',
+            fontSize: '0.8rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            background: assetType === 'forex' ? 'rgba(var(--primary-rgb), 0.15)' : 'rgba(255,255,255,0.04)',
+            border: assetType === 'forex' ? '1px solid rgba(var(--primary-rgb), 0.4)' : '1px solid transparent',
+            color: assetType === 'forex' ? 'var(--primary)' : 'var(--text-muted)',
+            transition: 'all 0.2s'
+          }}
+        >
+          💱 Forex (Devisen)
+        </button>
+      </div>
+
       <div className="risk-calc">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {assetType === 'forex' && (
+            <>
+              <div className="risk-input-group">
+                <label>Forex Paar</label>
+                <select 
+                  value={selectedPair} 
+                  onChange={e => handlePairChange(e.target.value)}
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 8,
+                    padding: '10px 14px',
+                    color: 'var(--text-main)',
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    outline: 'none',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit'
+                  }}
+                >
+                  {FOREX_PAIRS.map(p => <option key={p.symbol} value={p.symbol}>{p.symbol}</option>)}
+                </select>
+              </div>
+              <div className="risk-input-group">
+                <label>Spread (Pips)</label>
+                <input type="number" step="0.1" placeholder="e.g. 1.2" value={spread} onChange={e => setSpread(e.target.value)} />
+              </div>
+            </>
+          )}
+
           {[
             { label: `Capital (${currency})`, val: capital, set: setCapital, ph: 'e.g. 10000' },
             { label: 'Risk %', val: risk, set: setRisk, ph: 'e.g. 1' },
-            { label: 'Entry Price', val: entry, set: setEntry, ph: 'e.g. 150.00' },
-            { label: 'Stop Loss', val: stop, set: setStop, ph: 'e.g. 147.00' },
+            { label: 'Entry Price', val: entry, set: setEntry, ph: assetType === 'forex' ? 'e.g. 1.0820' : 'e.g. 150.00' },
+            { label: 'Stop Loss', val: stop, set: setStop, ph: assetType === 'forex' ? 'e.g. 1.0770' : 'e.g. 147.00' },
           ].map(f => (
             <div className="risk-input-group" key={f.label}>
               <label>{f.label}</label>
-              <input type="number" placeholder={f.ph} value={f.val} onChange={e => f.set(e.target.value)} />
+              <input type="number" step="any" placeholder={f.ph} value={f.val} onChange={e => f.set(e.target.value)} />
             </div>
           ))}
         </div>
-        <div className="risk-result-panel">
-          <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--primary)' }}>📊 Position Sizing</h3>
-          {[
-            { label: 'Risk Amount', value: `${currency}${riskAmt.toFixed(2)}` },
-            { label: 'Position Size', value: `${posSize.toFixed(2)} shares` },
-            { label: 'Stop Distance', value: `${currency}${diff.toFixed(2)}` },
-            { label: 'Risk/Entry Ratio', value: `${rr.toFixed(2)}%` },
-          ].map(r => (
-            <div className="risk-result-row" key={r.label}>
-              <span className="label">{r.label}</span>
-              <span className="value">{r.value}</span>
-            </div>
-          ))}
-        </div>
+
+        {assetType === 'stocks' ? (
+          <div className="risk-result-panel">
+            <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--primary)' }}>📊 Position Sizing (Stocks)</h3>
+            {[
+              { label: 'Risk Amount', value: `${currency}${riskAmt.toFixed(2)}` },
+              { label: 'Position Size', value: `${posSize.toFixed(2)} shares` },
+              { label: 'Stop Distance', value: `${currency}${diff.toFixed(4)}` },
+              { label: 'Risk/Entry Ratio', value: `${rr.toFixed(2)}%` },
+            ].map(r => (
+              <div className="risk-result-row" key={r.label}>
+                <span className="label">{r.label}</span>
+                <span className="value">{r.value}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="risk-result-panel">
+            <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--primary)' }}>📊 Position Sizing (Forex)</h3>
+            {[
+              { label: 'Capital at Risk', value: `${currency}${riskAmt.toFixed(2)}` },
+              { label: 'Stop Loss (Pips)', value: `${stopLossPips.toFixed(1)} pips` },
+              { label: 'Standard Lots (100k)', value: `${positionLots.toFixed(2)} Lots` },
+              { label: 'Mini Lots (10k)', value: `${(positionLots * 10).toFixed(1)} Mini` },
+              { label: 'Micro Lots (1k)', value: `${(positionLots * 100).toFixed(1)} Micro` },
+              { label: 'Total Units', value: Math.round(positionUnits).toLocaleString() },
+              { label: `Spread Cost`, value: `${currency}${spreadCost.toFixed(2)}` },
+              { label: `Total Transaction Risk`, value: `${currency}${totalRisk.toFixed(2)}`, isTotal: true },
+            ].map(r => (
+              <div className="risk-result-row" key={r.label}>
+                <span className="label" style={{ fontWeight: r.isTotal ? '800' : 'inherit' }}>{r.label}</span>
+                <span className="value" style={{ fontSize: r.isTotal ? '1.25rem' : 'inherit', color: r.isTotal ? 'var(--primary)' : 'var(--text-main)' }}>{r.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -60,6 +262,10 @@ function RiskCalc({ currency }) {
 function TradeJournal({ currency }) {
   const trades = useStore(s => s.trades || []);
   const setTrades = useStore(s => s.setTrades);
+  
+  const [sortField, setSortField] = useState('date');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [pastCollapsed, setPastCollapsed] = useState(false);
 
   const add = () => setTrades([...trades, {
     id: Date.now(), symbol: '', type: 'Long', entry: '', exit: '', size: '', pnl: '', date: new Date().toISOString().split('T')[0], notes: ''
@@ -71,6 +277,94 @@ function TradeJournal({ currency }) {
   const totalPnl = trades.reduce((s, t) => s + (parseFloat(t.pnl) || 0), 0);
   const wins = trades.filter(t => parseFloat(t.pnl) > 0).length;
   const wr = trades.length ? ((wins / trades.length) * 100).toFixed(0) : 0;
+
+  const today = new Date().toISOString().split('T')[0];
+  const todayTrades = trades.filter(t => t.date === today);
+  const pastTrades = trades.filter(t => t.date !== today);
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const renderSortHeader = (field, label) => {
+    const isSorted = sortField === field;
+    return (
+      <th key={field} onClick={() => handleSort(field)} className="sortable-header" style={{ cursor: 'pointer', userSelect: 'none' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {label}
+          {isSorted ? (sortDirection === 'asc' ? ' ▲' : ' ▼') : <span style={{ opacity: 0.25 }}> ↕</span>}
+        </div>
+      </th>
+    );
+  };
+
+  const sortTradesList = useCallback((list) => {
+    return [...list].sort((a, b) => {
+      let valA = a[sortField];
+      let valB = b[sortField];
+      
+      if (['entry', 'exit', 'size', 'pnl'].includes(sortField)) {
+        valA = parseFloat(valA) || 0;
+        valB = parseFloat(valB) || 0;
+      } else {
+        valA = String(valA || '').toLowerCase();
+        valB = String(valB || '').toLowerCase();
+      }
+      
+      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [sortField, sortDirection]);
+
+  const sortedTodayTrades = useMemo(() => sortTradesList(todayTrades), [todayTrades, sortTradesList]);
+  const sortedPastTrades = useMemo(() => sortTradesList(pastTrades), [pastTrades, sortTradesList]);
+
+  const renderTradeTable = (tradesList, emptyMessage) => {
+    return (
+      <div className="trading-table-container">
+        <table className="trading-table">
+          <thead>
+            <tr>
+              {renderSortHeader('symbol', 'Symbol')}
+              {renderSortHeader('type', 'Type')}
+              {renderSortHeader('entry', 'Entry')}
+              {renderSortHeader('exit', 'Exit')}
+              {renderSortHeader('size', 'Size')}
+              {renderSortHeader('pnl', `P&L (${currency})`)}
+              {renderSortHeader('date', 'Date')}
+              {renderSortHeader('notes', 'Notes')}
+              <th style={{ width: 40 }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {tradesList.map(t => (
+              <tr key={t.id}>
+                <td><input value={t.symbol} onChange={e => upd(t.id, 'symbol', e.target.value)} placeholder="AAPL" style={{ fontWeight: 700, width: 70 }} /></td>
+                <td>
+                  <select value={t.type} onChange={e => upd(t.id, 'type', e.target.value)} style={{ background: 'transparent', border: 'none', color: t.type === 'Long' ? 'var(--green-text)' : 'var(--red-text)', fontWeight: 700, cursor: 'pointer' }}>
+                    <option>Long</option><option>Short</option>
+                  </select>
+                </td>
+                {['entry', 'exit', 'size', 'pnl'].map(f => (
+                  <td key={f}><input type="number" step="any" value={t[f]} onChange={e => upd(t.id, f, e.target.value)} placeholder="0" style={{ width: 70 }} /></td>
+                ))}
+                <td><input type="date" value={t.date} onChange={e => upd(t.id, 'date', e.target.value)} /></td>
+                <td><input value={t.notes} onChange={e => upd(t.id, 'notes', e.target.value)} placeholder="Notes..." /></td>
+                <td><button onClick={() => del(t.id)} style={{ color: 'var(--red-text)', fontSize: '1.1rem', background: 'none', border: 'none', cursor: 'pointer' }}>×</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {!tradesList.length && <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>{emptyMessage}</div>}
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -87,36 +381,243 @@ function TradeJournal({ currency }) {
           </div>
         ))}
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-main)' }}>📅 Today's Trades (Heutige Trades)</h3>
         <button className="notion-button" onClick={add}>+ New Trade</button>
       </div>
-      <div className="trading-table-container">
-        <table className="trading-table">
-          <thead>
-            <tr>
-              {['Symbol', 'Type', 'Entry', 'Exit', 'Size', `P&L (${currency})`, 'Date', 'Notes', ''].map(h => <th key={h}>{h}</th>)}
-            </tr>
-          </thead>
-          <tbody>
-            {trades.map(t => (
-              <tr key={t.id}>
-                <td><input value={t.symbol} onChange={e => upd(t.id, 'symbol', e.target.value)} placeholder="AAPL" style={{ fontWeight: 700, width: 70 }} /></td>
-                <td>
-                  <select value={t.type} onChange={e => upd(t.id, 'type', e.target.value)} style={{ background: 'transparent', border: 'none', color: t.type === 'Long' ? 'var(--green-text)' : 'var(--red-text)', fontWeight: 700, cursor: 'pointer' }}>
-                    <option>Long</option><option>Short</option>
-                  </select>
-                </td>
-                {['entry', 'exit', 'size', 'pnl'].map(f => (
-                  <td key={f}><input type="number" value={t[f]} onChange={e => upd(t.id, f, e.target.value)} placeholder="0" style={{ width: 70 }} /></td>
+
+      {renderTradeTable(sortedTodayTrades, 'No trades logged today. Click "+ New Trade" to log one.')}
+
+      <div className="past-trades-accordion" style={{ marginTop: 24 }}>
+        <div 
+          className="past-trades-header-bar" 
+          onClick={() => setPastCollapsed(!pastCollapsed)}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '12px 18px',
+            background: 'rgba(255, 255, 255, 0.03)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '10px',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            userSelect: 'none'
+          }}
+        >
+          <span style={{ fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: 8 }}>
+            🕒 Vergangene Trades ({sortedPastTrades.length})
+          </span>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            {pastCollapsed ? '▼ Ausklappen' : '▲ Einklappen'}
+          </span>
+        </div>
+        {!pastCollapsed && (
+          <div style={{ marginTop: 12 }}>
+            {renderTradeTable(sortedPastTrades, 'No past trades recorded.')}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Market Hours / Sessions Clocks Tab ───────────────────
+function TradingSessions() {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (tz) => {
+    return time.toLocaleTimeString('de-DE', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  };
+
+  const formatDate = (tz) => {
+    return time.toLocaleDateString('de-DE', { timeZone: tz, weekday: 'short', day: 'numeric', month: 'short' });
+  };
+
+  const sessions = [
+    { id: 'sydney', name: 'Sydney', tz: 'Australia/Sydney', open: 8, close: 17, emoji: '🇦🇺' },
+    { id: 'tokyo', name: 'Tokyo', tz: 'Asia/Tokyo', open: 9, close: 18, emoji: '🇯🇵' },
+    { id: 'london', name: 'London', tz: 'Europe/London', open: 8, close: 17, emoji: '🇬🇧' },
+    { id: 'newyork', name: 'New York', tz: 'America/New_York', open: 8, close: 17, emoji: '🇺🇸' },
+  ];
+
+  const getSessionStatus = (s) => {
+    let localTimeStr;
+    try {
+      localTimeStr = time.toLocaleTimeString('en-US', { timeZone: s.tz, hour12: false, hour: 'numeric', minute: 'numeric', second: 'numeric' });
+    } catch {
+      localTimeStr = time.toLocaleTimeString('en-US', { hour12: false, hour: 'numeric', minute: 'numeric', second: 'numeric' });
+    }
+    const [h, m, sec] = localTimeStr.split(':').map(Number);
+    const currentDec = h + m / 60 + sec / 3600;
+    
+    const isOpen = currentDec >= s.open && currentDec < s.close;
+    
+    let countdownText = '';
+    if (isOpen) {
+      const diffSecs = Math.max(0, Math.floor((s.close - currentDec) * 3600));
+      const hours = Math.floor(diffSecs / 3600);
+      const minutes = Math.floor((diffSecs % 3600) / 60);
+      countdownText = `Schließt in ${hours} Std. ${minutes} Min.`;
+    } else {
+      let diffHours = 0;
+      if (currentDec < s.open) {
+        diffHours = s.open - currentDec;
+      } else {
+        diffHours = (24 - currentDec) + s.open;
+      }
+      const diffSecs = Math.max(0, Math.floor(diffHours * 3600));
+      const hours = Math.floor(diffSecs / 3600);
+      const minutes = Math.floor((diffSecs % 3600) / 60);
+      countdownText = `Öffnet in ${hours} Std. ${minutes} Min.`;
+    }
+    
+    return { isOpen, countdownText };
+  };
+
+  const localTimezoneName = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const isSessionOpenAtLocalHour = (s, localHour) => {
+    const d = new Date(time);
+    d.setHours(localHour, 0, 0, 0);
+    try {
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: s.tz,
+        hour: 'numeric',
+        hour12: false
+      });
+      const tzHour = parseInt(formatter.format(d), 10);
+      return tzHour >= s.open && tzHour < s.close;
+    } catch {
+      return false;
+    }
+  };
+
+  const currentLocalHour = time.getHours();
+
+  const sydneyStatus = getSessionStatus(sessions[0]);
+  const tokyoStatus = getSessionStatus(sessions[1]);
+  const londonStatus = getSessionStatus(sessions[2]);
+  const newyorkStatus = getSessionStatus(sessions[3]);
+
+  const overlaps = [];
+  if (londonStatus.isOpen && newyorkStatus.isOpen) {
+    overlaps.push({ name: 'London & New York Overlap', desc: '🔥 Peak Volatility & Volume (Haupt-Handelszeit)', color: 'var(--primary)' });
+  }
+  if (tokyoStatus.isOpen && londonStatus.isOpen) {
+    overlaps.push({ name: 'Tokyo & London Overlap', desc: '⚡ Moderate Volatility (Asien/Europa-Übergang)', color: 'var(--green-text)' });
+  }
+  if (sydneyStatus.isOpen && tokyoStatus.isOpen) {
+    overlaps.push({ name: 'Sydney & Tokyo Overlap', desc: '🌏 Standard Volatility (Pazifik/Asien-Sitzung)', color: '#4cc9f0' });
+  }
+
+  return (
+    <div className="sessions-container" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      {overlaps.length > 0 && (
+        <div className="overlaps-banners" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {overlaps.map(o => (
+            <div key={o.name} className="overlap-banner-card" style={{ borderLeft: `4px solid ${o.color}`, background: 'rgba(255,255,255,0.02)', padding: '12px 18px', borderRadius: '0 8px 8px 0', border: '1px solid var(--border-color)', borderLeftWidth: 4 }}>
+              <div className="overlap-banner-title" style={{ fontWeight: 800, fontSize: '0.9rem', color: o.color }}>{o.name}</div>
+              <div className="overlap-banner-desc" style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 2 }}>{o.desc}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="sessions-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+        {sessions.map(s => {
+          const { isOpen, countdownText } = getSessionStatus(s);
+          return (
+            <div key={s.id} className={`session-card ${isOpen ? 'open' : 'closed'}`} style={{ background: 'var(--card-bg)', border: `1px solid ${isOpen ? 'rgba(34, 197, 94, 0.3)' : 'var(--border-color)'}`, borderRadius: 12, padding: 18, position: 'relative', overflow: 'hidden' }}>
+              {isOpen && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'var(--green-text)' }} />}
+              <div className="session-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <span className="session-emoji-name" style={{ fontWeight: 800, fontSize: '0.95rem' }}>{s.emoji} {s.name}</span>
+                <span 
+                  className={`session-badge ${isOpen ? 'open' : 'closed'}`}
+                  style={{
+                    fontSize: '0.65rem',
+                    fontWeight: 800,
+                    padding: '2px 8px',
+                    borderRadius: 20,
+                    background: isOpen ? 'rgba(34, 197, 94, 0.15)' : 'rgba(255,255,255,0.06)',
+                    color: isOpen ? 'var(--green-text)' : 'var(--text-muted)'
+                  }}
+                >
+                  {isOpen ? '● OPEN' : 'CLOSED'}
+                </span>
+              </div>
+              <div className="session-time" style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.5px', marginBottom: 4 }}>{formatTime(s.tz)}</div>
+              <div className="session-date" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 16 }}>{formatDate(s.tz)}</div>
+              <div className="session-hours-info" style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 10 }}>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Lokale Stunden: {s.open}:00 - {s.close === 18 ? '18:00' : '17:00'}</div>
+                <div style={{ color: isOpen ? 'var(--green-text)' : 'var(--primary)', fontSize: '0.75rem', fontWeight: 600, marginTop: 4 }}>
+                  {countdownText}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="sessions-timeline-section" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: 12, padding: 20 }}>
+        <h3 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', color: 'var(--text-main)' }}>🕒 Forex Session Timeline</h3>
+        <p style={{ margin: '0 0 18px 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          Lokale PC-Zeitzone: <strong>{localTimezoneName}</strong> (aktuell: {time.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr)
+        </p>
+        
+        <div className="timeline-container-wrapper" style={{ overflowX: 'auto' }}>
+          <div style={{ minWidth: 640 }}>
+            {/* Hours Header Row */}
+            <div className="timeline-hours-header" style={{ display: 'flex', alignItems: 'center', marginBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 6 }}>
+              <div className="timeline-row-label" style={{ width: 100, fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>Session</div>
+              <div className="timeline-hours-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(24, 1fr)', flex: 1, gap: 2 }}>
+                {Array.from({ length: 24 }, (_, i) => (
+                  <div key={i} className={`timeline-hour-marker ${i === currentLocalHour ? 'current' : ''}`} style={{ textAlign: 'center', fontSize: '0.7rem', fontWeight: i === currentLocalHour ? '800' : '600', color: i === currentLocalHour ? 'var(--primary)' : 'var(--text-muted)' }}>
+                    {String(i).padStart(2, '0')}
+                  </div>
                 ))}
-                <td><input type="date" value={t.date} onChange={e => upd(t.id, 'date', e.target.value)} /></td>
-                <td><input value={t.notes} onChange={e => upd(t.id, 'notes', e.target.value)} placeholder="Notes..." /></td>
-                <td><button onClick={() => del(t.id)} style={{ color: 'var(--red-text)', fontSize: '1.1rem', background: 'none', border: 'none', cursor: 'pointer' }}>×</button></td>
-              </tr>
+              </div>
+            </div>
+            
+            {/* Session Rows */}
+            {sessions.map(s => (
+              <div key={s.id} className="timeline-row" style={{ display: 'flex', alignItems: 'center', marginBottom: 6 }}>
+                <div className="timeline-row-label" style={{ width: 100, fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                  <span>{s.emoji} {s.name}</span>
+                </div>
+                <div className="timeline-hours-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(24, 1fr)', flex: 1, gap: 2 }}>
+                  {Array.from({ length: 24 }, (_, i) => {
+                    const isOpen = isSessionOpenAtLocalHour(s, i);
+                    const isCurrent = i === currentLocalHour;
+                    return (
+                      <div 
+                        key={i} 
+                        className={`timeline-hour-block ${isOpen ? 'open' : 'closed'} ${isCurrent ? 'current' : ''}`}
+                        style={{
+                          height: 24,
+                          borderRadius: 4,
+                          background: isOpen 
+                            ? (isCurrent ? 'rgba(34, 197, 94, 0.45)' : 'rgba(34, 197, 94, 0.2)') 
+                            : (isCurrent ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255,255,255,0.03)'),
+                          border: isCurrent ? '1.5px solid var(--primary)' : isOpen ? '1px solid rgba(34, 197, 94, 0.35)' : '1px solid rgba(255,255,255,0.02)',
+                          boxShadow: isCurrent ? '0 0 6px rgba(var(--primary-rgb), 0.5)' : 'none',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                        title={`${s.name} Session: ${isOpen ? 'Offen' : 'Geschlossen'} um ${i}:00 Uhr`}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
-        {!trades.length && <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>No trades logged yet. Click "+ New Trade" to start.</div>}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -294,6 +795,7 @@ function FinanceLink({ navigate, currency }) {
 
   const totalPnl = trades.reduce((s, t) => s + (parseFloat(t.pnl) || 0), 0);
 
+  /* eslint-disable react-hooks/purity */
   const exportToExpenses = () => {
     const entry = {
       id: Date.now(),
@@ -308,6 +810,7 @@ function FinanceLink({ navigate, currency }) {
     setExpenses([...expenses, entry]);
     alert('✅ Exported to Finance Hub!');
   };
+  /* eslint-enable react-hooks/purity */
 
   return (
     <div>
@@ -345,10 +848,11 @@ function FinanceLink({ navigate, currency }) {
 // ── Main Component ─────────────────────────────────────
 const TABS = [
   { id: 'journal', label: 'Journal', emoji: '📓' },
+  { id: 'risk', label: 'Risiko Berechner', emoji: '⚖️' },
+  { id: 'sessions', label: 'Market Hours', emoji: '⏰' },
   { id: 'trends', label: 'Trend Analyser', emoji: '📈' },
   { id: 'analyse', label: 'Analyse Tool', emoji: '🔍' },
   { id: 'plan', label: 'Plan', emoji: '📋' },
-  { id: 'risk', label: 'Risiko Berechner', emoji: '⚖️' },
   { id: 'strategies', label: 'Strategies', emoji: '♟️' },
   { id: 'watchlist', label: 'Stock List', emoji: '⭐' },
   { id: 'finance', label: 'Finance Link', emoji: '🔗' },
@@ -362,10 +866,11 @@ export default function TradingTerminal({ navigate }) {
   const renderTab = () => {
     switch (tab) {
       case 'journal': return <TradeJournal currency={currency} />;
+      case 'risk': return <RiskCalc currency={currency} />;
+      case 'sessions': return <TradingSessions />;
       case 'trends': return <TrendAnalyser />;
       case 'analyse': return <AnalyseTool />;
       case 'plan': return <TradingPlan />;
-      case 'risk': return <RiskCalc currency={currency} />;
       case 'strategies': return <Strategies />;
       case 'watchlist': return <Watchlist />;
       case 'finance': return <FinanceLink navigate={navigate} currency={currency} />;

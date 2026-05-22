@@ -21,6 +21,56 @@ export default function ProfileSettings() {
 
   const [saveStatus, setSaveStatus] = useState('');
 
+  const [syncCode, setSyncCode] = useState('');
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [inputSyncCode, setInputSyncCode] = useState('');
+  const [isRestoring, setIsRestoring] = useState(false);
+
+  const handleCreateSync = async () => {
+    setIsSyncing(true);
+    try {
+      const state = useStore.getState();
+      const res = await fetch('https://jsonbin-zeta.vercel.app/api/bins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state)
+      });
+      if (!res.ok) throw new Error('Sync upload failed');
+      const result = await res.json();
+      if (result && result.id) {
+        setSyncCode(result.id);
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Failed to upload data for sync. Please try again.');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handleRestoreSync = async () => {
+    if (!inputSyncCode.trim()) return;
+    setIsRestoring(true);
+    try {
+      const res = await fetch(`https://jsonbin-zeta.vercel.app/api/bins/${inputSyncCode.trim()}`);
+      if (!res.ok) throw new Error('Sync fetch failed');
+      const data = await res.json();
+      if (data && data.data) {
+        useStore.setState(data.data);
+        alert('🎉 Data successfully loaded and synced!');
+        setInputSyncCode('');
+        window.location.reload();
+      } else {
+        alert('Invalid sync file structure.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Failed to retrieve sync data. Please check the code.');
+    } finally {
+      setIsRestoring(false);
+    }
+  };
+
 
   const presets = [
     { name: 'Original', color: '#d48f48' },
@@ -112,7 +162,7 @@ export default function ProfileSettings() {
           } else {
             alert('Invalid backup file structure!');
           }
-        } catch (err) {
+        } catch {
           alert('Error reading backup file!');
         }
       }
@@ -131,7 +181,7 @@ export default function ProfileSettings() {
         } else {
           alert('Invalid backup file structure!');
         }
-      } catch (err) {
+      } catch {
         alert('Error reading backup file!');
       }
     };
@@ -777,6 +827,81 @@ export default function ProfileSettings() {
               />
             </label>
           )}
+        </div>
+
+        {/* Cloud Sync Section */}
+        <div style={{ marginTop: '20px', padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+          <h3 style={{ fontSize: '0.95rem', margin: '0 0 10px 0', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            📲 Mobile & Web Cloud Sync
+          </h3>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px', lineHeight: '1.4' }}>
+            Synchronize your statistics and data between this device and your iPhone 11.
+            Generate a sync key, or scan the QR code with your phone's camera.
+          </p>
+
+          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '20px' }}>
+            <div>
+              <button
+                onClick={handleCreateSync}
+                className="notion-button"
+                disabled={isSyncing}
+                style={{ background: 'var(--primary)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}
+              >
+                {isSyncing ? 'Uploading...' : '☁️ Generate Sync Code & QR'}
+              </button>
+            </div>
+
+            {syncCode && (
+              <div style={{ display: 'flex', gap: '20px', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', flex: 1, minWidth: '280px' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="form-label" style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your Sync Code</label>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '1px', color: 'var(--primary)', margin: '4px 0 4px 0' }}>
+                    {syncCode}
+                  </div>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
+                    Enter this code on your iPhone 11 under settings, or scan the QR code on the right.
+                  </p>
+                </div>
+                <div>
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(window.location.origin + window.location.pathname + '?sync=' + syncCode)}`}
+                    alt="Sync QR Code"
+                    style={{ borderRadius: '6px', background: '#fff', padding: '4px', width: '100px', height: '100px', display: 'block' }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div style={{ borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '15px' }}>
+            <h4 style={{ margin: '0 0 10px 0', fontSize: '0.85rem', color: 'var(--text-main)' }}>Enter Sync Code from Another Device</h4>
+            <div style={{ display: 'flex', gap: '10px', maxWidth: '400px' }}>
+              <input
+                type="text"
+                placeholder="e.g. a1b2c3d4"
+                value={inputSyncCode}
+                onChange={(e) => setInputSyncCode(e.target.value)}
+                style={{
+                  flex: 1,
+                  background: 'var(--bg-input)',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-main)',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  outline: 'none',
+                  fontSize: '0.85rem'
+                }}
+              />
+              <button
+                onClick={handleRestoreSync}
+                className="notion-button secondary"
+                disabled={isRestoring}
+                style={{ padding: '8px 16px', fontSize: '0.8rem', whiteSpace: 'nowrap', margin: 0 }}
+              >
+                {isRestoring ? 'Downloading...' : 'Link & Restore'}
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Auto-Backup Directory Section */}

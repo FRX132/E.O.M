@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../../store';
 import MuscleMap from './MuscleMap';
-import { EXERCISE_DATABASE } from './WorkoutModal';
+import { EXERCISE_DATABASE } from '../../constants';
 import WorkoutModal from './WorkoutModal';
 
 const SportIcon = () => (
@@ -13,7 +13,6 @@ const SportIcon = () => (
 export default function SportHub() {
   const workouts = useStore(state => state.workouts) || [];
   const setWorkouts = useStore(state => state.setWorkouts);
-  const theme = useStore(state => state.theme);
 
   const [selectedMuscle, setSelectedMuscle] = useState(null);
   const [selectedWorkout, setSelectedWorkout] = useState(null);

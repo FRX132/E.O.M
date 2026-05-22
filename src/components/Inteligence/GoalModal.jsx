@@ -1,34 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import '../Styles/GoalModal.css';
 
+const getDefaultState = (initialColumn) => ({
+  id: null,
+  text: '',
+  notes: '',
+  url: '',
+  hasDate: false,
+  date: new Date().toISOString().split('T')[0],
+  hasTime: false,
+  time: '12:00',
+  isUrgent: false,
+  priority: 'None',
+  difficulty: 'Easy',
+  minutes: 10,
+  list: initialColumn || 'week'
+});
+
 export default function GoalModal({ isOpen, onClose, onSave, initialColumn, initialData }) {
-  const getDefaultState = () => ({
-    id: null,
-    text: '',
-    notes: '',
-    url: '',
-    hasDate: false,
-    date: new Date().toISOString().split('T')[0],
-    hasTime: false,
-    time: '12:00',
-    isUrgent: false,
-    priority: 'None',
-    difficulty: 'Easy',
-    minutes: 10,
-    list: initialColumn || 'week'
-  });
+  const [goalData, setGoalData] = useState(() => getDefaultState(initialColumn));
 
-  const [goalData, setGoalData] = useState(getDefaultState());
-
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (isOpen) {
       if (initialData) {
         setGoalData({ ...initialData, list: initialData.list || initialColumn || 'week' });
       } else {
-        setGoalData(getDefaultState());
+        setGoalData(getDefaultState(initialColumn));
       }
     }
   }, [isOpen, initialData, initialColumn]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!isOpen) return null;
 
@@ -43,7 +45,7 @@ export default function GoalModal({ isOpen, onClose, onSave, initialColumn, init
     <div className="mac-modal-overlay" onClick={onClose}>
       <div className="mac-modal" onClick={(e) => e.stopPropagation()}>
         <div className="mac-modal-header">
-          <span>📍</span> {initialData ? 'Goal bearbeiten' : 'Neues Goal'}
+           <span>📍</span> {initialData ? 'Edit Goal' : 'New Goal'}
         </div>
 
         <div className="mac-modal-content">
@@ -52,7 +54,7 @@ export default function GoalModal({ isOpen, onClose, onSave, initialColumn, init
               <input 
                 className="mac-input" 
                 style={{ fontWeight: 600, fontSize: '17px' }}
-                placeholder="Titel" 
+                placeholder="Title" 
                 value={goalData.text}
                 onChange={(e) => setGoalData({ ...goalData, text: e.target.value })}
                 autoFocus
@@ -61,7 +63,7 @@ export default function GoalModal({ isOpen, onClose, onSave, initialColumn, init
             <div className="mac-row" style={{ minHeight: '60px' }}>
               <textarea 
                 className="mac-input" 
-                placeholder="Notizen" 
+                placeholder="Notes" 
                 style={{ resize: 'none', height: '100%', paddingTop: '8px' }}
                 value={goalData.notes}
                 onChange={(e) => setGoalData({ ...goalData, notes: e.target.value })}
@@ -77,10 +79,10 @@ export default function GoalModal({ isOpen, onClose, onSave, initialColumn, init
             </div>
           </div>
 
-          <div className="mac-section-title">Datum & Uhrzeit</div>
+          <div className="mac-section-title">Date & Time</div>
           <div className="mac-input-group">
             <div className="mac-row">
-              <span className="mac-row-label">Datum</span>
+              <span className="mac-row-label">Date</span>
               <label className="mac-switch">
                 <input 
                   type="checkbox" 
@@ -102,7 +104,7 @@ export default function GoalModal({ isOpen, onClose, onSave, initialColumn, init
               </div>
             )}
             <div className="mac-row">
-              <span className="mac-row-label">Uhrzeit</span>
+              <span className="mac-row-label">Time</span>
               <label className="mac-switch">
                 <input 
                   type="checkbox" 
@@ -124,7 +126,7 @@ export default function GoalModal({ isOpen, onClose, onSave, initialColumn, init
               </div>
             )}
             <div className="mac-row">
-              <span className="mac-row-label">Dringend</span>
+              <span className="mac-row-label">Urgent</span>
               <label className="mac-switch">
                 <input 
                   type="checkbox" 
@@ -136,39 +138,39 @@ export default function GoalModal({ isOpen, onClose, onSave, initialColumn, init
             </div>
           </div>
 
-          <div className="mac-section-title">Organisation</div>
+          <div className="mac-section-title">Organization</div>
           <div className="mac-input-group">
             <div className="mac-row">
-              <span className="mac-row-label">Priorität</span>
+              <span className="mac-row-label">Priority</span>
               <select 
                 className="mac-select"
                 value={goalData.priority}
                 onChange={(e) => setGoalData({ ...goalData, priority: e.target.value })}
               >
-                <option value="None">Ohne</option>
-                <option value="Low">Niedrig</option>
-                <option value="Medium">Mittel</option>
-                <option value="High">Hoch</option>
+                <option value="None">None</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
               </select>
             </div>
             <div className="mac-row">
-              <span className="mac-row-label">Liste</span>
+              <span className="mac-row-label">List</span>
               <select 
                 className="mac-select"
                 value={goalData.list}
                 onChange={(e) => setGoalData({ ...goalData, list: e.target.value })}
               >
-                <option value="week">Woche</option>
-                <option value="month">Monat</option>
-                <option value="year">Jahr</option>
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+                <option value="year">Year</option>
               </select>
             </div>
           </div>
 
-          <div className="mac-section-title">XP - Fortschritt</div>
+          <div className="mac-section-title">XP Progress</div>
           <div className="mac-input-group">
             <div className="mac-row">
-              <span className="mac-row-label">Schwierigkeit</span>
+              <span className="mac-row-label">Difficulty</span>
               <select 
                 className="mac-select"
                 value={goalData.difficulty}
@@ -181,7 +183,7 @@ export default function GoalModal({ isOpen, onClose, onSave, initialColumn, init
               </select>
             </div>
             <div className="mac-row">
-              <span className="mac-row-label">Zeit (Minuten)</span>
+              <span className="mac-row-label">Time (Minutes)</span>
               <input 
                 type="number"
                 className="mac-input" 
@@ -194,13 +196,13 @@ export default function GoalModal({ isOpen, onClose, onSave, initialColumn, init
         </div>
 
         <div className="mac-modal-footer">
-          <button className="mac-btn mac-btn-cancel" onClick={onClose}>Abbrechen</button>
+          <button className="mac-btn mac-btn-cancel" onClick={onClose}>Cancel</button>
           <button 
             className="mac-btn mac-btn-add" 
             onClick={handleSave}
             disabled={!goalData.text}
           >
-            {initialData ? 'Speichern' : 'Hinzufügen'}
+            {initialData ? 'Save' : 'Add'}
           </button>
         </div>
       </div>

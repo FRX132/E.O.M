@@ -31,9 +31,9 @@ export default function Editor() {
     if (files.length === 0) {
       const defaultFile = {
         id: 1,
-        name: 'Obsidian Handbuch.md',
+        name: 'Obsidian Guide.md',
         folder: 'Obsidian',
-        content: `# 📓 Obsidian & Markdown Handbuch\n\nWillkommen in deinem E.O.M Notizen-Workspace! Hier findest du eine Übersicht über die wichtigsten Markdown-Formatierungen, die du auch in Obsidian verwenden kannst.\n\n## 1. Überschriften (Headings)\nVerwende \`#\` gefolgt von einem Leerzeichen für Überschriften:\n# Überschrift 1 (H1)\n## Überschrift 2 (H2)\n### Überschrift 3 (H3)\n\n## 2. Textformatierung\n* *Kursiv* (\`*Kursiv*\` oder \`_Kursiv_\`)\n* **Fett** (\`**Fett**\` oder \`__Fett__\`)\n* ***Fett & Kursiv*** (\`***Fett & Kursiv***\`)\n* ~~Durchgestrichen~~ (\`~~Durchgestrichen~~\`)\n* ==Markiert (Obsidian Highlight)== (\`==Markiert==\`)\n\n## 3. Listen (Lists)\n### Unsortiert:\n- Punkt 1\n- Punkt 2\n  - Unterpunkt 2a\n\n### Sortiert:\n1. Erster Punkt\n2. Zweiter Punkt\n\n### Aufgabenliste (Task List):\n- [ ] Offene Aufgabe\n- [x] Erledigte Aufgabe\n\n## 4. Links & Bilder\n* Externer Link: [Google](https://google.com) (\`[Google](https://google.com)\`)\n* Interner Wikilink (Obsidian-Style): [[Titel einer anderen Notiz]] (\`[[Titel einer anderen Notiz]]\`)\n* Bild: \`![Bild Beschreibung](URL)\`\n\n## 5. Code & Zitate\n### Inline-Code:\nVerwende Backticks: \`const temp = 24.5;\`\n\n### Code-Block:\n\`\`\`javascript\n// Syntax-Highlighting für JS\nfunction greet() {\n  console.log("Hallo Welt!");\n}\n\`\`\`\n\n### Zitate (Blockquotes):\n> "Die Grenzen meiner Sprache bedeuten die Grenzen meiner Welt." — Ludwig Wittgenstein\n\n## 6. Tabellen (Tables)\n| Feature | Syntax | Beispiel |\n| :--- | :---: | ---: |\n| Fett | \`**text**\` | **Fett** |\n| Code | \\\`code\\\` | \\\`Code\\\` |\n\n## 7. Mathematische Formeln (LaTeX)\n* Inline: $E = mc^2$ (\`$E = mc^2$\`)\n`,
+        content: `# 📓 Obsidian & Markdown Guide\n\nWelcome to your E.O.M Notes Workspace! Here is an overview of the most important Markdown formatting syntax, which you can also use directly in Obsidian.\n\n## 1. Headings\nUse \`#\` followed by a space for headings:\n# Heading 1 (H1)\n## Heading 2 (H2)\n### Heading 3 (H3)\n\n## 2. Text Formatting\n* *Italic* (\`*Italic*\` or \`_Italic_\`)\n* **Bold** (\`**Bold**\` or \`__Bold__\`)\n* ***Bold & Italic*** (\`***Bold & Italic***\`)\n* ~~Strikethrough~~ (\`~~Strikethrough~~\`)\n* ==Highlighted (Obsidian Highlight)== (\`==Highlighted==\`)\n\n## 3. Lists\n### Unordered:\n- Item 1\n- Item 2\n  - Sub-item 2a\n\n### Ordered:\n1. First item\n2. Second item\n\n### Task List:\n- [ ] Open task\n- [x] Completed task\n\n## 4. Links & Images\n* External Link: [Google](https://google.com) (\`[Google](https://google.com)\`)\n* Internal Wikilink (Obsidian-Style): [[Title of another note]] (\`[[Title of another note]]\`)\n* Image: \`![Image description](URL)\`\n\n## 5. Code & Quotes\n### Inline Code:\nUse backticks: \`const temp = 24.5;\`\n\n### Code Block:\n\`\`\`javascript\n// Syntax highlighting for JS\nfunction greet() {\n  console.log("Hello World!");\n}\n\`\`\`\n\n### Blockquotes:\n> "The limits of my language mean the limits of my world." — Ludwig Wittgenstein\n\n## 6. Tables\n| Feature | Syntax | Example |\n| :--- | :---: | ---: |\n| Bold | \`**text**\` | **Bold** |\n| Code | \\\`code\\\` | \\\`Code\\\` |\n\n## 7. Math Formulas (LaTeX)\n* Inline: $E = mc^2$ (\`$E = mc^2$\`)\n`,
         timestamp: Date.now()
       };
       setFiles([defaultFile]);
@@ -47,6 +47,18 @@ export default function Editor() {
       setActiveFileId(files[0].id);
     }
   }, [files, activeFileId]);
+
+  // Keep local folders list synchronized with any folders in files
+  useEffect(() => {
+    const existing = files.map(f => f.folder).filter(Boolean);
+    setFolders(prev => {
+      const merged = Array.from(new Set([...prev, ...existing]));
+      if (merged.length !== prev.length) {
+        return merged;
+      }
+      return prev;
+    });
+  }, [files]);
 
   const activeFile = files.find(f => f.id === activeFileId);
 
@@ -87,6 +99,52 @@ export default function Editor() {
       setFolders([...folders, cleanFolder]);
     }
     setNewFolderName('');
+  };
+
+  const handleImportFiles = async () => {
+    if (!window.electronAPI || !window.electronAPI.selectFiles) {
+      alert("Electron API is not available.");
+      return;
+    }
+    const res = await window.electronAPI.selectFiles();
+    if (res.success && res.files && res.files.length > 0) {
+      const baseTime = Date.now();
+      const imported = res.files.map((file, idx) => ({
+        id: baseTime + idx,
+        name: file.name,
+        content: file.content,
+        folder: file.folder || 'Inbox',
+        timestamp: file.timestamp || baseTime
+      }));
+      setFiles([...imported, ...files]);
+      setActiveFileId(imported[0].id);
+      setIsPreview(false);
+    } else if (res.error && res.error !== 'No files selected') {
+      alert(`Error importing files: ${res.error}`);
+    }
+  };
+
+  const handleImportFolder = async () => {
+    if (!window.electronAPI || !window.electronAPI.selectVault) {
+      alert("Electron API is not available.");
+      return;
+    }
+    const res = await window.electronAPI.selectVault();
+    if (res.success && res.files && res.files.length > 0) {
+      const baseTime = Date.now();
+      const imported = res.files.map((file, idx) => ({
+        id: baseTime + idx,
+        name: file.name,
+        content: file.content,
+        folder: file.folder,
+        timestamp: file.timestamp || baseTime
+      }));
+      setFiles([...imported, ...files]);
+      setActiveFileId(imported[0].id);
+      setIsPreview(false);
+    } else if (res.error && res.error !== 'No directory selected') {
+      alert(`Error importing folder: ${res.error}`);
+    }
   };
 
   const handleUpdate = (field, value) => {
@@ -164,6 +222,52 @@ export default function Editor() {
               style={{ padding: '6px 10px', minWidth: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               +
+            </button>
+          </div>
+
+          {/* Import Actions */}
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <button 
+              onClick={handleImportFiles} 
+              className="pill" 
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                padding: '6px 8px',
+                fontSize: '0.75rem',
+                border: '1px dashed var(--border-color)',
+                background: 'rgba(255,255,255,0.02)',
+                color: 'var(--text-main)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              title="Import markdown or text files"
+            >
+              📥 Import File(s)
+            </button>
+            <button 
+              onClick={handleImportFolder} 
+              className="pill" 
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                padding: '6px 8px',
+                fontSize: '0.75rem',
+                border: '1px dashed var(--border-color)',
+                background: 'rgba(255,255,255,0.02)',
+                color: 'var(--text-main)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              title="Import local folder or Obsidian vault"
+            >
+              📁 Import Folder
             </button>
           </div>
 

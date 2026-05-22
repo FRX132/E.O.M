@@ -1,73 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../Styles/GoalModal.css';
 
-export const EXERCISE_DATABASE = {
-  chest: [
-    { name: 'Bench Press', type: 'Free Weight', sets: 3, reps: '8-12' },
-    { name: 'Incline Dumbbell Press', type: 'Free Weight', sets: 3, reps: '10-12' },
-    { name: 'Chest Flyes', type: 'Free Weight', sets: 3, reps: '12-15' },
-    { name: 'Pushups', type: 'Bodyweight', sets: 3, reps: 'Until Failure' },
-    { name: 'Chest Press Machine', type: 'Machine', sets: 3, reps: '10-12' },
-    { name: 'Pec Deck Machine', type: 'Machine', sets: 3, reps: '12-15' },
-    { name: 'Cable Crossovers', type: 'Cable', sets: 3, reps: '12-15' }
-  ],
-  'upper-back': [
-    { name: 'Pullups', type: 'Bodyweight', sets: 3, reps: 'Until Failure' },
-    { name: 'Bent Over Rows', type: 'Free Weight', sets: 3, reps: '8-10' },
-    { name: 'Lat Pulldowns', type: 'Cable', sets: 3, reps: '10-12' },
-    { name: 'Seated Cable Row', type: 'Cable', sets: 3, reps: '10-12' },
-    { name: 'T-Bar Row Machine', type: 'Machine', sets: 3, reps: '8-10' }
-  ],
-  'lower-back': [
-    { name: 'Deadlifts', type: 'Free Weight', sets: 3, reps: '5-8' },
-    { name: 'Hyperextensions', type: 'Bodyweight', sets: 3, reps: '15' },
-    { name: 'Back Extension Machine', type: 'Machine', sets: 3, reps: '12-15' }
-  ],
-  deltoids: [
-    { name: 'Overhead Press', type: 'Free Weight', sets: 3, reps: '8-10' },
-    { name: 'Lateral Raises', type: 'Free Weight', sets: 3, reps: '15-20' },
-    { name: 'Front Raises', type: 'Free Weight', sets: 3, reps: '12-15' },
-    { name: 'Rear Delt Flyes', type: 'Free Weight', sets: 3, reps: '12-15' },
-    { name: 'Shoulder Press Machine', type: 'Machine', sets: 3, reps: '10-12' },
-    { name: 'Cable Lateral Raises', type: 'Cable', sets: 3, reps: '12-15' }
-  ],
-  biceps: [
-    { name: 'Barbell Curls', type: 'Free Weight', sets: 3, reps: '10-12' },
-    { name: 'Hammer Curls', type: 'Free Weight', sets: 3, reps: '12' },
-    { name: 'Preacher Curls', type: 'Free Weight', sets: 2, reps: '12-15' },
-    { name: 'Bicep Curl Machine', type: 'Machine', sets: 3, reps: '10-12' },
-    { name: 'Cable Curls', type: 'Cable', sets: 3, reps: '12-15' }
-  ],
-  triceps: [
-    { name: 'Skull Crushers', type: 'Free Weight', sets: 3, reps: '10-12' },
-    { name: 'Tricep Pushdowns', type: 'Cable', sets: 3, reps: '12-15' },
-    { name: 'Dips', type: 'Bodyweight', sets: 3, reps: 'Until Failure' },
-    { name: 'Tricep Extension Machine', type: 'Machine', sets: 3, reps: '10-12' }
-  ],
-  abs: [
-    { name: 'Plank', type: 'Bodyweight', sets: 3, reps: '60s' },
-    { name: 'Leg Raises', type: 'Bodyweight', sets: 3, reps: '15-20' },
-    { name: 'Crunches', type: 'Bodyweight', sets: 3, reps: '20' },
-    { name: 'Ab Crunch Machine', type: 'Machine', sets: 3, reps: '15-20' },
-    { name: 'Cable Crunches', type: 'Cable', sets: 3, reps: '15-20' }
-  ],
-  quadriceps: [
-    { name: 'Squats', type: 'Free Weight', sets: 3, reps: '8-10' },
-    { name: 'Leg Press', type: 'Machine', sets: 3, reps: '10-12' },
-    { name: 'Leg Extensions', type: 'Machine', sets: 3, reps: '15' },
-    { name: 'Hack Squat Machine', type: 'Machine', sets: 3, reps: '8-10' }
-  ],
-  hamstring: [
-    { name: 'Stiff Leg Deadlifts', type: 'Free Weight', sets: 3, reps: '10-12' },
-    { name: 'Seated Leg Curls', type: 'Machine', sets: 3, reps: '12-15' },
-    { name: 'Lying Leg Curls', type: 'Machine', sets: 3, reps: '10-12' }
-  ],
-  calves: [
-    { name: 'Standing Calf Raises', type: 'Free Weight', sets: 4, reps: '15-20' },
-    { name: 'Seated Calf Raise Machine', type: 'Machine', sets: 3, reps: '15-20' },
-    { name: 'Calf Press on Leg Press Machine', type: 'Machine', sets: 3, reps: '15-20' }
-  ]
-};
+import { EXERCISE_DATABASE } from '../../constants';
 
 export default function WorkoutModal({ isOpen, onClose, onSave, selectedMuscle, initialData }) {
   const [sessionData, setSessionData] = useState({
@@ -79,6 +13,7 @@ export default function WorkoutModal({ isOpen, onClose, onSave, selectedMuscle, 
   const [showCustomForm, setShowCustomForm] = useState(false);
   const [customEx, setCustomEx] = useState({ name: '', type: 'Custom', sets: 3, reps: '10', description: '', link: '' });
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (initialData) {
       setSessionData(initialData);
@@ -96,6 +31,7 @@ export default function WorkoutModal({ isOpen, onClose, onSave, selectedMuscle, 
       });
     }
   }, [selectedMuscle, initialData, isOpen]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!isOpen) return null;
 

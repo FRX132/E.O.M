@@ -1,3 +1,4 @@
+/* global require */
 const fs = require('fs');
 const data = JSON.parse(fs.readFileSync('./src/data/female_anatomy.json', 'utf8'));
 

@@ -39,7 +39,7 @@ export default function MarkdownViewer({ content, onUpdate }) {
                 <input
                   type="checkbox"
                   checked={checked}
-                  onChange={(e) => {
+                  onChange={() => {
                     handleCheckboxChange(currentIndex);
                   }}
                   onClick={(e) => {

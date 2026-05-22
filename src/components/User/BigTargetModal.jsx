@@ -10,6 +10,7 @@ export default function BigTargetModal({ isOpen, onClose, onSave, initialData })
     img: ''
   });
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (initialData) {
       setTargetData({
@@ -22,6 +23,7 @@ export default function BigTargetModal({ isOpen, onClose, onSave, initialData })
       setTargetData({ title: '', notes: '', category: 'Work', img: '' });
     }
   }, [initialData, isOpen]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!isOpen) return null;
 
@@ -104,13 +106,13 @@ export default function BigTargetModal({ isOpen, onClose, onSave, initialData })
         </div>
 
         <div className="mac-modal-footer">
-          <button className="mac-btn mac-btn-cancel" onClick={onClose}>Abbrechen</button>
+          <button className="mac-btn mac-btn-cancel" onClick={onClose}>Cancel</button>
           <button
             className="mac-btn mac-btn-add"
             onClick={handleSave}
             disabled={!targetData.title}
           >
-            {initialData ? 'Speichern' : 'Hinzufügen'}
+            {initialData ? 'Save' : 'Add'}
           </button>
         </div>
       </div>

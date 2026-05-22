@@ -20,18 +20,22 @@ export default function Overview({ navigate }) {
   const overviewSettings = useStore(state => state.overviewSettings);
   const setOverviewSettings = useStore(state => state.setOverviewSettings);
 
-  const [time, setTime] = useState(new Date());
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [clockStyle, setClockStyle] = useState(0); // 0: 24h with sec, 1: 24h minimal, 2: 12h AM/PM
-  const [calendarStyle, setCalendarStyle] = useState(0); // 0: Month Grid, 1: Weekly Strip
-  const [overviewLayout, setOverviewLayout] = useState(0); // 0: Default, 1: Minimal, 2: Glass, 3: Brutal
-  const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
-
   const settings = overviewSettings || {
     visibleWidgets: { clock: true, calendar: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true },
     widgetTitles: { clock: "Clock", calendar: "Calendar", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats" },
     visibleStatsBars: { expenses: true, goals: true, habits: true, fridge: true, targets: true, library: true, cinema: true, quests: true }
   };
+
+  const [time, setTime] = useState(new Date());
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [clockStyle, setClockStyle] = useState(0); // 0: 24h with sec, 1: 24h minimal, 2: 12h AM/PM
+  const [calendarStyle, setCalendarStyle] = useState(0); // 0: Month Grid, 1: Weekly Strip
+  const overviewLayout = settings.layout ?? 0;
+  const setOverviewLayout = (newLayout) => {
+    const layoutVal = typeof newLayout === 'function' ? newLayout(overviewLayout) : newLayout;
+    setOverviewSettings({ ...settings, layout: layoutVal });
+  };
+  const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
 
   const LAYOUT_NAMES = ["Default Premium", "Minimal Clean", "Glassmorphism", "Neo-Brutalism"];
 
@@ -272,51 +276,20 @@ export default function Overview({ navigate }) {
   };
 
   return (
-    <div className={`overview-container layout-theme-${overviewLayout}`}>
+    <div className={`overview-container layout-theme-${overviewLayout}`} style={{ position: 'relative' }}>
 
-      {/* Floating Theme & Customization Toggle */}
-      <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 999, display: 'flex', gap: '10px' }}>
+      {/* Floating Theme & Customization Toggle - Top Right */}
+      <div className="overview-controls">
         <button
           onClick={() => setOverviewLayout(s => (s + 1) % 4)}
-          style={{
-            background: 'var(--primary)',
-            color: '#fff',
-            border: 'none',
-            padding: '12px 20px',
-            borderRadius: '30px',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
-            cursor: 'pointer',
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'transform 0.2s'
-          }}
-          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+          className="overview-control-btn"
         >
           <span>🎨</span> {LAYOUT_NAMES[overviewLayout]}
         </button>
 
         <button
           onClick={() => setIsCustomizeOpen(true)}
-          style={{
-            background: 'rgba(30, 30, 35, 0.9)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color: '#fff',
-            padding: '12px 20px',
-            borderRadius: '30px',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
-            cursor: 'pointer',
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'transform 0.2s'
-          }}
-          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+          className="overview-control-btn"
         >
           <span>⚙️</span> Customize Page
         </button>
@@ -807,6 +780,7 @@ export default function Overview({ navigate }) {
                 onClick={() => {
                   if (confirm("Reset overview customization to defaults?")) {
                     setOverviewSettings({
+                      layout: 0,
                       visibleWidgets: { clock: true, calendar: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true },
                       widgetTitles: { clock: "Clock", calendar: "Calendar", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats" },
                       visibleStatsBars: { expenses: true, goals: true, habits: true, fridge: true, targets: true, library: true, cinema: true, quests: true }

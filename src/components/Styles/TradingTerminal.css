@@ -27,7 +27,7 @@
   border-radius: 8px;
   font-size: 0.8rem;
   font-weight: 600;
-  background: rgba(255,255,255,0.04);
+  background: var(--bg-card-alt);
   border: 1px solid transparent;
   color: var(--text-muted);
   cursor: pointer;
@@ -36,7 +36,7 @@
 }
 
 .trading-subnav-btn:hover {
-  background: rgba(255,255,255,0.08);
+  background: var(--bg-input);
   color: var(--text-main);
 }
 
@@ -110,7 +110,7 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--text-muted);
-  background: rgba(255,255,255,0.03);
+  background: var(--bg-card-alt);
   border-bottom: 1px solid var(--border-color);
   text-align: left;
   white-space: nowrap;
@@ -119,14 +119,14 @@
 .trading-table td {
   padding: 12px 16px;
   font-size: 0.85rem;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--border-light);
   vertical-align: middle;
 }
 
 .trading-table tr:last-child td { border-bottom: none; }
 
 .trading-table tr:hover td {
-  background: rgba(255,255,255,0.02);
+  background: var(--bg-card-alt);
 }
 
 .trading-table input,
@@ -193,7 +193,7 @@
 }
 
 .risk-input-group input {
-  background: rgba(255,255,255,0.05);
+  background: var(--bg-input);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 10px 14px;
@@ -225,7 +225,7 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 14px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .risk-result-row:last-child { border-bottom: none; padding-bottom: 0; }
@@ -329,7 +329,7 @@
 
 .strategy-textarea {
   font-size: 0.83rem;
-  background: rgba(255,255,255,0.03);
+  background: var(--bg-card-alt);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   color: var(--text-muted);
@@ -419,8 +419,118 @@
 }
 
 .trend-direction.neutral {
-  background: rgba(255,255,255,0.08);
+  background: var(--bg-input);
   color: var(--text-muted);
+}
+
+/* Sortable headers in journal table */
+.sortable-header {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.sortable-header:hover {
+  background: var(--bg-input) !important;
+  color: var(--text-main) !important;
+}
+
+/* Past Trades Accordion Header */
+.past-trades-header-bar:hover {
+  background: var(--bg-input) !important;
+  border-color: rgba(var(--primary-rgb), 0.3) !important;
+}
+
+/* Asset Type Buttons in Risk Calculator */
+.asset-type-btn {
+  transition: all 0.2s ease;
+}
+.asset-type-btn:hover {
+  background: var(--bg-input) !important;
+  color: var(--text-main) !important;
+}
+.asset-type-btn.active {
+  background: rgba(var(--primary-rgb), 0.15) !important;
+  border-color: rgba(var(--primary-rgb), 0.4) !important;
+  color: var(--primary) !important;
+}
+
+/* Risk Calculator Input Select */
+.risk-input-group select {
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.risk-input-group select:focus {
+  border-color: var(--primary) !important;
+  background: rgba(var(--primary-rgb), 0.06) !important;
+}
+
+/* Sessions tab components */
+.sessions-container {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.session-card {
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.session-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+.session-card.open {
+  border-color: rgba(34, 197, 94, 0.35) !important;
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.05);
+}
+
+.session-badge.open {
+  animation: pulse-badge-green 2s infinite alternate;
+}
+
+@keyframes pulse-badge-green {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+  100% { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0); }
+}
+
+.overlap-banner-card {
+  transition: all 0.2s ease;
+}
+.overlap-banner-card:hover {
+  background: var(--bg-card-alt) !important;
+  transform: translateX(2px);
+}
+
+.timeline-container-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+.timeline-container-wrapper::-webkit-scrollbar-track {
+  background: var(--bg-card-alt);
+  border-radius: 4px;
+}
+.timeline-container-wrapper::-webkit-scrollbar-thumb {
+  background: var(--bg-input);
+  border-radius: 4px;
+}
+.timeline-container-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+.timeline-hour-block {
+  transition: all 0.15s ease;
+}
+.timeline-hour-block:hover {
+  transform: scale(1.08);
+  z-index: 10;
+}
+.timeline-hour-block.open {
+  background: rgba(34, 197, 94, 0.25) !important;
+}
+.timeline-hour-block.open:hover {
+  background: rgba(34, 197, 94, 0.4) !important;
+}
+.timeline-hour-block.closed:hover {
+  background: var(--bg-input) !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 768px) {

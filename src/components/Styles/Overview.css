@@ -73,7 +73,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 0 40px 20px 40px;
+  padding: 0 40px 65px 40px;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -209,7 +209,7 @@
 .xp-label {
   font-size: 0.7rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-main);
   letter-spacing: 1px;
 }
 
@@ -222,11 +222,11 @@
 .xp-bar-outer {
   width: 100%;
   height: 10px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-card-alt);
   border-radius: 5px;
   overflow: hidden;
   backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
 }
 
 .xp-bar-inner {
@@ -772,19 +772,41 @@
   cursor: default;
 }
 
+.cal-day:not(.empty) {
+  cursor: pointer;
+  position: relative;
+}
+
 .cal-day.empty {
   background: transparent;
 }
 
 .cal-day:not(.empty):hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-color);
 }
 
 .cal-day.today {
   background: var(--primary);
   color: #fff;
   font-weight: 700;
-  box-shadow: 0 0 15px rgba(0, 120, 255, 0.4);
+  box-shadow: var(--neon-glow);
+}
+
+.cal-day-events {
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+}
+
+.cal-day-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
 }
 .sync-grid {
   display: grid;
@@ -895,6 +917,12 @@
 
   .hero-title {
     font-size: 1.8rem;
+  }
+
+  .hero-user {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
   }
 
   .hero-avatar {
@@ -1019,4 +1047,115 @@
 
 .layout-theme-3 .hero-dot {
   border-radius: 0;
+}
+
+/* Control Buttons Positioning & Default Glassmorphism Styling */
+.overview-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 99;
+  display: flex;
+  gap: 10px;
+}
+
+.overview-control-btn {
+  background: rgba(20, 20, 25, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.overview-control-btn:hover {
+  transform: scale(1.05);
+  background: rgba(20, 20, 25, 0.8);
+}
+
+@media (max-width: 900px) {
+  .overview-controls {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    gap: 8px;
+  }
+  .overview-control-btn {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    border-radius: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .overview-controls {
+    top: 10px;
+    right: 10px;
+    gap: 6px;
+  }
+  .overview-control-btn {
+    padding: 4px 10px;
+    font-size: 0.7rem;
+  }
+}
+
+/* ================= NEO-BRUTALISM (THEME 3) LAYOUT ADJUSTMENTS ================= */
+.layout-theme-3 .overview-control-btn {
+  border-radius: 0 !important;
+  border: 3px solid var(--text-main) !important;
+  box-shadow: 4px 4px 0 var(--text-main) !important;
+  background: var(--bg-card) !important;
+  color: var(--text-main) !important;
+}
+
+.layout-theme-3 .overview-control-btn:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 6px 6px 0 var(--text-main) !important;
+}
+
+.layout-theme-3 .hero-avatar {
+  border-radius: 0 !important;
+  border: 4px solid var(--text-main) !important;
+  box-shadow: 4px 4px 0 var(--text-main) !important;
+}
+
+.layout-theme-3 .status-badge {
+  border-radius: 0 !important;
+  border: 2px solid var(--text-main) !important;
+  box-shadow: 2px 2px 0 var(--text-main) !important;
+  background: var(--bg-card) !important;
+}
+
+.layout-theme-3 .xp-bar-outer {
+  border-radius: 0 !important;
+  border: 3px solid var(--text-main) !important;
+  background: var(--bg-card-alt) !important;
+  height: 16px !important;
+}
+
+.layout-theme-3 .xp-bar-inner {
+  border-radius: 0 !important;
+  background: var(--primary) !important;
+  box-shadow: none !important;
+}
+
+.layout-theme-3 .premium-card {
+  border: 3px solid var(--text-main) !important;
+  border-radius: 0 !important;
+  box-shadow: 6px 6px 0px var(--text-main) !important;
+  background: var(--bg-card) !important;
+}
+
+.layout-theme-3 .notion-tabs {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom: 3px solid var(--text-main) !important;
 }

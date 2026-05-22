@@ -1,3 +1,4 @@
+/* global require, __dirname */
 const fs = require('fs');
 const path = require('path');
 

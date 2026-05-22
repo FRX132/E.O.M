@@ -16,6 +16,42 @@ const isDev = !app.isPackaged;
 
 let mainWindow;
 
+function readFilesRecursively(dir, rootDirName, baseDir) {
+  let results = [];
+  try {
+    const list = fs.readdirSync(dir);
+    for (const file of list) {
+      if (file.startsWith('.')) continue;
+      const filePath = path.join(dir, file);
+      const stat = fs.statSync(filePath);
+      if (stat && stat.isDirectory()) {
+        results = results.concat(readFilesRecursively(filePath, rootDirName, baseDir));
+      } else {
+        const ext = path.extname(file).toLowerCase();
+        if (ext === '.md' || ext === '.txt') {
+          const content = fs.readFileSync(filePath, 'utf-8');
+          const relativePath = path.relative(baseDir, filePath);
+          const relativeDir = path.dirname(relativePath);
+          let folderName = rootDirName;
+          if (relativeDir !== '.') {
+            const sanitizedRelativeDir = relativeDir.replace(/\\/g, '/');
+            folderName = `${rootDirName}/${sanitizedRelativeDir}`;
+          }
+          results.push({
+            name: file,
+            content: content,
+            folder: folderName,
+            timestamp: stat.mtimeMs || Date.now()
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.error(`Error scanning directory ${dir}:`, err);
+  }
+  return results;
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -120,6 +156,55 @@ app.whenReady().then(() => {
       }
     }
     return { success: false, error: 'No file selected' };
+  });
+
+  ipcMain.handle('select-files', async () => {
+    const { filePaths } = await dialog.showOpenDialog({
+      title: 'Select Text/Markdown Files',
+      properties: ['openFile', 'multiSelections'],
+      filters: [
+        { name: 'Markdown and Text Files', extensions: ['md', 'txt'] },
+        { name: 'All Files', extensions: ['*'] }
+      ]
+    });
+    if (filePaths && filePaths.length > 0) {
+      const files = [];
+      for (const filePath of filePaths) {
+        try {
+          const content = fs.readFileSync(filePath, 'utf-8');
+          const stat = fs.statSync(filePath);
+          files.push({
+            name: path.basename(filePath),
+            content: content,
+            folder: 'Inbox',
+            timestamp: stat.mtimeMs || Date.now()
+          });
+        } catch (err) {
+          console.error(`Failed to read file ${filePath}:`, err);
+        }
+      }
+      return { success: true, files };
+    }
+    return { success: false, error: 'No files selected' };
+  });
+
+  ipcMain.handle('select-vault-directory', async () => {
+    const { filePaths } = await dialog.showOpenDialog({
+      title: 'Select Folder / Obsidian Vault',
+      properties: ['openDirectory']
+    });
+    if (filePaths && filePaths.length > 0) {
+      const dirPath = filePaths[0];
+      const rootDirName = path.basename(dirPath);
+      try {
+        const files = readFilesRecursively(dirPath, rootDirName, dirPath);
+        return { success: true, files };
+      } catch (err) {
+        console.error("Error reading directory:", err);
+        return { success: false, error: err.message };
+      }
+    }
+    return { success: false, error: 'No directory selected' };
   });
 
   createWindow();

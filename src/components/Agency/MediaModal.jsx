@@ -11,6 +11,7 @@ export default function MediaModal({ isOpen, onClose, onSave, initialData, type 
     notes: ''
   });
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (initialData) {
       setMediaData({
@@ -32,6 +33,7 @@ export default function MediaModal({ isOpen, onClose, onSave, initialData, type 
       });
     }
   }, [initialData, isOpen, type]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!isOpen) return null;
 
@@ -128,7 +130,7 @@ export default function MediaModal({ isOpen, onClose, onSave, initialData, type 
             </div>
           </div>
 
-          <div className="mac-section-title">Notes / Notizen</div>
+          <div className="mac-section-title">Notes</div>
           <div className="mac-input-group" style={{ padding: '10px' }}>
             <textarea
               className="mac-input"
@@ -145,13 +147,13 @@ export default function MediaModal({ isOpen, onClose, onSave, initialData, type 
         </div>
 
         <div className="mac-modal-footer">
-          <button className="mac-btn mac-btn-cancel" onClick={onClose}>Abbrechen</button>
+          <button className="mac-btn mac-btn-cancel" onClick={onClose}>Cancel</button>
           <button 
             className="mac-btn mac-btn-add" 
             onClick={handleSave}
             disabled={!mediaData.title}
           >
-            {initialData ? 'Speichern' : 'Hinzufügen'}
+            {initialData ? 'Save' : 'Add'}
           </button>
         </div>
       </div>

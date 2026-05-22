@@ -22,7 +22,7 @@ const CATEGORY_COLORS = {
 };
 
 const CustomSkillNode = ({ data }) => {
-  const { node, isUnlocked, canUnlock, handleNodeClick, theme } = data;
+  const { node, isUnlocked, handleNodeClick, theme } = data;
 
   const unlockedState = isUnlocked(node.id);
   const color = CATEGORY_COLORS[node.category] || '#777';

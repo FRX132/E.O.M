@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect, useState } from 'react';
+import React, { useMemo, useCallback, useEffect, useState, useRef } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -76,32 +76,32 @@ const StickyNode = ({ id, data }) => {
   const [hovered, setHovered] = useState(false);
 
   return (
-    <div className="nodrag" 
+    <div className="nodrag"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-      background: data.color || '#fef08a',
-      padding: '10px',
-      borderRadius: '4px',
-      width: data.color === 'transparent' ? 'auto' : '200px',
-      minWidth: '100px',
-      minHeight: data.color === 'transparent' ? 'auto' : '200px',
-      boxShadow: data.color === 'transparent' ? 'none' : '4px 4px 10px rgba(0,0,0,0.3)',
-      color: data.color === 'transparent' ? '#fff' : '#000',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative'
-    }}>
+        background: data.color || '#fef08a',
+        padding: '10px',
+        borderRadius: '4px',
+        width: data.color === 'transparent' ? 'auto' : '200px',
+        minWidth: '100px',
+        minHeight: data.color === 'transparent' ? 'auto' : '200px',
+        boxShadow: data.color === 'transparent' ? 'none' : '4px 4px 10px rgba(0,0,0,0.3)',
+        color: data.color === 'transparent' ? '#fff' : '#000',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative'
+      }}>
       {hovered && (
         <div style={{ position: 'absolute', top: '-35px', left: 0, background: 'var(--bg-card)', padding: '5px', borderRadius: '6px', display: 'flex', gap: '5px', boxShadow: '0 4px 10px rgba(0,0,0,0.5)', zIndex: 10, alignItems: 'center' }}>
           {/* Colors */}
           {['#fef08a', '#bbf7d0', '#bfdbfe', '#fbcfe8', 'transparent'].map(c => (
-             <div key={c} onClick={() => data.onChangeStyle && data.onChangeStyle(id, { color: c })} style={{ width: 16, height: 16, borderRadius: '50%', background: c === 'transparent' ? '#333' : c, border: c === 'transparent' ? '1px dashed #fff' : 'none', cursor: 'pointer' }} title={c === 'transparent' ? 'Transparent (Heading)' : 'Color'} />
+            <div key={c} onClick={() => data.onChangeStyle && data.onChangeStyle(id, { color: c })} style={{ width: 16, height: 16, borderRadius: '50%', background: c === 'transparent' ? '#333' : c, border: c === 'transparent' ? '1px dashed #fff' : 'none', cursor: 'pointer' }} title={c === 'transparent' ? 'Transparent (Heading)' : 'Color'} />
           ))}
           <div style={{ width: 1, height: '16px', background: '#555', margin: '0 5px' }} />
           {/* Sizes */}
           {['0.9rem', '1.2rem', '1.8rem', '2.5rem'].map((s, i) => (
-             <button key={s} onClick={() => data.onChangeStyle && data.onChangeStyle(id, { fontSize: s })} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '0 4px', fontSize: '0.8rem' }} title={`Size ${['S', 'M', 'L', 'XL'][i]}`}>{['S', 'M', 'L', 'XL'][i]}</button>
+            <button key={s} onClick={() => data.onChangeStyle && data.onChangeStyle(id, { fontSize: s })} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '0 4px', fontSize: '0.8rem' }} title={`Size ${['S', 'M', 'L', 'XL'][i]}`}>{['S', 'M', 'L', 'XL'][i]}</button>
           ))}
           <div style={{ width: 1, height: '16px', background: '#555', margin: '0 5px' }} />
           {/* Bold */}
@@ -113,18 +113,18 @@ const StickyNode = ({ id, data }) => {
       )}
       <div className="custom-drag-handle" style={{ height: '20px', cursor: 'grab', background: data.color === 'transparent' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', marginBottom: '5px', borderRadius: '2px' }}></div>
       <Handle type="target" position={Position.Top} style={{ background: '#555' }} />
-      <textarea 
-        defaultValue={data.text} 
+      <textarea
+        defaultValue={data.text}
         onChange={(e) => data.onChange && data.onChange(id, e.target.value)}
-        style={{ 
-          flex: 1, 
-          width: '100%', 
-          border: 'none', 
-          background: 'transparent', 
-          resize: 'both', 
-          outline: 'none', 
-          color: data.color === 'transparent' ? '#fff' : '#000', 
-          fontFamily: data.color === 'transparent' ? 'var(--font-heading, sans-serif)' : 'monospace', 
+        style={{
+          flex: 1,
+          width: '100%',
+          border: 'none',
+          background: 'transparent',
+          resize: 'both',
+          outline: 'none',
+          color: data.color === 'transparent' ? '#fff' : '#000',
+          fontFamily: data.color === 'transparent' ? 'var(--font-heading, sans-serif)' : 'monospace',
           fontSize: data.fontSize || '0.9rem',
           fontWeight: data.fontWeight || 'normal'
         }}
@@ -143,6 +143,7 @@ const nodeTypes = {
 
 export default function ProjectCanvas() {
   const store = useStore();
+  const handlersRef = useRef({});
 
   const generateDefaultLayout = useCallback(() => {
     const nodes = [];
@@ -194,14 +195,14 @@ export default function ProjectCanvas() {
       // Re-inject the onChange handler for sticky notes because functions can't be stored in JSON
       const restoredNodes = store.canvasNodes.map(node => {
         if (node.type === 'sticky') {
-          return { 
-            ...node, 
-            data: { 
-              ...node.data, 
-              onChange: (id, val) => handleStickyChange(id, val),
-              onChangeStyle: (id, style) => handleStickyStyleChange(id, style),
-              onDelete: (id) => handleDeleteNode(id)
-            } 
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              onChange: (id, val) => handlersRef.current.handleStickyChange?.(id, val),
+              onChangeStyle: (id, style) => handlersRef.current.handleStickyStyleChange?.(id, style),
+              onDelete: (id) => handlersRef.current.handleDeleteNode?.(id)
+            }
           };
         }
         return node;
@@ -219,7 +220,7 @@ export default function ProjectCanvas() {
     // Strip functions before saving
     const cleanNodes = nodes.map(n => {
       if (n.type === 'sticky') {
-        const { onChange, onChangeStyle, onDelete, ...cleanData } = n.data;
+        const { onChange: _onChange, onChangeStyle: _onChangeStyle, onDelete: _onDelete, ...cleanData } = n.data;
         return { ...n, data: cleanData };
       }
       return n;
@@ -254,18 +255,23 @@ export default function ProjectCanvas() {
     }
   }, [setNodes, setEdges]);
 
+  // Update ref with fresh handlers so they are always current
+  useEffect(() => {
+    handlersRef.current = { handleStickyChange, handleStickyStyleChange, handleDeleteNode };
+  }, [handleStickyChange, handleStickyStyleChange, handleDeleteNode]);
+
   // Make sure existing sticky nodes have the handler if they were generated
   useEffect(() => {
     setNodes((nds) => nds.map(n => {
       if (n.type === 'sticky' && !n.data.onChangeStyle) {
-        return { 
-          ...n, 
-          data: { 
-            ...n.data, 
+        return {
+          ...n,
+          data: {
+            ...n.data,
             onChange: handleStickyChange,
             onChangeStyle: handleStickyStyleChange,
             onDelete: handleDeleteNode
-          } 
+          }
         };
       }
       return n;
@@ -325,9 +331,9 @@ export default function ProjectCanvas() {
         <Controls style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }} />
         <MiniMap
           nodeColor={(n) => {
-             if (n.type === 'category') return 'var(--primary)';
-             if (n.type === 'sticky') return '#fef08a';
-             return 'var(--border-color)';
+            if (n.type === 'category') return 'var(--primary)';
+            if (n.type === 'sticky') return '#fef08a';
+            return 'var(--border-color)';
           }}
           maskColor="rgba(0,0,0,0.5)"
           style={{ background: 'var(--bg-main)' }}
@@ -339,22 +345,22 @@ export default function ProjectCanvas() {
         </Panel>
 
         <Panel position="top-right" style={{ display: 'flex', gap: '10px', background: 'rgba(0,0,0,0.6)', padding: '10px', borderRadius: '10px', backdropFilter: 'blur(10px)' }}>
-          <button 
-            className="notion-button secondary" 
+          <button
+            className="notion-button secondary"
             onClick={addStickyNote}
             style={{ margin: 0, padding: '6px 12px', fontSize: '0.85rem' }}
           >
             ➕ Sticky Note
           </button>
-          <button 
-            className="notion-button secondary" 
+          <button
+            className="notion-button secondary"
             onClick={addOSItem}
             style={{ margin: 0, padding: '6px 12px', fontSize: '0.85rem' }}
           >
             ➕ Custom OS Item
           </button>
-          <button 
-            className="notion-button secondary" 
+          <button
+            className="notion-button secondary"
             onClick={resetCanvas}
             style={{ margin: 0, padding: '6px 12px', fontSize: '0.85rem', color: 'var(--red-text)' }}
           >
