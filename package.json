@@ -1,8 +1,8 @@
 {
   "name": "eom",
   "private": true,
-  "version": "1.6.3",
-  "description": "Life Planner OS",
+  "version": "1.6.4",
+  "description": "E.O.M",
   "author": "Freakzy",
   "type": "module",
   "main": "electron/main.js",
@@ -62,7 +62,8 @@
     "mac": {
       "target": "dmg",
       "category": "public.app-category.productivity",
-      "icon": "build/icon.png"
+      "icon": "build/icon.png",
+      "identity": null
     },
     "win": {
       "target": "nsis",

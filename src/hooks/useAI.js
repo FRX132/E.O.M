@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import AIWorker from '../workers/aiWorker.js?worker&inline';
 
 export function useAI() {
     const [isReady, setIsReady] = useState(false);
@@ -10,9 +11,7 @@ export function useAI() {
 
 
     useEffect(() => {
-        worker.current = new Worker(new URL('../workers/aiWorker.js', import.meta.url), {
-            type: 'module'
-        });
+        worker.current = new AIWorker();
 
         const onMessageReceived = (e) => {
             const { status, data, output, error } = e.data;

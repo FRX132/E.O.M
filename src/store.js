@@ -52,6 +52,7 @@ const EMPTY_STATE = {
   expenses: [],
   assets: [],
   habits: generateEmptyHabitDays(),
+  customHabitTemplates: [],
   goals: { week: [], month: [], year: [] },
   fridge: [],
   targets: [],
@@ -74,6 +75,7 @@ const EMPTY_STATE = {
   canvasNodes: null,
   canvasEdges: null,
   aiKnowledgeBase: [],
+  timetableBlocks: [],
   isAuthenticated: false,
   autoBackupPath: null,
   theme: 'dark',
@@ -140,6 +142,7 @@ const initialState = {
   expenses: migrateLegacyData('os_expenses', EMPTY_STATE.expenses),
   assets: migrateLegacyData('os_assets', EMPTY_STATE.assets),
   habits: migrateLegacyData('os_habits', EMPTY_STATE.habits),
+  customHabitTemplates: migrateLegacyData('os_custom_habit_templates', EMPTY_STATE.customHabitTemplates),
   goals: migrateLegacyData('os_goals', EMPTY_STATE.goals),
   fridge: migrateLegacyData('os_fridge', EMPTY_STATE.fridge),
   targets: migrateLegacyData('os_bigtargets', EMPTY_STATE.targets),
@@ -152,6 +155,7 @@ const initialState = {
   canvasNodes: migrateLegacyData('os_canvas_nodes', EMPTY_STATE.canvasNodes),
   canvasEdges: migrateLegacyData('os_canvas_edges', EMPTY_STATE.canvasEdges),
   aiKnowledgeBase: migrateLegacyData('os_knowledge_base', EMPTY_STATE.aiKnowledgeBase),
+  timetableBlocks: migrateLegacyData('os_timetable_blocks', EMPTY_STATE.timetableBlocks),
   journal: migrateLegacyData('os_journal', EMPTY_STATE.journal),
   editorFiles: migrateLegacyData('os_editor_files', EMPTY_STATE.editorFiles),
   trades: migrateLegacyData('os_trades', EMPTY_STATE.trades),
@@ -168,6 +172,131 @@ const initialState = {
   designSettings: migrateLegacyData('os_design_settings', EMPTY_STATE.designSettings),
   financeSettings: migrateLegacyData('os_finance_settings', EMPTY_STATE.financeSettings),
   overviewSettings: migrateLegacyData('os_overview_settings', EMPTY_STATE.overviewSettings),
+};
+
+const shouldTemplateBeActiveOnDate = (template, dateStr) => {
+  if (!template) return false;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dateObj = new Date(y, m - 1, d);
+
+  if (template.repeat === 'Daily') {
+    return true;
+  }
+
+  if (template.repeat === 'Weekly') {
+    const weekdayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+    return (template.weekdays || []).includes(weekdayName);
+  }
+
+  if (template.repeat === 'Monthly') {
+    if (!template.createdAt) return false;
+    const createDate = new Date(template.createdAt);
+    return dateObj.getDate() === createDate.getDate();
+  }
+
+  if (template.repeat === 'Once') {
+    if (!template.createdAt) return false;
+    const createDateStr = template.createdAt.split('T')[0];
+    return dateStr === createDateStr;
+  }
+
+  return false;
+};
+
+const syncHabitsInternal = (currentHabits, templates, unlockedSkills, skillDefs) => {
+  let updatedHabits = [...currentHabits];
+  
+  // 1. Rollover & Roadmap Check
+  const today = new Date();
+  const futureDays = 7; // Look 7 days ahead
+
+  for (let i = 0; i <= futureDays; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const id = d.toISOString().split('T')[0];
+    const name = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+    if (!updatedHabits.find(h => h.id === id)) {
+      const newDay = { id, date: name, habits: [] };
+      updatedHabits.push(newDay);
+    }
+  }
+
+  // Sort by date and keep a window
+  updatedHabits.sort((a, b) => a.id.localeCompare(b.id));
+
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const yesterdayId = yesterday.toISOString().split('T')[0];
+
+  updatedHabits = updatedHabits.filter(h => h.id >= yesterdayId);
+  if (updatedHabits.length > 10) updatedHabits = updatedHabits.slice(0, 10);
+
+  // 2. Skill Sync
+  const habitsThatShouldExist = skillDefs
+    .filter(skill => unlockedSkills.includes(skill.id) && skill.habit)
+    .map(skill => ({ id: `h-${skill.id}`, name: skill.habit }));
+
+  updatedHabits = updatedHabits.map(day => {
+    const existingIds = new Set(day.habits.map(h => h.id));
+    const missingHabits = habitsThatShouldExist.filter(h => !existingIds.has(h.id));
+    
+    let habitsForDay = [...day.habits];
+    if (missingHabits.length > 0) {
+      habitsForDay = [...habitsForDay, ...missingHabits.map(h => ({ ...h, done: false }))];
+    }
+    
+    return {
+      ...day,
+      habits: habitsForDay
+    };
+  });
+
+  // 3. Custom Habits Sync
+  updatedHabits = updatedHabits.map(day => {
+    const activeCustomsForDay = templates.filter(t => shouldTemplateBeActiveOnDate(t, day.id));
+    const activeCustomIds = new Set(activeCustomsForDay.map(t => t.id));
+
+    // Filter out customs no longer active
+    const filteredHabits = day.habits.filter(h => {
+      if (h.id.startsWith('custom-')) {
+        return activeCustomIds.has(h.id);
+      }
+      return true;
+    });
+
+    // Update existing customs
+    const nextHabits = filteredHabits.map(h => {
+      if (h.id.startsWith('custom-')) {
+        const template = activeCustomsForDay.find(t => t.id === h.id);
+        if (template) {
+          return { ...h, name: template.name, notes: template.notes, color: template.color };
+        }
+      }
+      return h;
+    });
+
+    // Append newly active customs
+    const existingIds = new Set(nextHabits.map(h => h.id));
+    const missingCustoms = activeCustomsForDay.filter(t => !existingIds.has(t.id));
+    
+    missingCustoms.forEach(t => {
+      nextHabits.push({
+        id: t.id,
+        name: t.name,
+        notes: t.notes,
+        color: t.color,
+        done: false
+      });
+    });
+
+    return {
+      ...day,
+      habits: nextHabits
+    };
+  });
+
+  return updatedHabits;
 };
 
 export const useStore = create(
@@ -193,6 +322,7 @@ export const useStore = create(
       setEditorFiles: (updater) => set((state) => ({ editorFiles: typeof updater === 'function' ? updater(state.editorFiles) : updater })),
       setTrades: (updater) => set((state) => ({ trades: typeof updater === 'function' ? updater(state.trades) : updater })),
       setCalendarEvents: (updater) => set((state) => ({ calendarEvents: typeof updater === 'function' ? (state.calendarEvents ? updater(state.calendarEvents) : updater([])) : updater })),
+      setTimetableBlocks: (updater) => set((state) => ({ timetableBlocks: typeof updater === 'function' ? updater(state.timetableBlocks || []) : updater })),
       setWatchlist: (updater) => set((state) => ({ watchlist: typeof updater === 'function' ? updater(state.watchlist) : updater })),
       setTradingTrends: (updater) => set((state) => ({ tradingTrends: typeof updater === 'function' ? updater(state.tradingTrends) : updater })),
       setTradingStrategies: (updater) => set((state) => ({ tradingStrategies: typeof updater === 'function' ? updater(state.tradingStrategies) : updater })),
@@ -265,57 +395,67 @@ export const useStore = create(
         skills: state.skills.includes(skillId) ? state.skills : [...state.skills, skillId]
       })),
 
+      addCustomHabitTemplate: (template) => set((state) => {
+        const nextTemplates = [...(state.customHabitTemplates || []), template];
+        const nextHabits = syncHabitsInternal(state.habits, nextTemplates, state.skills, []);
+        return {
+          customHabitTemplates: nextTemplates,
+          habits: nextHabits
+        };
+      }),
+      removeCustomHabitTemplate: (id) => set((state) => {
+        const nextTemplates = (state.customHabitTemplates || []).filter(t => t.id !== id);
+        const nextHabits = syncHabitsInternal(state.habits, nextTemplates, state.skills, []);
+        return {
+          customHabitTemplates: nextTemplates,
+          habits: nextHabits
+        };
+      }),
+      updateCustomHabitTemplate: (id, updatedFields) => set((state) => {
+        const nextTemplates = (state.customHabitTemplates || []).map(t => t.id === id ? { ...t, ...updatedFields } : t);
+        const nextHabits = syncHabitsInternal(state.habits, nextTemplates, state.skills, []);
+        return {
+          customHabitTemplates: nextTemplates,
+          habits: nextHabits
+        };
+      }),
+
       syncHabits: (skillDefs) => set((state) => {
-        let needsUpdate = false;
-        let updatedHabits = [...state.habits];
-
-        // 1. Rollover & Roadmap Check
-        const today = new Date();
-        const futureDays = 7; // Look 7 days ahead
-
-        for (let i = 0; i <= futureDays; i++) {
-          const d = new Date(today);
-          d.setDate(today.getDate() + i);
-          const id = d.toISOString().split('T')[0];
-          const name = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-
-          if (!updatedHabits.find(h => h.id === id)) {
-            needsUpdate = true;
-            const newDay = { id, date: name, habits: [] };
-            updatedHabits.push(newDay);
+        // --- Legacy Migration check ---
+        let templates = state.customHabitTemplates || [];
+        let needsMigrationUpdate = false;
+        if (templates.length === 0) {
+          const seenIds = new Set();
+          (state.habits || []).forEach(day => {
+            (day.habits || []).forEach(h => {
+              if (h.id.startsWith('custom-') && !seenIds.has(h.id)) {
+                seenIds.add(h.id);
+                templates.push({
+                  id: h.id,
+                  name: h.name,
+                  notes: h.notes || '',
+                  color: h.color || 'blue',
+                  repeat: 'Daily',
+                  weekdays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                  createdAt: new Date().toISOString()
+                });
+              }
+            });
+          });
+          if (templates.length > 0) {
+            needsMigrationUpdate = true;
           }
         }
-
-        // Sort by date and keep a window (past 1 day + future 7 days)
-        updatedHabits.sort((a, b) => a.id.localeCompare(b.id));
-
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-        const yesterdayId = yesterday.toISOString().split('T')[0];
-
-        updatedHabits = updatedHabits.filter(h => h.id >= yesterdayId);
-        if (updatedHabits.length > 10) updatedHabits = updatedHabits.slice(0, 10);
-
-
-        // 2. Skill Sync
-        const habitsThatShouldExist = skillDefs
-          .filter(skill => state.skills.includes(skill.id) && skill.habit)
-          .map(skill => ({ id: `h-${skill.id}`, name: skill.habit }));
-
-        updatedHabits = updatedHabits.map(day => {
-          const existingIds = new Set(day.habits.map(h => h.id));
-          const missingHabits = habitsThatShouldExist.filter(h => !existingIds.has(h.id));
-          if (missingHabits.length > 0) {
-            needsUpdate = true;
-            return {
-              ...day,
-              habits: [...day.habits, ...missingHabits.map(h => ({ ...h, done: false }))]
-            };
-          }
-          return day;
-        });
-
-        if (needsUpdate) return { habits: updatedHabits };
+        
+        const nextHabits = syncHabitsInternal(state.habits, templates, state.skills, skillDefs);
+        const habitsChanged = JSON.stringify(state.habits) !== JSON.stringify(nextHabits);
+        
+        if (habitsChanged || needsMigrationUpdate) {
+          return {
+            customHabitTemplates: templates,
+            habits: nextHabits
+          };
+        }
         return {};
       }),
 

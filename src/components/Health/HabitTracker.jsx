@@ -2,6 +2,26 @@ import React, { useState, useMemo } from 'react';
 import { useStore } from '../../store';
 import { SKILL_DEF } from '../../constants';
 import '../Styles/HabitTracker.css';
+import '../Styles/Timetable.css';
+
+const PaletteIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M12.433 10.07C14.133 10.585 16 11.15 16 12c0 2.5-4 4-8 4S0 14.5 0 12c0-3.5 3-5.5 6-5.5-.1.1-.1.2-.1.3 0 .7.5 1.2 1.2 1.2.8 0 1.2-.8 1.7-1.2.4-.4.8-.7 1.3-.7a1 1 0 0 1 1 1c0 .4-.2.8-.4 1.1-.3.3-.4.8-.3 1.3z"/>
+    <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+  </svg>
+);
+
+const COLORS = ['blue', 'green', 'orange', 'purple', 'pink', 'yellow', 'red'];
+
+const COLORS_MAP = {
+  blue: { bg: 'rgba(59, 130, 246, 0.08)', border: '#3b82f6', text: '#3b82f6' },
+  green: { bg: 'rgba(16, 185, 129, 0.08)', border: '#10b981', text: '#10b981' },
+  orange: { bg: 'rgba(249, 115, 22, 0.08)', border: '#f97316', text: '#f97316' },
+  purple: { bg: 'rgba(168, 85, 247, 0.08)', border: '#a855f7', text: '#a855f7' },
+  pink: { bg: 'rgba(236, 72, 153, 0.08)', border: '#ec4899', text: '#ec4899' },
+  yellow: { bg: 'rgba(234, 179, 8, 0.08)', border: '#eab308', text: '#eab308' },
+  red: { bg: 'rgba(239, 68, 68, 0.08)', border: '#ef4444', text: '#ef4444' }
+};
 
 const ListIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
@@ -52,6 +72,16 @@ function HabitDetailModal({ habit, days, onClose }) {
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.4rem', cursor: 'pointer', color: 'var(--text-muted)' }}>×</button>
         </div>
 
+        {habit.notes && (
+          <div style={{
+            fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 20,
+            background: 'rgba(255,255,255,0.03)', padding: 12, borderRadius: 10,
+            lineHeight: 1.5
+          }}>
+            {habit.notes}
+          </div>
+        )}
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 24 }}>
           {[
             { label: 'Current Streak', value: `${streak} days`, color: streak >= 3 ? '#f97316' : 'var(--primary)' },
@@ -94,33 +124,40 @@ export default function HabitTracker() {
   const activeQuests = useStore(state => state.activeQuests || []);
   const updateQuestProgress = useStore(state => state.updateQuestProgress);
   const addXP = useStore(state => state.addXP);
+  const customHabitTemplates = useStore(state => state.customHabitTemplates || []);
+  const addCustomHabitTemplate = useStore(state => state.addCustomHabitTemplate);
+  const removeCustomHabitTemplate = useStore(state => state.removeCustomHabitTemplate);
 
-  const [newHabitName, setNewHabitName] = useState('');
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [habitTitle, setHabitTitle] = useState('');
+  const [habitNotes, setHabitNotes] = useState('');
+  const [habitColor, setHabitColor] = useState('blue');
+  const [habitRepeat, setHabitRepeat] = useState('Daily');
+  const [habitWeekdays, setHabitWeekdays] = useState(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [detailHabit, setDetailHabit] = useState(null);
 
   const todayId = new Date().toISOString().split('T')[0];
   const todayDay = days.find(d => d.id === todayId);
 
-  // Add a custom habit to ALL tracked days
-  const addCustomHabit = () => {
-    const name = newHabitName.trim();
-    if (!name) return;
+  // Add a custom habit template to store
+  const addCustomHabit = (name, notes, color, repeat, weekdays) => {
+    const cleanName = name.trim();
+    if (!cleanName) return;
     const id = `custom-${Date.now()}`;
-    setDays(days.map(day => ({
-      ...day,
-      habits: [...day.habits, { id, name, done: false }]
-    })));
-    setNewHabitName('');
-    setShowAddForm(false);
+    addCustomHabitTemplate({
+      id,
+      name: cleanName,
+      notes: notes.trim(),
+      color,
+      repeat,
+      weekdays,
+      createdAt: new Date().toISOString()
+    });
   };
 
-  // Remove a custom habit from ALL days
+  // Remove a custom habit template from store
   const removeCustomHabit = (habitId) => {
-    setDays(days.map(day => ({
-      ...day,
-      habits: day.habits.filter(h => h.id !== habitId)
-    })));
+    removeCustomHabitTemplate(habitId);
   };
 
   const toggleHabit = (dayId, habitId) => {
@@ -141,11 +178,10 @@ export default function HabitTracker() {
     }));
   };
 
-  // Unique habit names from today (for the habit list header)
+  // Unique habits loaded from master templates list
   const uniqueHabits = useMemo(() => {
-    if (!todayDay) return [];
-    return todayDay.habits.filter(h => !h.id.startsWith('quest-'));
-  }, [todayDay]);
+    return customHabitTemplates;
+  }, [customHabitTemplates]);
 
   const calculateProgress = (habits) => {
     const total = habits.length;
@@ -165,6 +201,152 @@ export default function HabitTracker() {
         />
       )}
 
+      {showAddModal && (
+        <div className="timetable-modal-backdrop" onClick={() => setShowAddModal(false)}>
+          <div className="timetable-modal-content" onClick={(e) => e.stopPropagation()}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                addCustomHabit(habitTitle, habitNotes, habitColor, habitRepeat, habitWeekdays);
+                setShowAddModal(false);
+              }}
+              className="mac-modal-form"
+            >
+              <div className="mac-text-fields-group">
+                <input
+                  type="text"
+                  required
+                  className="mac-title-input"
+                  placeholder="Title"
+                  value={habitTitle}
+                  onChange={e => setHabitTitle(e.target.value)}
+                />
+                <textarea
+                  className="mac-notes-textarea"
+                  placeholder="Notes"
+                  rows={2}
+                  value={habitNotes}
+                  onChange={e => setHabitNotes(e.target.value)}
+                />
+              </div>
+
+              <div className="mac-group">
+                <div className="mac-group-title">Organisation</div>
+                <div className="mac-group-list">
+                  <div className="mac-row">
+                    <span className="mac-row-label">
+                      <PaletteIcon /> Color
+                    </span>
+                    <div className="mac-row-control">
+                      <div className="mac-color-picker">
+                        {COLORS.map(c => (
+                          <div
+                            key={c}
+                            className={`mac-color-circle ${c} ${habitColor === c ? 'selected' : ''}`}
+                            onClick={() => setHabitColor(c)}
+                            title={c}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mac-row">
+                    <span className="mac-row-label">
+                      🔄 Repeat
+                    </span>
+                    <div className="mac-row-control">
+                      <select
+                        className="mac-select"
+                        value={habitRepeat}
+                        onChange={e => {
+                          const val = e.target.value;
+                          setHabitRepeat(val);
+                          if (val === 'Daily' || val === 'Once') {
+                            setHabitWeekdays(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']);
+                          }
+                        }}
+                      >
+                        <option value="Once">Once</option>
+                        <option value="Daily">Daily</option>
+                        <option value="Weekly">Weekly</option>
+                        <option value="Monthly">Monthly</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {habitRepeat === 'Weekly' && (
+                    <div className="mac-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 10 }}>
+                      <span className="mac-row-label">
+                        📅 Active Days
+                      </span>
+                      <div style={{ display: 'flex', gap: 8, width: '100%', justifyContent: 'space-between', marginTop: 4 }}>
+                        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
+                          const shortNames = {
+                            Monday: 'M',
+                            Tuesday: 'T',
+                            Wednesday: 'W',
+                            Thursday: 'T',
+                            Friday: 'F',
+                            Saturday: 'S',
+                            Sunday: 'S'
+                          };
+                          const label = shortNames[day];
+                          const isSelected = habitWeekdays.includes(day);
+                          return (
+                            <button
+                              key={day}
+                              type="button"
+                              onClick={() => {
+                                if (isSelected) {
+                                  if (habitWeekdays.length > 1) {
+                                    setHabitWeekdays(habitWeekdays.filter(d => d !== day));
+                                  }
+                                } else {
+                                  setHabitWeekdays([...habitWeekdays, day]);
+                                }
+                              }}
+                              style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: '50%',
+                                border: '1px solid rgba(255,255,255,0.15)',
+                                background: isSelected ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
+                                color: isSelected ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                                fontSize: '0.8rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.2s',
+                                outline: 'none'
+                              }}
+                              title={day}
+                            >
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mac-footer-actions" style={{ margin: '20px -20px -20px', padding: '16px 20px' }}>
+                <button type="button" className="mac-btn-cancel" onClick={() => setShowAddModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="mac-btn-save">
+                  Add
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <div className="premium-header-container">
         <div className="premium-icon-wrapper"><ListIcon /></div>
         <h1 className="premium-title">Habit Tracker</h1>
@@ -178,40 +360,33 @@ export default function HabitTracker() {
           <button
             className="notion-button"
             style={{ fontSize: '0.8rem', padding: '5px 14px' }}
-            onClick={() => setShowAddForm(!showAddForm)}
+            onClick={() => {
+              setHabitTitle('');
+              setHabitNotes('');
+              setHabitColor('blue');
+              setHabitRepeat('Daily');
+              setHabitWeekdays(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']);
+              setShowAddModal(true);
+            }}
           >
             + Add Habit
           </button>
         </div>
 
-        {showAddForm && (
-          <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: 10 }}>
-            <input
-              className="notion-input"
-              placeholder="e.g. Read 30 minutes, Meditate, Cold shower..."
-              value={newHabitName}
-              onChange={e => setNewHabitName(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && addCustomHabit()}
-              autoFocus
-              style={{ flex: 1 }}
-            />
-            <button className="notion-button" onClick={addCustomHabit} style={{ padding: '8px 18px' }}>Add</button>
-            <button onClick={() => setShowAddForm(false)} style={{ background: 'none', border: '1px solid var(--border-color)', borderRadius: 8, padding: '8px 14px', color: 'var(--text-muted)', cursor: 'pointer' }}>Cancel</button>
-          </div>
-        )}
-
         <div style={{ padding: '12px 20px', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {uniqueHabits.map(habit => {
             const streak = calcStreak(days, habit.id);
             const isCustom = habit.id.startsWith('custom-');
+            const cStyles = COLORS_MAP[habit.color || 'blue'] || COLORS_MAP.blue;
             return (
               <div
                 key={habit.id}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8,
-                  background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)',
+                  background: cStyles.bg, border: `1px solid ${cStyles.border}`,
                   borderRadius: 20, padding: '5px 12px', fontSize: '0.82rem', cursor: 'pointer',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  color: cStyles.text
                 }}
                 onClick={() => setDetailHabit(habit)}
                 title="Click for details"
@@ -254,16 +429,24 @@ export default function HabitTracker() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
                   {day.habits.map(habit => {
                     const streak = calcStreak(days, habit.id);
+                    const cStyles = COLORS_MAP[habit.color || 'blue'] || COLORS_MAP.blue;
                     return (
                       <div key={habit.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <input
                           type="checkbox"
                           checked={habit.done}
                           onChange={() => toggleHabit(day.id, habit.id)}
-                          style={{ cursor: 'pointer', accentColor: 'var(--primary)' }}
+                          style={{ cursor: 'pointer', accentColor: cStyles.border }}
                         />
                         <span
-                          style={{ fontSize: '0.8rem', opacity: habit.done ? 0.6 : 1, textDecoration: habit.done ? 'line-through' : 'none', cursor: 'pointer', flex: 1 }}
+                          style={{
+                            fontSize: '0.8rem',
+                            opacity: habit.done ? 0.6 : 1,
+                            textDecoration: habit.done ? 'line-through' : 'none',
+                            cursor: 'pointer',
+                            flex: 1,
+                            color: habit.done ? 'var(--text-muted)' : cStyles.text
+                          }}
                           onClick={() => setDetailHabit(habit)}
                         >
                           {streak >= 3 && <span style={{ marginRight: 3 }}>🔥</span>}
