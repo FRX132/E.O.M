@@ -533,7 +533,227 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ============================================
+   TRADE REPORT IMPORT SYSTEM
+   ============================================ */
+
+.import-steps {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--bg-card-alt);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.import-step-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.import-step-item.active {
+  color: var(--primary);
+}
+
+.import-step-item.completed {
+  color: var(--green-text);
+}
+
+.import-drag-zone {
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 12px;
+  padding: 35px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.import-drag-zone:hover, .import-drag-zone.dragging {
+  border-color: var(--primary);
+  background: rgba(var(--primary-rgb), 0.05);
+  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.15);
+}
+
+.import-drag-icon {
+  font-size: 2.2rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.import-drag-zone:hover .import-drag-icon {
+  transform: translateY(-4px);
+  color: var(--primary);
+}
+
+.import-or-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 15px 20px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.import-or-divider::before, .import-or-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.import-or-divider:not(:empty)::before {
+  margin-right: 15px;
+}
+
+.import-or-divider:not(:empty)::after {
+  margin-left: 15px;
+}
+
+.import-textarea-container {
+  margin: 0 20px 20px;
+}
+
+.import-preview-table-container {
+  overflow-x: auto;
+  max-height: 40vh;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card-alt);
+  border-radius: 8px;
+  margin: 20px;
+}
+
+.import-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.import-preview-table th {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.import-preview-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.import-preview-table tr:last-child td {
+  border-bottom: none;
+}
+
+.import-preview-table input, .import-preview-table select {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-main);
+  padding: 4px 6px;
+  font-size: 0.8rem;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.import-preview-table input:focus, .import-preview-table select:focus {
+  border-color: var(--primary);
+  background: rgba(var(--primary-rgb), 0.05);
+}
+
+.import-preview-table tr.invalid-row {
+  background: rgba(239, 68, 68, 0.03);
+}
+
+.import-row-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+.import-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.import-badge.success {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--green-text);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.import-badge.warning {
+  background: rgba(217, 119, 6, 0.15);
+  color: var(--primary);
+  border: 1px solid rgba(217, 119, 6, 0.3);
+}
+
+.mapping-rows-container {
+  margin: 20px;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mapping-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mapping-row:last-child {
+  border-bottom: none;
+}
+
+.mapping-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.mapping-select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-main);
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.mapping-select:focus {
+  border-color: var(--primary);
+}
+
 @media (max-width: 768px) {
   .risk-calc { grid-template-columns: 1fr; }
   .trading-stats-row { grid-template-columns: 1fr 1fr; }
 }
+

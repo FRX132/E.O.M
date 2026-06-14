@@ -48,25 +48,60 @@ function HabitDetailModal({ habit, days, onClose }) {
   const total = days.filter(d => d.habits.find(h => h.id === habit.id));
   const rate = total.length ? Math.round((allDone.length / total.length) * 100) : 0;
 
+  const progressPct = habit.streakGoal ? Math.min(100, Math.round((streak / habit.streakGoal) * 100)) : null;
+  const isCompleted = progressPct !== null && progressPct >= 100;
+  
+  let statusText = '';
+  if (progressPct !== null) {
+    if (progressPct >= 100) statusText = 'Goal streak achieved! 🏆';
+    else if (progressPct >= 75) statusText = 'Almost accomplished! 🔥';
+    else if (progressPct >= 50) statusText = 'Over halfway there! 💪';
+    else if (progressPct >= 25) statusText = 'Building consistency! 📈';
+    else statusText = 'Just started! 🚀';
+  }
+
+  const cStyles = COLORS_MAP[habit.color || 'blue'] || COLORS_MAP.blue;
+  const barColor = isCompleted ? 'linear-gradient(90deg, #eab308, #f97316)' : cStyles.border;
+
+  let startDateText = '';
+  let endDateText = '';
+  if (habit.startDate) {
+    const [y, m, d] = habit.startDate.split('-').map(Number);
+    startDateText = new Date(y, m - 1, d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    if (habit.streakGoal) {
+      const end = new Date(y, m - 1, d);
+      end.setDate(end.getDate() + Number(habit.streakGoal) - 1);
+      endDateText = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+  }
+
   return (
     <div style={{
       position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000,
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20
     }} onClick={onClose}>
       <div onClick={e => e.stopPropagation()} style={{
-        background: 'var(--sidebar-bg)', border: '1px solid var(--border-color)',
-        borderRadius: 16, padding: 32, maxWidth: 440, width: '100%', boxSizing: 'border-box'
+        background: 'var(--sidebar-bg)', border: isCompleted ? '1px solid #eab308' : '1px solid var(--border-color)',
+        borderRadius: 16, padding: 32, maxWidth: 440, width: '100%', boxSizing: 'border-box',
+        boxShadow: isCompleted ? '0 0 20px rgba(234, 179, 8, 0.2)' : '0 10px 30px rgba(0,0,0,0.3)',
+        transition: 'all 0.3s ease'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '1.2rem' }}>
-              {streak >= 3 && <span style={{ marginRight: 6 }}>🔥</span>}
+            <h2 style={{ margin: 0, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: 6, color: isCompleted ? '#eab308' : 'var(--text-main)' }}>
+              {isCompleted ? '🏆' : (streak >= 3 ? '🔥' : '')}
               {habit.name}
             </h2>
-            {streak >= 3 && (
-              <div style={{ fontSize: '0.78rem', color: '#f97316', fontWeight: 700, marginTop: 4 }}>
-                🔥 {streak}-day streak — keep going!
+            {progressPct !== null ? (
+              <div style={{ fontSize: '0.78rem', color: isCompleted ? '#eab308' : '#f97316', fontWeight: 700, marginTop: 4 }}>
+                {isCompleted ? '🎉 Goal Streak Completed!' : `Streak goal: ${streak} / ${habit.streakGoal} days`}
               </div>
+            ) : (
+              streak >= 3 && (
+                <div style={{ fontSize: '0.78rem', color: '#f97316', fontWeight: 700, marginTop: 4 }}>
+                  🔥 {streak}-day streak — keep going!
+                </div>
+              )
             )}
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.4rem', cursor: 'pointer', color: 'var(--text-muted)' }}>×</button>
@@ -84,7 +119,7 @@ function HabitDetailModal({ habit, days, onClose }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 24 }}>
           {[
-            { label: 'Current Streak', value: `${streak} days`, color: streak >= 3 ? '#f97316' : 'var(--primary)' },
+            { label: 'Current Streak', value: `${streak} days`, color: isCompleted ? '#eab308' : (streak >= 3 ? '#f97316' : 'var(--primary)') },
             { label: 'Completion Rate', value: `${rate}%`, color: rate >= 70 ? 'var(--green-text)' : 'var(--text-main)' },
             { label: 'Days Tracked', value: total.length },
           ].map(s => (
@@ -95,6 +130,50 @@ function HabitDetailModal({ habit, days, onClose }) {
           ))}
         </div>
 
+        {progressPct !== null && (
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 700, marginBottom: 6 }}>
+              <span style={{ color: isCompleted ? '#eab308' : 'var(--text-muted)' }}>{statusText}</span>
+              <span style={{ color: isCompleted ? '#eab308' : cStyles.text }}>{progressPct}%</span>
+            </div>
+            <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 4, overflow: 'hidden' }}>
+              <div style={{
+                height: '100%',
+                width: `${progressPct}%`,
+                background: barColor,
+                boxShadow: isCompleted ? '0 0 10px rgba(234, 179, 8, 0.5)' : 'none',
+                transition: 'width 0.4s ease'
+              }} />
+            </div>
+          </div>
+        )}
+
+        {(startDateText || habit.streakGoal) && (
+          <div style={{
+            background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)',
+            borderRadius: 10, padding: '12px 16px', marginBottom: 24, fontSize: '0.8rem'
+          }}>
+            {startDateText && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Start Date:</span>
+                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{startDateText}</span>
+              </div>
+            )}
+            {endDateText && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderTop: '1px solid rgba(255,255,255,0.04)', marginTop: 4, paddingTop: 6 }}>
+                <span style={{ color: 'var(--text-muted)' }}>Streak Goal Ends:</span>
+                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{endDateText}</span>
+              </div>
+            )}
+            {habit.streakGoal && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderTop: '1px solid rgba(255,255,255,0.04)', marginTop: 4, paddingTop: 6 }}>
+                <span style={{ color: 'var(--text-muted)' }}>Duration:</span>
+                <span style={{ fontWeight: 600, color: isCompleted ? '#eab308' : 'var(--text-main)' }}>{habit.streakGoal} days</span>
+              </div>
+            )}
+          </div>
+        )}
+
         <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
           Last 10 Days
         </div>
@@ -104,9 +183,10 @@ function HabitDetailModal({ habit, days, onClose }) {
             const done = h?.done;
             return (
               <div key={day.id} title={day.date} style={{
-                width: 28, height: 28, borderRadius: 6, background: done ? 'var(--primary)' : 'rgba(255,255,255,0.06)',
-                border: `1px solid ${done ? 'var(--primary)' : 'var(--border-color)'}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem'
+                width: 28, height: 28, borderRadius: 6, background: done ? (isCompleted ? '#eab308' : 'var(--primary)') : 'rgba(255,255,255,0.06)',
+                border: `1px solid ${done ? (isCompleted ? '#eab308' : 'var(--primary)') : 'var(--border-color)'}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem',
+                color: done ? '#000000' : 'var(--text-muted)'
               }}>
                 {done ? '✓' : ''}
               </div>
@@ -133,6 +213,8 @@ export default function HabitTracker() {
   const [habitColor, setHabitColor] = useState('blue');
   const [habitRepeat, setHabitRepeat] = useState('Daily');
   const [habitWeekdays, setHabitWeekdays] = useState(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']);
+  const [habitStartDate, setHabitStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [habitStreakGoal, setHabitStreakGoal] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [detailHabit, setDetailHabit] = useState(null);
 
@@ -140,7 +222,7 @@ export default function HabitTracker() {
   const todayDay = days.find(d => d.id === todayId);
 
   // Add a custom habit template to store
-  const addCustomHabit = (name, notes, color, repeat, weekdays) => {
+  const addCustomHabit = (name, notes, color, repeat, weekdays, startDate, streakGoal) => {
     const cleanName = name.trim();
     if (!cleanName) return;
     const id = `custom-${Date.now()}`;
@@ -151,6 +233,8 @@ export default function HabitTracker() {
       color,
       repeat,
       weekdays,
+      startDate: startDate || new Date().toISOString().split('T')[0],
+      streakGoal: streakGoal ? Number(streakGoal) : null,
       createdAt: new Date().toISOString()
     });
   };
@@ -207,7 +291,7 @@ export default function HabitTracker() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                addCustomHabit(habitTitle, habitNotes, habitColor, habitRepeat, habitWeekdays);
+                addCustomHabit(habitTitle, habitNotes, habitColor, habitRepeat, habitWeekdays, habitStartDate, habitStreakGoal);
                 setShowAddModal(false);
               }}
               className="mac-modal-form"
@@ -334,6 +418,59 @@ export default function HabitTracker() {
                 </div>
               </div>
 
+              <div className="mac-group">
+                <div className="mac-group-title">Duration & Streak Goal</div>
+                <div className="mac-group-list">
+                  <div className="mac-row">
+                    <span className="mac-row-label">
+                      📅 Start Date
+                    </span>
+                    <div className="mac-row-control">
+                      <input
+                        type="date"
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'rgba(255, 255, 255, 0.75)',
+                          fontSize: '0.85rem',
+                          fontFamily: 'inherit',
+                          outline: 'none',
+                          textAlign: 'right',
+                          cursor: 'pointer'
+                        }}
+                        value={habitStartDate}
+                        onChange={e => setHabitStartDate(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mac-row">
+                    <span className="mac-row-label">
+                      🎯 Streak Goal (Days)
+                    </span>
+                    <div className="mac-row-control">
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="Indefinite"
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'rgba(255, 255, 255, 0.75)',
+                          fontSize: '0.85rem',
+                          fontFamily: 'inherit',
+                          outline: 'none',
+                          textAlign: 'right',
+                          width: '100px'
+                        }}
+                        value={habitStreakGoal}
+                        onChange={e => setHabitStreakGoal(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="mac-footer-actions" style={{ margin: '20px -20px -20px', padding: '16px 20px' }}>
                 <button type="button" className="mac-btn-cancel" onClick={() => setShowAddModal(false)}>
                   Cancel
@@ -366,6 +503,8 @@ export default function HabitTracker() {
               setHabitColor('blue');
               setHabitRepeat('Daily');
               setHabitWeekdays(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']);
+              setHabitStartDate(new Date().toISOString().split('T')[0]);
+              setHabitStreakGoal('');
               setShowAddModal(true);
             }}
           >
@@ -378,25 +517,46 @@ export default function HabitTracker() {
             const streak = calcStreak(days, habit.id);
             const isCustom = habit.id.startsWith('custom-');
             const cStyles = COLORS_MAP[habit.color || 'blue'] || COLORS_MAP.blue;
+            const hasGoal = habit.streakGoal > 0;
+            const isCompleted = hasGoal && streak >= habit.streakGoal;
+
+            const bg = isCompleted
+              ? 'linear-gradient(135deg, rgba(234, 179, 8, 0.15) 0%, rgba(249, 115, 22, 0.15) 100%)'
+              : cStyles.bg;
+            const border = isCompleted ? '1px solid #eab308' : `1px solid ${cStyles.border}`;
+            const color = isCompleted ? '#eab308' : cStyles.text;
+            const boxShadow = isCompleted ? '0 0 10px rgba(234, 179, 8, 0.25)' : 'none';
+
             return (
               <div
                 key={habit.id}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8,
-                  background: cStyles.bg, border: `1px solid ${cStyles.border}`,
+                  background: bg, border: border, boxShadow: boxShadow,
                   borderRadius: 20, padding: '5px 12px', fontSize: '0.82rem', cursor: 'pointer',
                   transition: 'all 0.2s',
-                  color: cStyles.text
+                  color: color
                 }}
+                className={isCompleted ? 'habit-glow-gold' : ''}
                 onClick={() => setDetailHabit(habit)}
                 title="Click for details"
               >
-                {streak >= 3 && <span>🔥</span>}
+                {isCompleted ? (
+                  <span>🏆</span>
+                ) : (
+                  streak >= 3 && <span>🔥</span>
+                )}
                 <span style={{ fontWeight: 600 }}>{habit.name}</span>
-                {streak > 0 && (
-                  <span style={{ fontSize: '0.72rem', color: streak >= 3 ? '#f97316' : 'var(--text-muted)', fontWeight: 700 }}>
-                    {streak}d
+                {hasGoal ? (
+                  <span style={{ fontSize: '0.72rem', color: isCompleted ? '#eab308' : 'var(--text-muted)', fontWeight: 700 }}>
+                    {streak}/{habit.streakGoal}d
                   </span>
+                ) : (
+                  streak > 0 && (
+                    <span style={{ fontSize: '0.72rem', color: streak >= 3 ? '#f97316' : 'var(--text-muted)', fontWeight: 700 }}>
+                      {streak}d
+                    </span>
+                  )
                 )}
                 {isCustom && (
                   <button
@@ -430,13 +590,15 @@ export default function HabitTracker() {
                   {day.habits.map(habit => {
                     const streak = calcStreak(days, habit.id);
                     const cStyles = COLORS_MAP[habit.color || 'blue'] || COLORS_MAP.blue;
+                    const hasGoal = habit.streakGoal > 0;
+                    const isCompleted = hasGoal && streak >= habit.streakGoal;
                     return (
                       <div key={habit.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <input
                           type="checkbox"
                           checked={habit.done}
                           onChange={() => toggleHabit(day.id, habit.id)}
-                          style={{ cursor: 'pointer', accentColor: cStyles.border }}
+                          style={{ cursor: 'pointer', accentColor: isCompleted ? '#eab308' : cStyles.border }}
                         />
                         <span
                           style={{
@@ -445,12 +607,35 @@ export default function HabitTracker() {
                             textDecoration: habit.done ? 'line-through' : 'none',
                             cursor: 'pointer',
                             flex: 1,
-                            color: habit.done ? 'var(--text-muted)' : cStyles.text
+                            color: habit.done ? 'var(--text-muted)' : (isCompleted ? '#eab308' : cStyles.text),
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
                           }}
                           onClick={() => setDetailHabit(habit)}
                         >
-                          {streak >= 3 && <span style={{ marginRight: 3 }}>🔥</span>}
-                          {habit.name}
+                          <span style={{ display: 'flex', alignItems: 'center' }}>
+                            {isCompleted ? (
+                              <span style={{ marginRight: 4 }}>🏆</span>
+                            ) : (
+                              streak >= 3 && <span style={{ marginRight: 3 }}>🔥</span>
+                            )}
+                            {habit.name}
+                          </span>
+                          {hasGoal && (
+                            <span style={{
+                              fontSize: '0.68rem',
+                              fontWeight: 700,
+                              background: isCompleted ? 'rgba(234, 179, 8, 0.12)' : 'rgba(255, 255, 255, 0.05)',
+                              border: isCompleted ? '1px solid rgba(234, 179, 8, 0.3)' : '1px solid rgba(255, 255, 255, 0.08)',
+                              borderRadius: 4,
+                              padding: '1px 5px',
+                              color: isCompleted ? '#eab308' : 'var(--text-muted)',
+                              marginLeft: 8
+                            }}>
+                              {streak}/{habit.streakGoal}
+                            </span>
+                          )}
                         </span>
                       </div>
                     );

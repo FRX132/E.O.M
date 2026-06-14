@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useStore } from '../../store';
 import '../Styles/TradingTerminal.css';
+import { parseCSV, detectMappings, mapCsvRowsToTrades, parseJSON, parseUnstructuredText, parseHTML } from './tradeParser';
+
+
 
 // ── Icons ──────────────────────────────────────────────
 const Icon = ({ d, size = 18 }) => (
@@ -258,6 +261,516 @@ function RiskCalc({ currency }) {
   );
 }
 
+// ── Trade Report Importer Modal ───────────────────────
+function TradeImportModal({ isOpen, onClose, currency }) {
+  const trades = useStore(s => s.trades || []);
+  const setTrades = useStore(s => s.setTrades);
+
+  const [step, setStep] = useState(1);
+  const [fileType, setFileType] = useState(null);
+  const [fileName, setFileName] = useState('');
+  const [rawText, setRawText] = useState('');
+  const [csvRows, setCsvRows] = useState([]);
+  
+  const [mappings, setMappings] = useState({
+    symbol: -1, type: -1, entry: -1, exit: -1, size: -1, pnl: -1, date: -1, notes: -1
+  });
+  const [headerRowIndex, setHeaderRowIndex] = useState(0);
+  const [parsedTrades, setParsedTrades] = useState([]);
+  const [selectedTrades, setSelectedTrades] = useState(new Set());
+  const [dragging, setDragging] = useState(false);
+
+  // Reset states when modal is closed
+  useEffect(() => {
+    if (!isOpen) {
+      setStep(1);
+      setFileType(null);
+      setFileName('');
+      setRawText('');
+      setCsvRows([]);
+      setMappings({
+        symbol: -1, type: -1, entry: -1, exit: -1, size: -1, pnl: -1, date: -1, notes: -1
+      });
+      setHeaderRowIndex(0);
+      setParsedTrades([]);
+      setSelectedTrades(new Set());
+      setDragging(false);
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const processFileContent = (name, text) => {
+    setFileName(name);
+    const ext = name.split('.').pop().toLowerCase();
+    
+    if (ext === 'json') {
+      const parsed = parseJSON(text);
+      if (parsed.length > 0) {
+        setFileType('json');
+        setParsedTrades(parsed);
+        setSelectedTrades(new Set(parsed.map(t => t.id)));
+        setStep(3);
+      } else {
+        alert("Could not parse any trades from JSON file.");
+      }
+    } else if (ext === 'html' || ext === 'htm') {
+      const parsed = parseHTML(text);
+      if (parsed.length > 0) {
+        setFileType('html');
+        setParsedTrades(parsed);
+        setSelectedTrades(new Set(parsed.map(t => t.id)));
+        setStep(3);
+      } else {
+        alert("Could not parse any MT4/MT5 trades from HTML file.");
+      }
+    } else if (ext === 'csv') {
+      const rows = parseCSV(text);
+      if (rows.length > 0) {
+        setFileType('csv');
+        setCsvRows(rows);
+        const detection = detectMappings(rows);
+        setHeaderRowIndex(detection.headerRowIndex);
+        setMappings(detection.mappings);
+        setStep(2);
+      } else {
+        alert("The CSV file seems to be empty.");
+      }
+    } else {
+      // Default to text parsing or check if CSV-like
+      const parsed = parseUnstructuredText(text);
+      if (parsed.length > 0) {
+        setFileType('txt');
+        setRawText(text);
+        setParsedTrades(parsed);
+        setSelectedTrades(new Set(parsed.map(t => t.id)));
+        setStep(3);
+      } else {
+        const rows = parseCSV(text);
+        if (rows.length > 0 && rows[0].length > 1) {
+          setFileType('csv');
+          setCsvRows(rows);
+          const detection = detectMappings(rows);
+          setHeaderRowIndex(detection.headerRowIndex);
+          setMappings(detection.mappings);
+          setStep(2);
+        } else {
+          alert("Could not extract any trades automatically. You can paste raw text in the box below to try manual parsing.");
+        }
+      }
+    }
+  };
+
+  const handleFileDrop = (e) => {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      processFileContent(file.name, event.target.result);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      processFileContent(file.name, event.target.result);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleNativePDF = async () => {
+    if (window.electronAPI && window.electronAPI.parsePDF) {
+      try {
+        const res = await window.electronAPI.parsePDF();
+        if (res.success) {
+          setFileType('pdf');
+          setFileName(res.fileName);
+          setRawText(res.text);
+          const parsed = parseUnstructuredText(res.text);
+          if (parsed.length > 0) {
+            setParsedTrades(parsed);
+            setSelectedTrades(new Set(parsed.map(t => t.id)));
+            setStep(3);
+          } else {
+            alert("PDF read successfully, but no trades were found via auto-regex. You can paste raw text in the textarea below to try manual parsing.");
+            setRawText(res.text);
+          }
+        } else if (res.error !== 'No file selected') {
+          alert("Error parsing PDF: " + res.error);
+        }
+      } catch (err) {
+        alert("Failed to parse PDF: " + err.message);
+      }
+    } else {
+      alert("Electron API not available for PDF reading in this context.");
+    }
+  };
+
+  const handleRawTextSubmit = () => {
+    if (!rawText.trim()) return;
+    const parsed = parseUnstructuredText(rawText);
+    if (parsed.length > 0) {
+      setParsedTrades(parsed);
+      setSelectedTrades(new Set(parsed.map(t => t.id)));
+      setStep(3);
+    } else {
+      alert("Could not extract any trades with standard patterns. Please make sure the format has date, ticker, type (buy/sell), entry price, and P&L.");
+    }
+  };
+
+  const handleGenerateFromCSV = () => {
+    const tradesList = mapCsvRowsToTrades(csvRows, mappings, headerRowIndex + 1);
+    if (tradesList.length > 0) {
+      setParsedTrades(tradesList);
+      setSelectedTrades(new Set(tradesList.map(t => t.id)));
+      setStep(3);
+    } else {
+      alert("No trades were generated. Please check your column mappings.");
+    }
+  };
+
+  const handleToggleSelect = (id) => {
+    const newSelected = new Set(selectedTrades);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedTrades(newSelected);
+  };
+
+  const handleToggleSelectAll = () => {
+    if (selectedTrades.size === parsedTrades.length) {
+      setSelectedTrades(new Set());
+    } else {
+      setSelectedTrades(new Set(parsedTrades.map(t => t.id)));
+    }
+  };
+
+  const handleUpdateParsedTrade = (id, field, value) => {
+    setParsedTrades(prev => prev.map(t => t.id === id ? { ...t, [field]: value } : t));
+  };
+
+  const handleCommitImport = () => {
+    const toImport = parsedTrades.filter(t => selectedTrades.has(t.id));
+    if (toImport.length === 0) {
+      alert("Please select at least one trade to import.");
+      return;
+    }
+    
+    const newTrades = toImport.map(t => ({
+      id: Date.now() + Math.random(),
+      symbol: t.symbol.trim().toUpperCase(),
+      type: t.type === 'Short' ? 'Short' : 'Long',
+      entry: t.entry,
+      exit: t.exit,
+      size: t.size,
+      pnl: t.pnl,
+      date: t.date,
+      notes: t.notes
+    }));
+
+    setTrades([...trades, ...newTrades]);
+    onClose();
+  };
+
+  return (
+    <div className="mac-modal-overlay" onClick={onClose}>
+      <div className="mac-modal" style={{ width: step === 3 ? '850px' : '550px', transition: 'width 0.3s ease', maxHeight: '90vh' }} onClick={(e) => e.stopPropagation()}>
+        <div className="mac-modal-header">
+          <span>📥 Trade Report Importer</span>
+          {fileName && <span style={{ fontSize: '0.8rem', opacity: 0.6, marginLeft: 'auto' }}>({fileName})</span>}
+        </div>
+        
+        <div className="import-steps">
+          <div className={`import-step-item ${step === 1 ? 'active' : ''} ${step > 1 ? 'completed' : ''}`}>
+            <span>1. Datei auswählen {step > 1 ? '✓' : ''}</span>
+          </div>
+          <div className={`import-step-item ${step === 2 ? 'active' : ''} ${step > 2 ? 'completed' : ''}`}>
+            <span>2. Spalten zuordnen {step > 2 ? '✓' : ''}</span>
+          </div>
+          <div className={`import-step-item ${step === 3 ? 'active' : ''}`}>
+            <span>3. Vorschau & Import</span>
+          </div>
+        </div>
+
+        <div className="mac-modal-content">
+          {step === 1 && (
+            <div>
+              <div 
+                className={`import-drag-zone ${dragging ? 'dragging' : ''}`}
+                onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={handleFileDrop}
+                onClick={() => document.getElementById('import-file-input').click()}
+              >
+                <div className="import-drag-icon">📁</div>
+                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>
+                  Drag & drop CSV, JSON, TXT, HTML here or click to browse
+                </div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  Supports auto-detection of common formats (including MT4/MT5 HTML reports)
+                </div>
+                <input 
+                  type="file" 
+                  id="import-file-input" 
+                  style={{ display: 'none' }} 
+                  accept=".csv,.json,.txt,.html,.htm"
+                  onChange={handleFileSelect}
+                />
+              </div>
+
+              <div className="import-or-divider">oder PDF-Bericht einlesen</div>
+
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+                <button className="notion-button" style={{ background: 'rgba(var(--primary-rgb), 0.15)', color: 'var(--primary)', border: '1px solid rgba(var(--primary-rgb), 0.4)' }} onClick={handleNativePDF}>
+                  📄 Select PDF via System Dialog
+                </button>
+              </div>
+
+              <div className="import-or-divider">oder Rohtext einfügen</div>
+
+              <div className="import-textarea-container">
+                <textarea 
+                  className="strategy-textarea" 
+                  placeholder="Paste raw trade lines here... e.g.
+2026-06-12 EURUSD Buy 1.0820 1.0890 10000 +70.00
+AAPL Buy 100 180.00 185.00 +500.00" 
+                  value={rawText} 
+                  onChange={(e) => setRawText(e.target.value)}
+                  style={{ minHeight: '120px' }}
+                />
+                <button 
+                  className="notion-button" 
+                  style={{ marginTop: '10px', width: '100%' }}
+                  disabled={!rawText.trim()}
+                  onClick={handleRawTextSubmit}
+                >
+                  Parse Pasted Text
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div>
+              <div style={{ padding: '15px 20px 0 20px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Select which column in your CSV represents each Trade Journal field.
+              </div>
+              
+              <div className="mapping-rows-container">
+                {[
+                  { key: 'symbol', label: 'Symbol / Asset (e.g. AAPL)' },
+                  { key: 'type', label: 'Type (Long / Short)' },
+                  { key: 'entry', label: 'Entry Price' },
+                  { key: 'exit', label: 'Exit Price' },
+                  { key: 'size', label: 'Position Size' },
+                  { key: 'pnl', label: `P&L (${currency})` },
+                  { key: 'date', label: 'Execution Date' },
+                  { key: 'notes', label: 'Notes / Comments' },
+                ].map(item => (
+                  <div className="mapping-row" key={item.key}>
+                    <span className="mapping-label">{item.label}</span>
+                    <select 
+                      className="mapping-select"
+                      value={mappings[item.key]} 
+                      onChange={(e) => setMappings({ ...mappings, [item.key]: parseInt(e.target.value) })}
+                    >
+                      <option value="-1">-- Not present / Ignore --</option>
+                      {(csvRows[headerRowIndex] || []).map((col, idx) => (
+                        <option key={idx} value={idx}>
+                          Col {idx + 1}: {col || `(Empty)`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ padding: '0 20px 20px' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>
+                  File Row Preview (Header row: {headerRowIndex + 1})
+                </div>
+                <div style={{ overflowX: 'auto', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '10px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem', textAlign: 'left' }}>
+                    <thead>
+                      <tr>
+                        {(csvRows[headerRowIndex] || []).map((col, idx) => (
+                          <th key={idx} style={{ padding: '4px 8px', color: 'var(--primary)', borderBottom: '1px solid var(--border-color)', whiteSpace: 'nowrap' }}>
+                            Col {idx + 1}: {col}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {csvRows.slice(headerRowIndex + 1, headerRowIndex + 4).map((row, rIdx) => (
+                        <tr key={rIdx}>
+                          {row.map((cell, cIdx) => (
+                            <td key={cIdx} style={{ padding: '4px 8px', borderBottom: '1px solid var(--border-light)', whiteSpace: 'nowrap' }}>
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div>
+              <div style={{ padding: '15px 20px 0 20px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Verify parsed trades. You can edit values inline, check/uncheck trades, and resolve any empty fields.
+              </div>
+
+              <div className="import-preview-table-container">
+                <table className="import-preview-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '30px', textAlign: 'center' }}>
+                        <input 
+                          type="checkbox" 
+                          className="import-row-checkbox"
+                          checked={selectedTrades.size === parsedTrades.length && parsedTrades.length > 0} 
+                          onChange={handleToggleSelectAll}
+                        />
+                      </th>
+                      <th>Symbol</th>
+                      <th style={{ width: '90px' }}>Type</th>
+                      <th>Entry</th>
+                      <th>Exit</th>
+                      <th>Size</th>
+                      <th>P&L</th>
+                      <th style={{ width: '120px' }}>Date</th>
+                      <th>Notes</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {parsedTrades.map((t) => {
+                      const isValid = t.symbol.trim() !== '' && !isNaN(parseFloat(t.pnl || '0'));
+                      return (
+                        <tr key={t.id} className={!isValid ? 'invalid-row' : ''}>
+                          <td style={{ textAlign: 'center' }}>
+                            <input 
+                              type="checkbox" 
+                              className="import-row-checkbox"
+                              checked={selectedTrades.has(t.id)} 
+                              onChange={() => handleToggleSelect(t.id)}
+                            />
+                          </td>
+                          <td>
+                            <input 
+                              value={t.symbol} 
+                              onChange={(e) => handleUpdateParsedTrade(t.id, 'symbol', e.target.value)} 
+                              placeholder="e.g. AAPL"
+                              style={{ fontWeight: 700 }}
+                            />
+                          </td>
+                          <td>
+                            <select 
+                              value={t.type} 
+                              onChange={(e) => handleUpdateParsedTrade(t.id, 'type', e.target.value)}
+                            >
+                              <option>Long</option>
+                              <option>Short</option>
+                            </select>
+                          </td>
+                          <td>
+                            <input 
+                              type="number" 
+                              step="any"
+                              value={t.entry} 
+                              onChange={(e) => handleUpdateParsedTrade(t.id, 'entry', e.target.value)} 
+                            />
+                          </td>
+                          <td>
+                            <input 
+                              type="number" 
+                              step="any"
+                              value={t.exit} 
+                              onChange={(e) => handleUpdateParsedTrade(t.id, 'exit', e.target.value)} 
+                            />
+                          </td>
+                          <td>
+                            <input 
+                              type="number" 
+                              step="any"
+                              value={t.size} 
+                              onChange={(e) => handleUpdateParsedTrade(t.id, 'size', e.target.value)} 
+                            />
+                          </td>
+                          <td>
+                            <input 
+                              type="number" 
+                              step="any"
+                              value={t.pnl} 
+                              onChange={(e) => handleUpdateParsedTrade(t.id, 'pnl', e.target.value)} 
+                            />
+                          </td>
+                          <td>
+                            <input 
+                              type="date" 
+                              value={t.date} 
+                              onChange={(e) => handleUpdateParsedTrade(t.id, 'date', e.target.value)} 
+                            />
+                          </td>
+                          <td>
+                            <input 
+                              value={t.notes} 
+                              onChange={(e) => handleUpdateParsedTrade(t.id, 'notes', e.target.value)} 
+                            />
+                          </td>
+                          <td>
+                            {isValid ? (
+                              <span className="import-badge success">Ready</span>
+                            ) : (
+                              <span className="import-badge warning" title="Missing symbol or numbers">Fix Required</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="mac-modal-footer">
+          <button className="mac-btn mac-btn-cancel" onClick={onClose}>Cancel</button>
+          
+          {step === 2 && (
+            <button className="mac-btn mac-btn-add" onClick={handleGenerateFromCSV}>
+              Generate Preview
+            </button>
+          )}
+
+          {step === 3 && (
+            <button 
+              className="mac-btn mac-btn-add" 
+              onClick={handleCommitImport}
+              disabled={selectedTrades.size === 0}
+            >
+              Import {selectedTrades.size} Trades
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Trade Journal Tab ─────────────────────────────────
 function TradeJournal({ currency }) {
   const trades = useStore(s => s.trades || []);
@@ -266,6 +779,7 @@ function TradeJournal({ currency }) {
   const [sortField, setSortField] = useState('date');
   const [sortDirection, setSortDirection] = useState('desc');
   const [pastCollapsed, setPastCollapsed] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const add = () => setTrades([...trades, {
     id: Date.now(), symbol: '', type: 'Long', entry: '', exit: '', size: '', pnl: '', date: new Date().toISOString().split('T')[0], notes: ''
@@ -383,7 +897,12 @@ function TradeJournal({ currency }) {
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-main)' }}>📅 Today's Trades (Heutige Trades)</h3>
-        <button className="notion-button" onClick={add}>+ New Trade</button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="notion-button" style={{ background: 'var(--blue-bg)', color: 'var(--blue-text)' }} onClick={() => setIsImportModalOpen(true)}>
+            📥 Import Report
+          </button>
+          <button className="notion-button" onClick={add}>+ New Trade</button>
+        </div>
       </div>
 
       {renderTradeTable(sortedTodayTrades, 'No trades logged today. Click "+ New Trade" to log one.')}
@@ -418,6 +937,12 @@ function TradeJournal({ currency }) {
           </div>
         )}
       </div>
+
+      <TradeImportModal 
+        isOpen={isImportModalOpen} 
+        onClose={() => setIsImportModalOpen(false)} 
+        currency={currency} 
+      />
     </div>
   );
 }

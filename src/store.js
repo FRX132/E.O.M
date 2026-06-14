@@ -176,6 +176,26 @@ const initialState = {
 
 const shouldTemplateBeActiveOnDate = (template, dateStr) => {
   if (!template) return false;
+
+  // 1. Start date check
+  if (template.startDate && dateStr < template.startDate) {
+    return false;
+  }
+
+  // 2. Duration / streak goal check
+  if (template.startDate && template.streakGoal) {
+    const [y, m, d] = template.startDate.split('-').map(Number);
+    const startDateObj = new Date(y, m - 1, d);
+    startDateObj.setDate(startDateObj.getDate() + Number(template.streakGoal) - 1);
+    const ye = startDateObj.getFullYear();
+    const mo = String(startDateObj.getMonth() + 1).padStart(2, '0');
+    const da = String(startDateObj.getDate()).padStart(2, '0');
+    const endDateStr = `${ye}-${mo}-${da}`;
+    if (dateStr > endDateStr) {
+      return false;
+    }
+  }
+
   const [y, m, d] = dateStr.split('-').map(Number);
   const dateObj = new Date(y, m - 1, d);
 
@@ -270,7 +290,14 @@ const syncHabitsInternal = (currentHabits, templates, unlockedSkills, skillDefs)
       if (h.id.startsWith('custom-')) {
         const template = activeCustomsForDay.find(t => t.id === h.id);
         if (template) {
-          return { ...h, name: template.name, notes: template.notes, color: template.color };
+          return {
+            ...h,
+            name: template.name,
+            notes: template.notes,
+            color: template.color,
+            startDate: template.startDate,
+            streakGoal: template.streakGoal
+          };
         }
       }
       return h;
@@ -286,6 +313,8 @@ const syncHabitsInternal = (currentHabits, templates, unlockedSkills, skillDefs)
         name: t.name,
         notes: t.notes,
         color: t.color,
+        startDate: t.startDate,
+        streakGoal: t.streakGoal,
         done: false
       });
     });
@@ -437,7 +466,9 @@ export const useStore = create(
                   color: h.color || 'blue',
                   repeat: 'Daily',
                   weekdays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-                  createdAt: new Date().toISOString()
+                  createdAt: new Date().toISOString(),
+                  startDate: new Date().toISOString().split('T')[0],
+                  streakGoal: null
                 });
               }
             });

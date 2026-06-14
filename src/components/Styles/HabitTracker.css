@@ -33,3 +33,18 @@
   background: rgba(59, 130, 246, 0.1);
   border-color: var(--primary);
 }
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 6px rgba(234, 179, 8, 0.15);
+    border-color: rgba(234, 179, 8, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 14px rgba(234, 179, 8, 0.35);
+    border-color: rgba(234, 179, 8, 1);
+  }
+}
+
+.habit-glow-gold {
+  animation: pulseGlow 1.5s infinite alternate ease-in-out;
+}
