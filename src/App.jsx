@@ -258,16 +258,18 @@ function App() {
     if (syncCode) {
       const loadSync = async () => {
         try {
-          const res = await fetch(`https://jsonbin-zeta.vercel.app/api/bins/${syncCode}`);
+          const res = await fetch(`https://hst.sh/raw/${syncCode}`);
           if (!res.ok) throw new Error('Failed to fetch sync data');
           const data = await res.json();
-          if (data && data.data) {
+          if (data && data.profile) {
             // Restore Zustand store state
-            useStore.setState(data.data);
+            useStore.setState(data);
             alert('🎉 Data successfully synchronized from cloud!');
             // Clean up the URL parameter
             window.history.replaceState({}, document.title, window.location.pathname);
             window.location.reload();
+          } else {
+            throw new Error('Invalid sync data format');
           }
         } catch (e) {
           console.error(e);

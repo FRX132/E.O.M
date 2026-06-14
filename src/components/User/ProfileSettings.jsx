@@ -30,15 +30,15 @@ export default function ProfileSettings() {
     setIsSyncing(true);
     try {
       const state = useStore.getState();
-      const res = await fetch('https://jsonbin-zeta.vercel.app/api/bins', {
+      const res = await fetch('https://hst.sh/documents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(state)
       });
       if (!res.ok) throw new Error('Sync upload failed');
       const result = await res.json();
-      if (result && result.id) {
-        setSyncCode(result.id);
+      if (result && result.key) {
+        setSyncCode(result.key);
       }
     } catch (e) {
       console.error(e);
@@ -52,11 +52,11 @@ export default function ProfileSettings() {
     if (!inputSyncCode.trim()) return;
     setIsRestoring(true);
     try {
-      const res = await fetch(`https://jsonbin-zeta.vercel.app/api/bins/${inputSyncCode.trim()}`);
+      const res = await fetch(`https://hst.sh/raw/${inputSyncCode.trim()}`);
       if (!res.ok) throw new Error('Sync fetch failed');
       const data = await res.json();
-      if (data && data.data) {
-        useStore.setState(data.data);
+      if (data && data.profile) {
+        useStore.setState(data);
         alert('🎉 Data successfully loaded and synced!');
         setInputSyncCode('');
         window.location.reload();
