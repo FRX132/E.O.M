@@ -67,21 +67,11 @@ export default function SportHub() {
       </div>
 
       {viewMode === 'map' ? (
-        <div className="notion-block" style={{ padding: '0 20px 40px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(400px, 1fr) 400px', gap: '40px', alignItems: 'start', margin: '0 auto' }}>
+        <div className="notion-block sporthub-map-block">
+          <div className="sporthub-grid">
 
             {/* Left Side: Interactive Body */}
-            <div style={{
-              background: 'rgba(255,255,255,0.02)',
-              borderRadius: '30px',
-              padding: '40px',
-              border: '1px solid var(--border-color)',
-              textAlign: 'center',
-              backdropFilter: 'blur(20px)',
-              boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
-              position: 'sticky',
-              top: '20px'
-            }}>
+            <div className="sporthub-left-col">
               <div style={{ marginBottom: '30px' }}>
                 <h2 style={{ fontSize: '1.8rem', marginBottom: '8px', fontWeight: 800, letterSpacing: '-0.02em' }}>Anatomical Map</h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
@@ -96,7 +86,7 @@ export default function SportHub() {
             </div>
 
             {/* Right Side: Workout Journal */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div className="sporthub-right-col">
 
               <div style={{
                 display: 'flex',
@@ -118,14 +108,7 @@ export default function SportHub() {
                 </button>
               </div>
 
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-                maxHeight: '600px',
-                overflowY: 'auto',
-                paddingRight: '10px'
-              }}>
+              <div className="sporthub-journal-list">
                 {workouts.length > 0 ? (
                   workouts.map((w) => (
                     <div key={w.id} style={{
@@ -254,9 +237,62 @@ export default function SportHub() {
         .workout-entry:hover button {
           color: #ff4d4d !important;
         }
+        .sporthub-map-block {
+          padding: 0 20px 40px;
+        }
+        .sporthub-grid {
+          display: grid;
+          grid-template-columns: minmax(400px, 1fr) 400px;
+          gap: 40px;
+          align-items: start;
+          margin: 0 auto;
+        }
+        .sporthub-left-col {
+          background: rgba(255,255,255,0.02);
+          border-radius: 30px;
+          padding: 40px;
+          border: 1px solid var(--border-color);
+          text-align: center;
+          backdrop-filter: blur(20px);
+          box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+          position: sticky;
+          top: 20px;
+        }
+        .sporthub-right-col {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+        .sporthub-journal-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          max-height: 600px;
+          overflow-y: auto;
+          padding-right: 10px;
+        }
         @media (max-width: 1000px) {
-          .notion-block > div {
+          .sporthub-grid {
             grid-template-columns: 1fr !important;
+          }
+          .sporthub-left-col {
+            position: static !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .sporthub-map-block {
+            padding: 0 10px 20px !important;
+          }
+          .sporthub-grid {
+            gap: 20px !important;
+          }
+          .sporthub-left-col {
+            padding: 20px !important;
+            border-radius: 20px !important;
+          }
+          .sporthub-journal-list {
+            max-height: none !important;
+            padding-right: 0 !important;
           }
         }
       `}</style>

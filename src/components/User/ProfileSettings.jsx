@@ -1,5 +1,5 @@
 // Imports 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../../store';
 
 const SettingsIcon = () => (
@@ -25,15 +25,40 @@ export default function ProfileSettings() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [inputSyncCode, setInputSyncCode] = useState('');
   const [isRestoring, setIsRestoring] = useState(false);
+  const [qrType, setQrType] = useState('local');
+  const [localIp, setLocalIp] = useState('localhost');
+
+  useEffect(() => {
+    if (window.electronAPI && window.electronAPI.getLocalIP) {
+      window.electronAPI.getLocalIP().then((ip) => {
+        if (ip) setLocalIp(ip);
+      });
+    }
+  }, []);
+
+  const sanitizeStateForSync = (state) => {
+    const cleanState = { ...state };
+    if (cleanState.profile) {
+      cleanState.profile = {
+        ...cleanState.profile,
+        profilePicture: '',
+        backgroundImage: '',
+        heroImage: ''
+      };
+    }
+    cleanState.aiKnowledgeBase = [];
+    return cleanState;
+  };
 
   const handleCreateSync = async () => {
     setIsSyncing(true);
     try {
       const state = useStore.getState();
-      const res = await fetch('https://hst.sh/documents', {
+      const sanitizedState = sanitizeStateForSync(state);
+      const res = await fetch('https://api.pastes.dev/post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(state)
+        body: JSON.stringify(sanitizedState)
       });
       if (!res.ok) throw new Error('Sync upload failed');
       const result = await res.json();
@@ -52,11 +77,26 @@ export default function ProfileSettings() {
     if (!inputSyncCode.trim()) return;
     setIsRestoring(true);
     try {
-      const res = await fetch(`https://hst.sh/raw/${inputSyncCode.trim()}`);
+      const res = await fetch(`https://api.pastes.dev/${inputSyncCode.trim()}`);
       if (!res.ok) throw new Error('Sync fetch failed');
       const data = await res.json();
       if (data && data.profile) {
-        useStore.setState(data);
+        const existingState = useStore.getState();
+        const mergedState = {
+          ...existingState,
+          ...data,
+          profile: {
+            ...existingState.profile,
+            ...data.profile,
+            profilePicture: data.profile.profilePicture || existingState.profile.profilePicture || '',
+            backgroundImage: data.profile.backgroundImage || existingState.profile.backgroundImage || '',
+            heroImage: data.profile.heroImage || existingState.profile.heroImage || ''
+          },
+          aiKnowledgeBase: (data.aiKnowledgeBase && data.aiKnowledgeBase.length > 0)
+            ? data.aiKnowledgeBase
+            : (existingState.aiKnowledgeBase || [])
+        };
+        useStore.setState(mergedState);
         alert('🎉 Data successfully loaded and synced!');
         setInputSyncCode('');
         window.location.reload();
@@ -839,8 +879,22 @@ export default function ProfileSettings() {
             Generate a sync key, or scan the QR code with your phone's camera.
           </p>
 
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '20px' }}>
-            <div>
+          <div className="form-group" style={{ maxWidth: '400px', marginBottom: '20px' }}>
+            <label className="form-label">Public Web App URL</label>
+            <input
+              type="text"
+              className="notion-input"
+              value={profile.webAppUrl || ''}
+              onChange={(e) => setProfile({ webAppUrl: e.target.value })}
+              placeholder="https://frx132.github.io/E.O.M/"
+            />
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+              Used to construct the sync QR code for the public web version.
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'stretch', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <button
                 onClick={handleCreateSync}
                 className="notion-button"
@@ -852,22 +906,72 @@ export default function ProfileSettings() {
             </div>
 
             {syncCode && (
-              <div style={{ display: 'flex', gap: '20px', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', flex: 1, minWidth: '280px' }}>
-                <div style={{ flex: 1 }}>
-                  <label className="form-label" style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your Sync Code</label>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '1px', color: 'var(--primary)', margin: '4px 0 4px 0' }}>
-                    {syncCode}
+              <div style={{ display: 'flex', gap: '20px', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', flex: 1, minWidth: '320px', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                    <button
+                      onClick={() => setQrType('local')}
+                      className={`notion-button ${qrType === 'local' ? '' : 'secondary'}`}
+                      style={{ padding: '4px 10px', fontSize: '0.75rem', margin: 0, border: qrType === 'local' ? '1px solid var(--primary)' : '1px solid var(--border-color)' }}
+                    >
+                      Local Network
+                    </button>
+                    <button
+                      onClick={() => setQrType('web')}
+                      className={`notion-button ${qrType === 'web' ? '' : 'secondary'}`}
+                      style={{ padding: '4px 10px', fontSize: '0.75rem', margin: 0, border: qrType === 'web' ? '1px solid var(--primary)' : '1px solid var(--border-color)' }}
+                    >
+                      Public Web
+                    </button>
                   </div>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
-                    Enter this code on your iPhone 11 under settings, or scan the QR code on the right.
+
+                  <label className="form-label" style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your Sync Code</label>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 700, letterSpacing: '1px', color: 'var(--primary)', margin: '4px 0 8px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {syncCode}
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(syncCode);
+                        alert('Sync Code copied!');
+                      }}
+                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '4px', fontSize: '0.7rem', padding: '2px 8px', color: 'var(--text-main)', cursor: 'pointer' }}
+                    >
+                      Copy Code
+                    </button>
+                  </div>
+
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0 0 10px 0' }}>
+                    {qrType === 'local'
+                      ? `WiFi Sync URL: http://${localIp}:5173/?sync=${syncCode}`
+                      : `Web Sync URL: ${(profile.webAppUrl || 'https://frx132.github.io/E.O.M/').replace(/\/$/, '')}/?sync=${syncCode}`
+                    }
                   </p>
+
+                  <button
+                    onClick={() => {
+                      const fullUrl = qrType === 'local'
+                        ? `http://${localIp}:5173/?sync=${syncCode}`
+                        : `${profile.webAppUrl || 'https://frx132.github.io/E.O.M/'}?sync=${syncCode}`;
+                      navigator.clipboard.writeText(fullUrl);
+                      alert('Sync Link copied!');
+                    }}
+                    className="notion-button secondary"
+                    style={{ padding: '4px 10px', fontSize: '0.75rem', margin: 0 }}
+                  >
+                    🔗 Copy Sync Link
+                  </button>
                 </div>
-                <div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
                   <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(window.location.origin + window.location.pathname + '?sync=' + syncCode)}`}
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(
+                      qrType === 'local'
+                        ? `http://${localIp}:5173/?sync=${syncCode}`
+                        : `${profile.webAppUrl || 'https://frx132.github.io/E.O.M/'}?sync=${syncCode}`
+                    )}`}
                     alt="Sync QR Code"
                     style={{ borderRadius: '6px', background: '#fff', padding: '4px', width: '100px', height: '100px', display: 'block' }}
                   />
+                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Scan with phone</span>
                 </div>
               </div>
             )}

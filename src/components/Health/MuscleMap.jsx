@@ -69,38 +69,14 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
     <div className="muscle-map-container" style={{ position: 'relative', width: '100%', maxWidth: '800px', margin: '0 auto' }}>
 
       {/* View & Gender Toggles */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '15px',
-        marginBottom: '30px'
-      }}>
+      <div className="anatomy-toggles-wrapper">
         {/* Gender Toggle */}
-        <div style={{
-          display: 'flex',
-          background: 'rgba(255,255,255,0.03)',
-          padding: '4px',
-          borderRadius: '14px',
-          border: '1px solid var(--border-color)',
-          backdropFilter: 'blur(10px)'
-        }}>
+        <div className="anatomy-toggle-pill-container">
           {['male', 'female'].map(g => (
             <button
               key={g}
               onClick={() => setGender(g)}
-              style={{
-                padding: '8px 20px',
-                borderRadius: '11px',
-                border: 'none',
-                background: gender === g ? 'var(--primary)' : 'transparent',
-                color: gender === g ? '#fff' : 'var(--text-muted)',
-                fontWeight: 700,
-                fontSize: '0.8rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                textTransform: 'capitalize'
-              }}
+              className={`anatomy-toggle-btn ${gender === g ? 'active' : ''}`}
             >
               {g} Structure
             </button>
@@ -108,57 +84,20 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
         </div>
 
         {/* View Toggle */}
-        <div style={{
-          display: 'flex',
-          gap: '6px',
-          background: 'rgba(255,255,255,0.03)',
-          padding: '4px',
-          borderRadius: '14px',
-          border: '1px solid var(--border-color)',
-          backdropFilter: 'blur(10px)'
-        }}>
+        <div className="anatomy-toggle-pill-container">
           <button
             onClick={() => setView('front')}
-            style={{
-              padding: '10px 30px',
-              borderRadius: '11px',
-              border: 'none',
-              background: view === 'front' ? 'var(--primary)' : 'transparent',
-              color: view === 'front' ? '#fff' : 'var(--text-muted)',
-              fontWeight: 700,
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: view === 'front' ? '0 4px 15px rgba(var(--primary-rgb), 0.4)' : 'none'
-            }}
+            className={`anatomy-toggle-btn ${view === 'front' ? 'active' : ''}`}
           >Anatomy Front</button>
           <button
             onClick={() => setView('back')}
-            style={{
-              padding: '10px 30px',
-              borderRadius: '11px',
-              border: 'none',
-              background: view === 'back' ? 'var(--primary)' : 'transparent',
-              color: view === 'back' ? '#fff' : 'var(--text-muted)',
-              fontWeight: 700,
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: view === 'back' ? '0 4px 15px rgba(var(--primary-rgb), 0.4)' : 'none'
-            }}
+            className={`anatomy-toggle-btn ${view === 'back' ? 'active' : ''}`}
           >Anatomy Back</button>
         </div>
       </div>
 
       {/* The Map */}
-      <div style={{
-        position: 'relative',
-        background: 'radial-gradient(circle at center, rgba(var(--primary-rgb, 230, 30, 30), 0.05) 0%, transparent 80%)',
-        borderRadius: '40px',
-        padding: '30px',
-        border: '1px solid rgba(255,255,255,0.02)',
-        boxShadow: 'inset 0 0 50px rgba(0,0,0,0.2)'
-      }}>
+      <div className="anatomy-svg-wrapper">
         <svg
           viewBox={gender === 'female'
             ? (view === 'front' ? "100 200 600 1200" : "800 200 600 1200")
@@ -199,9 +138,74 @@ export default function MuscleMap({ onSelectMuscle, selectedMuscle }) {
         .muscle-map-container {
           animation: bodyFadeIn 0.8s ease-out;
         }
+        .anatomy-toggles-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 15px;
+          margin-bottom: 30px;
+        }
+        .anatomy-toggle-pill-container {
+          display: flex;
+          gap: 6px;
+          background: rgba(255,255,255,0.03);
+          padding: 4px;
+          border-radius: 14px;
+          border: 1px solid var(--border-color);
+          backdrop-filter: blur(10px);
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        .anatomy-toggle-btn {
+          padding: 8px 20px;
+          border-radius: 11px;
+          border: none;
+          background: transparent;
+          color: var(--text-muted);
+          font-weight: 700;
+          font-size: 0.8rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-transform: capitalize;
+        }
+        .anatomy-toggle-btn.active {
+          background: var(--primary);
+          color: #fff;
+          box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.4);
+        }
+        .anatomy-svg-wrapper {
+          position: relative;
+          background: radial-gradient(circle at center, rgba(var(--primary-rgb, 230, 30, 30), 0.05) 0%, transparent 80%);
+          border-radius: 40px;
+          padding: 30px;
+          border: 1px solid rgba(255,255,255,0.02);
+          box-shadow: inset 0 0 50px rgba(0,0,0,0.2);
+        }
         @keyframes bodyFadeIn {
           from { opacity: 0; transform: scale(0.98) translateY(10px); }
           to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @media (max-width: 480px) {
+          .anatomy-toggles-wrapper {
+            gap: 10px;
+            margin-bottom: 20px;
+          }
+          .anatomy-toggle-pill-container {
+            width: 100%;
+            border-radius: 10px;
+            padding: 3px;
+          }
+          .anatomy-toggle-btn {
+            flex: 1;
+            padding: 8px 6px;
+            font-size: 0.75rem;
+            border-radius: 8px;
+            white-space: nowrap;
+          }
+          .anatomy-svg-wrapper {
+            border-radius: 20px;
+            padding: 12px;
+          }
         }
       `}</style>
     </div>

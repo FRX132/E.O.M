@@ -6,5 +6,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   autoBackupSave: (folderPath, data) => ipcRenderer.invoke('auto-backup-save', folderPath, data),
   parsePDF: () => ipcRenderer.invoke('parse-pdf'),
   selectFiles: () => ipcRenderer.invoke('select-files'),
-  selectVault: () => ipcRenderer.invoke('select-vault-directory')
+  selectVault: () => ipcRenderer.invoke('select-vault-directory'),
+  getLocalIP: () => ipcRenderer.invoke('get-local-ip')
 });

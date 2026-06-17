@@ -184,7 +184,7 @@ const GraphUpIcon = () => (
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 900);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [openFolders, setOpenFolders] = useState({
     'Finance & Goals': true,
@@ -258,12 +258,27 @@ function App() {
     if (syncCode) {
       const loadSync = async () => {
         try {
-          const res = await fetch(`https://hst.sh/raw/${syncCode}`);
+          const res = await fetch(`https://api.pastes.dev/${syncCode}`);
           if (!res.ok) throw new Error('Failed to fetch sync data');
           const data = await res.json();
           if (data && data.profile) {
-            // Restore Zustand store state
-            useStore.setState(data);
+            // Restore and merge Zustand store state
+            const existingState = useStore.getState();
+            const mergedState = {
+              ...existingState,
+              ...data,
+              profile: {
+                ...existingState.profile,
+                ...data.profile,
+                profilePicture: data.profile.profilePicture || existingState.profile.profilePicture || '',
+                backgroundImage: data.profile.backgroundImage || existingState.profile.backgroundImage || '',
+                heroImage: data.profile.heroImage || existingState.profile.heroImage || ''
+              },
+              aiKnowledgeBase: (data.aiKnowledgeBase && data.aiKnowledgeBase.length > 0)
+                ? data.aiKnowledgeBase
+                : (existingState.aiKnowledgeBase || [])
+            };
+            useStore.setState(mergedState);
             alert('🎉 Data successfully synchronized from cloud!');
             // Clean up the URL parameter
             window.history.replaceState({}, document.title, window.location.pathname);

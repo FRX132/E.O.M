@@ -46,7 +46,8 @@ const EMPTY_STATE = {
     backgroundImage: '',
     heroImage: '',
     xp: 0,
-    currencySymbol: '€'
+    currencySymbol: '€',
+    webAppUrl: 'https://frx132.github.io/E.O.M/'
   },
   activeQuests: [], // [{ skillId, progress: 0, daysLeft: duration }]
   expenses: [],

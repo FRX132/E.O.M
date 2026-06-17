@@ -1,5 +1,6 @@
 import { app, BrowserWindow, globalShortcut, dialog, ipcMain } from 'electron';
 import fs from 'fs';
+import os from 'os';
 import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -205,6 +206,19 @@ app.whenReady().then(() => {
       }
     }
     return { success: false, error: 'No directory selected' };
+  });
+
+  ipcMain.handle('get-local-ip', async () => {
+    const interfaces = os.networkInterfaces();
+    for (const interfaceName in interfaces) {
+      const addresses = interfaces[interfaceName];
+      for (const address of addresses) {
+        if (address.family === 'IPv4' && !address.internal) {
+          return address.address;
+        }
+      }
+    }
+    return 'localhost';
   });
 
   createWindow();
