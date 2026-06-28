@@ -452,65 +452,67 @@ export default function ExpenseTracker() {
               })}
             </div>
 
-            <table className="notion-table">
-              <thead>
-                <tr>
-                  <th>Aa Asset Name</th>
-                  <th>◘ Type</th>
-                  <th># Value</th>
-                  <th>% Change</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {assets.map((asset) => (
-                  <tr key={asset.id}>
-                    <td>
-                      <input
-                        value={asset.name}
-                        onChange={(e) => updateAsset(asset.id, 'name', e.target.value)}
-                        style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%', outline: 'none' }}
-                      />
-                    </td>
-                    <td>
-                      <select
-                        value={asset.type}
-                        onChange={(e) => updateAsset(asset.id, 'type', e.target.value)}
-                        className={`pill blue`}
-                        style={{ border: 'none', appearance: 'none', outline: 'none' }}
-                      >
-                        {ASSET_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                      </select>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--text-muted)', marginRight: '4px' }}>{currency}</span>
-                        <input
-                          type="number"
-                          value={asset.amount}
-                          onChange={(e) => updateAsset(asset.id, 'amount', parseFloat(e.target.value) || 0)}
-                          style={{ background: 'transparent', border: 'none', color: 'inherit', maxWidth: '100px', outline: 'none', fontWeight: 600 }}
-                        />
-                      </div>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span style={{
-                          color: asset.change >= 0 ? 'var(--green-text)' : 'var(--red-text)',
-                          fontWeight: 800,
-                          fontSize: '0.9rem'
-                        }}>
-                          {asset.change >= 0 ? '+' : ''}{asset.change?.toFixed(1)}%
-                        </span>
-                      </div>
-                    </td>
-                    <td>
-                      <button onClick={() => deleteAsset(asset.id)} style={{ color: 'var(--red-text)', opacity: 0.5, fontSize: '1.2rem' }}>×</button>
-                    </td>
+            <div className="notion-table-wrapper" style={{ overflowX: 'auto', minWidth: 0, marginBottom: '10px' }}>
+              <table className="notion-table" style={{ minWidth: '600px' }}>
+                <thead>
+                  <tr>
+                    <th>Aa Asset Name</th>
+                    <th>◘ Type</th>
+                    <th># Value</th>
+                    <th>% Change</th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {assets.map((asset) => (
+                    <tr key={asset.id}>
+                      <td>
+                        <input
+                          value={asset.name}
+                          onChange={(e) => updateAsset(asset.id, 'name', e.target.value)}
+                          style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%', outline: 'none' }}
+                        />
+                      </td>
+                      <td>
+                        <select
+                          value={asset.type}
+                          onChange={(e) => updateAsset(asset.id, 'type', e.target.value)}
+                          className={`pill blue`}
+                          style={{ border: 'none', appearance: 'none', outline: 'none' }}
+                        >
+                          {ASSET_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <span style={{ color: 'var(--text-muted)', marginRight: '4px' }}>{currency}</span>
+                          <input
+                            type="number"
+                            value={asset.amount}
+                            onChange={(e) => updateAsset(asset.id, 'amount', parseFloat(e.target.value) || 0)}
+                            style={{ background: 'transparent', border: 'none', color: 'inherit', maxWidth: '100px', outline: 'none', fontWeight: 600 }}
+                          />
+                        </div>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{
+                            color: asset.change >= 0 ? 'var(--green-text)' : 'var(--red-text)',
+                            fontWeight: 800,
+                            fontSize: '0.9rem'
+                          }}>
+                            {asset.change >= 0 ? '+' : ''}{asset.change?.toFixed(1)}%
+                          </span>
+                        </div>
+                      </td>
+                      <td>
+                        <button onClick={() => deleteAsset(asset.id)} style={{ color: 'var(--red-text)', opacity: 0.5, fontSize: '1.2rem' }}>×</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             <button onClick={addAsset} style={{ color: 'var(--primary)', fontSize: '0.85rem', padding: '20px 0', width: '100%', textAlign: 'left', borderTop: '1px solid var(--border-color)', marginTop: '10px', fontWeight: 600 }}>
               + Register New Capital Asset
             </button>

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 // Migration Logic: Safely fetch legacy data if it exists.
 const migrateLegacyData = (key, defaultVal) => {
@@ -12,6 +12,84 @@ const migrateLegacyData = (key, defaultVal) => {
     console.error(`Failed to parse legacy ${key}`, e);
   }
   return defaultVal;
+};
+
+// Zustand Persist IndexedDB Custom Engine
+const idbStorage = {
+  getItem: async (name) => {
+    return new Promise((resolve) => {
+      const request = indexedDB.open('eom_db', 1);
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('store')) {
+          db.createObjectStore('store');
+        }
+      };
+      request.onsuccess = (e) => {
+        const db = e.target.result;
+        const transaction = db.transaction('store', 'readonly');
+        const store = transaction.objectStore('store');
+        const getReq = store.get(name);
+        getReq.onsuccess = () => {
+          if (getReq.result) {
+            resolve(getReq.result);
+          } else {
+            // Check legacy localStorage
+            const legacy = localStorage.getItem(name);
+            if (legacy) {
+              // Migrate it to IndexedDB asynchronously
+              idbStorage.setItem(name, legacy);
+              // Clean up localStorage to free up space
+              localStorage.removeItem(name);
+              resolve(legacy);
+            } else {
+              resolve(null);
+            }
+          }
+        };
+        getReq.onerror = () => {
+          resolve(localStorage.getItem(name) || null);
+        };
+      };
+      request.onerror = () => {
+        resolve(localStorage.getItem(name) || null);
+      };
+    });
+  },
+  setItem: async (name, value) => {
+    return new Promise((resolve) => {
+      const request = indexedDB.open('eom_db', 1);
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('store')) {
+          db.createObjectStore('store');
+        }
+      };
+      request.onsuccess = (e) => {
+        const db = e.target.result;
+        const transaction = db.transaction('store', 'readwrite');
+        const store = transaction.objectStore('store');
+        const putReq = store.put(value, name);
+        putReq.onsuccess = () => resolve();
+        putReq.onerror = () => resolve();
+      };
+      request.onerror = () => resolve();
+    });
+  },
+  removeItem: async (name) => {
+    return new Promise((resolve) => {
+      const request = indexedDB.open('eom_db', 1);
+      request.onsuccess = (e) => {
+        const db = e.target.result;
+        const transaction = db.transaction('store', 'readwrite');
+        const store = transaction.objectStore('store');
+        const deleteReq = store.delete(name);
+        deleteReq.onsuccess = () => resolve();
+        deleteReq.onerror = () => resolve();
+      };
+      request.onerror = () => resolve();
+    });
+  }
 };
 
 const generateEmptyHabitDays = () => {
@@ -77,6 +155,8 @@ const EMPTY_STATE = {
   canvasEdges: null,
   aiKnowledgeBase: [],
   timetableBlocks: [],
+  passwordsVault: [],
+  masterPasswordHash: "",
   isAuthenticated: false,
   autoBackupPath: null,
   theme: 'dark',
@@ -157,6 +237,8 @@ const initialState = {
   canvasEdges: migrateLegacyData('os_canvas_edges', EMPTY_STATE.canvasEdges),
   aiKnowledgeBase: migrateLegacyData('os_knowledge_base', EMPTY_STATE.aiKnowledgeBase),
   timetableBlocks: migrateLegacyData('os_timetable_blocks', EMPTY_STATE.timetableBlocks),
+  passwordsVault: migrateLegacyData('os_passwords_vault', EMPTY_STATE.passwordsVault),
+  masterPasswordHash: migrateLegacyData('os_master_password_hash', EMPTY_STATE.masterPasswordHash),
   journal: migrateLegacyData('os_journal', EMPTY_STATE.journal),
   editorFiles: migrateLegacyData('os_editor_files', EMPTY_STATE.editorFiles),
   trades: migrateLegacyData('os_trades', EMPTY_STATE.trades),
@@ -353,6 +435,8 @@ export const useStore = create(
       setTrades: (updater) => set((state) => ({ trades: typeof updater === 'function' ? updater(state.trades) : updater })),
       setCalendarEvents: (updater) => set((state) => ({ calendarEvents: typeof updater === 'function' ? (state.calendarEvents ? updater(state.calendarEvents) : updater([])) : updater })),
       setTimetableBlocks: (updater) => set((state) => ({ timetableBlocks: typeof updater === 'function' ? updater(state.timetableBlocks || []) : updater })),
+      setPasswordsVault: (updater) => set((state) => ({ passwordsVault: typeof updater === 'function' ? updater(state.passwordsVault || []) : updater })),
+      setMasterPassword: (hash) => set({ masterPasswordHash: hash }),
       setWatchlist: (updater) => set((state) => ({ watchlist: typeof updater === 'function' ? updater(state.watchlist) : updater })),
       setTradingTrends: (updater) => set((state) => ({ tradingTrends: typeof updater === 'function' ? updater(state.tradingTrends) : updater })),
       setTradingStrategies: (updater) => set((state) => ({ tradingStrategies: typeof updater === 'function' ? updater(state.tradingStrategies) : updater })),
@@ -508,7 +592,8 @@ export const useStore = create(
       resetAllData: () => set(EMPTY_STATE)
     }),
     {
-      name: 'life_os_storage', // The singular key in localStorage
+      name: 'life_os_storage',
+      storage: createJSONStorage(() => idbStorage)
     }
   )
 );
@@ -518,8 +603,8 @@ useStore.subscribe((state) => {
   if (state.autoBackupPath && window.electronAPI && window.electronAPI.autoBackupSave) {
     // Small delay to prevent blocking the main UI thread during rapid state changes (e.g. typing)
     clearTimeout(window._autoBackupTimeout);
-    window._autoBackupTimeout = setTimeout(() => {
-      const backupStr = localStorage.getItem('life_os_storage');
+    window._autoBackupTimeout = setTimeout(async () => {
+      const backupStr = await idbStorage.getItem('life_os_storage');
       if (backupStr) {
         window.electronAPI.autoBackupSave(state.autoBackupPath, backupStr);
       }

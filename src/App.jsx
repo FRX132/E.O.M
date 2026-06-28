@@ -28,6 +28,7 @@ import Journal from './components/Agency/Journal';
 import Editor from './components/Functions/Editor';
 import TradingTerminal from './components/User/TradingTerminal';
 import Timetable from './components/User/Timetable';
+import PasswordManager from './components/Agency/PasswordManager';
 import { SKILL_DEF } from './constants';
 import './components/Styles/Timetable.css';
 
@@ -137,17 +138,24 @@ const GlobeIcon = () => (
 // Icon for Journal
 const JournalIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-journal-text" viewBox="0 0 16 16">
-    <path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
-    <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
-    <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
+    <path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z" />
+    <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z" />
+    <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z" />
+  </svg>
+);
+
+const KeyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-key" viewBox="0 0 16 16">
+    <path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.5.5a.5.5 0 0 1-.707 0L7.3 9.3a4 4 0 0 1-7.3-1.3zm4-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+    <path d="M4 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
   </svg>
 );
 
 // Icon for Editor
 const CodeIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-code-square" viewBox="0 0 16 16">
-    <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-    <path d="M6.854 4.646a.5.5 0 0 1 0 .708L4.207 8l2.647 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0zm2.292 0a.5.5 0 0 0 0 .708L11.793 8l-2.647 2.646a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708 0z"/>
+    <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+    <path d="M6.854 4.646a.5.5 0 0 1 0 .708L4.207 8l2.647 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0zm2.292 0a.5.5 0 0 0 0 .708L11.793 8l-2.647 2.646a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708 0z" />
   </svg>
 );
 
@@ -169,15 +177,15 @@ const SettingsIcon = () => (
 // Icon for Timetable
 const CalendarIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-calendar3" viewBox="0 0 16 16">
-    <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
-    <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+    <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z" />
+    <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
   </svg>
 );
 
 // Icon for Trading Terminal
 const GraphUpIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-graph-up" viewBox="0 0 16 16">
-    <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07"/>
+    <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />
   </svg>
 );
 
@@ -253,6 +261,41 @@ function App() {
 
   // Automatic URL parameters Cloud Sync loader
   useEffect(() => {
+    const DATA_KEYS = [
+      'profile',
+      'activeQuests',
+      'expenses',
+      'assets',
+      'habits',
+      'customHabitTemplates',
+      'goals',
+      'fridge',
+      'targets',
+      'books',
+      'movies',
+      'workouts',
+      'languages',
+      'trips',
+      'journal',
+      'editorFiles',
+      'trades',
+      'watchlist',
+      'tradingTrends',
+      'tradingStrategies',
+      'tradingAnalyses',
+      'tradingPlan',
+      'calendarEvents',
+      'skills',
+      'canvasNodes',
+      'canvasEdges',
+      'timetableBlocks',
+      'theme',
+      'accentColor',
+      'designSettings',
+      'financeSettings',
+      'overviewSettings'
+    ];
+
     const params = new URLSearchParams(window.location.search);
     const syncCode = params.get('sync');
     if (syncCode) {
@@ -264,20 +307,24 @@ function App() {
           if (data && data.profile) {
             // Restore and merge Zustand store state
             const existingState = useStore.getState();
-            const mergedState = {
-              ...existingState,
-              ...data,
-              profile: {
-                ...existingState.profile,
-                ...data.profile,
-                profilePicture: data.profile.profilePicture || existingState.profile.profilePicture || '',
-                backgroundImage: data.profile.backgroundImage || existingState.profile.backgroundImage || '',
-                heroImage: data.profile.heroImage || existingState.profile.heroImage || ''
-              },
-              aiKnowledgeBase: (data.aiKnowledgeBase && data.aiKnowledgeBase.length > 0)
-                ? data.aiKnowledgeBase
-                : (existingState.aiKnowledgeBase || [])
-            };
+            const mergedState = { ...existingState };
+
+            DATA_KEYS.forEach(key => {
+              if (data[key] !== undefined) {
+                mergedState[key] = data[key];
+              }
+            });
+
+            // Restore image values that were cleared in sync from current existing state
+            if (mergedState.profile) {
+              mergedState.profile = {
+                ...mergedState.profile,
+                profilePicture: existingState.profile.profilePicture || '',
+                backgroundImage: existingState.profile.backgroundImage || '',
+                heroImage: existingState.profile.heroImage || ''
+              };
+            }
+
             useStore.setState(mergedState);
             alert('🎉 Data successfully synchronized from cloud!');
             // Clean up the URL parameter
@@ -334,6 +381,7 @@ function App() {
         { path: '/movies', label: 'Cinema', icon: <FilmIcon /> },
         { path: '/journal', label: 'Journal', icon: <JournalIcon /> },
         { path: '/trips', label: 'Trip Mode', icon: <GlobeIcon /> },
+        { path: '/passwords', label: 'Password Manager', icon: <KeyIcon /> },
       ]
     },
     {
@@ -463,7 +511,7 @@ function App() {
 
       </div>
 
-      {/* Menubar */}
+      {/* NAVBAR - For Mobile */}
       <div className="dashboard-content" style={{ position: 'relative', ...(profile.backgroundImage ? { backdropFilter: 'blur(10px)', background: 'rgba(10,10,12,0.65)' } : {}) }}>
 
         {/* Toggle Button */}
@@ -471,6 +519,7 @@ function App() {
           className="sidebar-toggle"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           aria-label="Toggle Sidebar"
+          style={{ left: isSidebarOpen ? '295px' : '15px' }}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
             <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
@@ -498,6 +547,7 @@ function App() {
             <Route path="/trading" element={<TradingTerminal navigate={navigate} />} />
             <Route path="/journal" element={<Journal />} />
             <Route path="/trips" element={<TripMode />} />
+            <Route path="/passwords" element={<PasswordManager />} />
             <Route path="/canvas" element={<ProjectCanvas />} />
             <Route path="/editor" element={<Editor />} />
             <Route path="/ai" element={<AIAssistant />} />

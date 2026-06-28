@@ -9,6 +9,41 @@ const SettingsIcon = () => (
   </svg>
 );
 
+const DATA_KEYS = [
+  'profile',
+  'activeQuests',
+  'expenses',
+  'assets',
+  'habits',
+  'customHabitTemplates',
+  'goals',
+  'fridge',
+  'targets',
+  'books',
+  'movies',
+  'workouts',
+  'languages',
+  'trips',
+  'journal',
+  'editorFiles',
+  'trades',
+  'watchlist',
+  'tradingTrends',
+  'tradingStrategies',
+  'tradingAnalyses',
+  'tradingPlan',
+  'calendarEvents',
+  'skills',
+  'canvasNodes',
+  'canvasEdges',
+  'timetableBlocks',
+  'theme',
+  'accentColor',
+  'designSettings',
+  'financeSettings',
+  'overviewSettings'
+];
+
 export default function ProfileSettings() {
   const profile = useStore(state => state.profile);
   const theme = useStore(state => state.theme);
@@ -27,6 +62,38 @@ export default function ProfileSettings() {
   const [isRestoring, setIsRestoring] = useState(false);
   const [qrType, setQrType] = useState('local');
   const [localIp, setLocalIp] = useState('localhost');
+  const [isEditingIp, setIsEditingIp] = useState(false);
+  const [syncPassphrase, setSyncPassphrase] = useState('');
+
+  // E2EE Symmetric helper for Cloud Sync
+  const encryptWithPassphrase = (plaintext, passphrase) => {
+    if (!passphrase) return plaintext; // If no passphrase, don't encrypt (backwards compatible)
+    let result = '';
+    for (let i = 0; i < plaintext.length; i++) {
+      const charCode = plaintext.charCodeAt(i) ^ passphrase.charCodeAt(i % passphrase.length);
+      result += String.fromCharCode(charCode);
+    }
+    return 'E2EE_' + btoa(unescape(encodeURIComponent(result)));
+  };
+
+  const decryptWithPassphrase = (ciphertext, passphrase) => {
+    if (!ciphertext || !ciphertext.startsWith('E2EE_')) return ciphertext; // Backwards compatible
+    if (!passphrase) {
+      throw new Error('This sync file is encrypted. Enter the correct passphrase.');
+    }
+    const cleanCipher = ciphertext.replace(/^E2EE_/, '');
+    try {
+      const decoded = decodeURIComponent(escape(atob(cleanCipher)));
+      let result = '';
+      for (let i = 0; i < decoded.length; i++) {
+        const charCode = decoded.charCodeAt(i) ^ passphrase.charCodeAt(i % passphrase.length);
+        result += String.fromCharCode(charCode);
+      }
+      return result;
+    } catch (e) {
+      throw new Error('Decryption failed. Please check your passphrase.');
+    }
+  };
 
   useEffect(() => {
     if (window.electronAPI && window.electronAPI.getLocalIP) {
@@ -37,7 +104,13 @@ export default function ProfileSettings() {
   }, []);
 
   const sanitizeStateForSync = (state) => {
-    const cleanState = { ...state };
+    const cleanState = {};
+    DATA_KEYS.forEach(key => {
+      if (state[key] !== undefined) {
+        cleanState[key] = state[key];
+      }
+    });
+
     if (cleanState.profile) {
       cleanState.profile = {
         ...cleanState.profile,
@@ -55,10 +128,13 @@ export default function ProfileSettings() {
     try {
       const state = useStore.getState();
       const sanitizedState = sanitizeStateForSync(state);
+      const payloadStr = JSON.stringify(sanitizedState);
+      const encryptedPayload = encryptWithPassphrase(payloadStr, syncPassphrase.trim());
+
       const res = await fetch('https://api.pastes.dev/post', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sanitizedState)
+        headers: { 'Content-Type': 'text/plain' },
+        body: encryptedPayload
       });
       if (!res.ok) throw new Error('Sync upload failed');
       const result = await res.json();
@@ -74,28 +150,67 @@ export default function ProfileSettings() {
   };
 
   const handleRestoreSync = async () => {
-    if (!inputSyncCode.trim()) return;
+    let cleanCode = inputSyncCode.trim();
+    if (!cleanCode) return;
+
+    // Robust parsing if the user pasted a full URL
+    if (cleanCode.includes('sync=')) {
+      const match = cleanCode.match(/[?&]sync=([^&]+)/);
+      if (match) cleanCode = match[1];
+    } else if (cleanCode.includes('pastes.dev/')) {
+      const parts = cleanCode.split('/');
+      cleanCode = parts[parts.length - 1];
+    }
+
     setIsRestoring(true);
     try {
-      const res = await fetch(`https://api.pastes.dev/${inputSyncCode.trim()}`);
+      const res = await fetch(`https://api.pastes.dev/${cleanCode}`);
       if (!res.ok) throw new Error('Sync fetch failed');
-      const data = await res.json();
+      
+      const rawText = await res.text();
+      let decryptedText = rawText;
+
+      if (rawText.startsWith('E2EE_')) {
+        let pass = syncPassphrase.trim();
+        if (!pass) {
+          pass = prompt('This sync code is encrypted. Please enter the Sync Passphrase to decrypt it:');
+          if (pass === null) {
+            setIsRestoring(false);
+            return;
+          }
+        }
+        
+        try {
+          decryptedText = decryptWithPassphrase(rawText, pass.trim());
+        } catch (err) {
+          alert(err.message || 'Decryption failed.');
+          setIsRestoring(false);
+          return;
+        }
+      }
+
+      const data = JSON.parse(decryptedText);
+
       if (data && data.profile) {
         const existingState = useStore.getState();
-        const mergedState = {
-          ...existingState,
-          ...data,
-          profile: {
-            ...existingState.profile,
-            ...data.profile,
-            profilePicture: data.profile.profilePicture || existingState.profile.profilePicture || '',
-            backgroundImage: data.profile.backgroundImage || existingState.profile.backgroundImage || '',
-            heroImage: data.profile.heroImage || existingState.profile.heroImage || ''
-          },
-          aiKnowledgeBase: (data.aiKnowledgeBase && data.aiKnowledgeBase.length > 0)
-            ? data.aiKnowledgeBase
-            : (existingState.aiKnowledgeBase || [])
-        };
+        const mergedState = { ...existingState };
+
+        DATA_KEYS.forEach(key => {
+          if (data[key] !== undefined) {
+            mergedState[key] = data[key];
+          }
+        });
+
+        // Restore image values that were cleared in sync from current existing state
+        if (mergedState.profile) {
+          mergedState.profile = {
+            ...mergedState.profile,
+            profilePicture: existingState.profile.profilePicture || '',
+            backgroundImage: existingState.profile.backgroundImage || '',
+            heroImage: existingState.profile.heroImage || ''
+          };
+        }
+
         useStore.setState(mergedState);
         alert('🎉 Data successfully loaded and synced!');
         setInputSyncCode('');
@@ -592,6 +707,27 @@ export default function ProfileSettings() {
                 </div>
 
                 <div className="design-setting-group" style={{ gridColumn: 'span 2' }}>
+                  <label className="form-label">Interface Style Template</label>
+                  <select
+                    className="notion-input"
+                    value={useStore.getState().designSettings.template || 'default'}
+                    onChange={(e) => useStore.getState().setDesignSettings({ template: e.target.value })}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <option value="default">Default OS Theme</option>
+                    <option value="cyberpunk">Cyberpunk Neon</option>
+                    <option value="glassmorphism">Glassmorphism (Aero Glass)</option>
+                    <option value="neo-brutalism">Neo-Brutalism</option>
+                    <option value="retro-terminal">Retro Terminal (Fallout CRT)</option>
+                    <option value="nordic-minimalist">Nordic Minimalist (Nord)</option>
+                    <option value="obsidian-gold">Obsidian Gold</option>
+                    <option value="claymorphism">Claymorphism Soft 3D</option>
+                    <option value="neumorphism">Neumorphism Soft UI</option>
+                    <option value="aurora-ui">Aurora Glow UI</option>
+                  </select>
+                </div>
+
+                <div className="design-setting-group" style={{ gridColumn: 'span 2' }}>
                   <label className="form-label">Active Typography</label>
                   <select
                     className="notion-input"
@@ -633,65 +769,86 @@ export default function ProfileSettings() {
                     <button
                       className="notion-button secondary"
                       style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ blur: 15, radius: 0, isNeon: true, isCompact: false, accent: '#ef4444', font: 'JetBrains Mono' })}
+                      onClick={() => applyDesignPreset({ template: 'cyberpunk', blur: 15, radius: 0, isNeon: true, isCompact: false, accent: '#ef4444', font: 'JetBrains Mono' })}
                     >
                       🚀 Cyberpunk
                     </button>
                     <button
                       className="notion-button secondary"
                       style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ blur: 0, radius: 4, isNeon: false, isCompact: true, accent: '#737373', font: 'Inter' })}
+                      onClick={() => applyDesignPreset({ template: 'default', blur: 0, radius: 4, isNeon: false, isCompact: true, accent: '#737373', font: 'Inter' })}
                     >
                       🔳 Minimalist
                     </button>
                     <button
                       className="notion-button secondary"
                       style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ blur: 25, radius: 25, isNeon: false, isCompact: false, accent: '#8b5cf6', font: 'Outfit' })}
+                      onClick={() => applyDesignPreset({ template: 'glassmorphism', blur: 25, radius: 25, isNeon: false, isCompact: false, accent: '#8b5cf6', font: 'Outfit' })}
                     >
                       💎 Ultra Glass
                     </button>
                     <button
                       className="notion-button secondary"
                       style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ blur: 10, radius: 12, isNeon: false, isCompact: false, accent: '#3b82f6', font: 'Roboto' })}
+                      onClick={() => applyDesignPreset({ template: 'default', blur: 10, radius: 12, isNeon: false, isCompact: false, accent: '#3b82f6', font: 'Roboto' })}
                     >
                       🖥️ Modern OS
                     </button>
                     <button
                       className="notion-button secondary"
                       style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ blur: 12, radius: 8, isNeon: true, isCompact: false, accent: '#10b981', font: 'JetBrains Mono' })}
+                      onClick={() => applyDesignPreset({ template: 'default', blur: 12, radius: 8, isNeon: true, isCompact: false, accent: '#10b981', font: 'JetBrains Mono' })}
                     >
                       🌿 Emerald Night
                     </button>
                     <button
                       className="notion-button secondary"
                       style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ blur: 5, radius: 20, isNeon: false, isCompact: false, accent: '#f59e0b', font: 'Roboto' })}
+                      onClick={() => applyDesignPreset({ template: 'default', blur: 5, radius: 20, isNeon: false, isCompact: false, accent: '#f59e0b', font: 'Roboto' })}
                     >
                       ☀️ Solarized
                     </button>
                     <button
                       className="notion-button secondary"
                       style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ blur: 20, radius: 4, isNeon: true, isCompact: false, accent: '#0ea5e9', font: 'Outfit' })}
+                      onClick={() => applyDesignPreset({ template: 'default', blur: 20, radius: 4, isNeon: true, isCompact: false, accent: '#0ea5e9', font: 'Outfit' })}
                     >
                       🌌 Deep Space
                     </button>
                     <button
                       className="notion-button secondary"
                       style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ blur: 0, radius: 0, isNeon: false, isCompact: true, accent: '#ffffff', font: 'Inter' })}
+                      onClick={() => applyDesignPreset({ template: 'default', blur: 0, radius: 0, isNeon: false, isCompact: true, accent: '#ffffff', font: 'Inter' })}
                     >
                       🌑 Noir
                     </button>
                     <button
                       className="notion-button secondary"
                       style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ blur: 15, radius: 30, isNeon: true, isCompact: false, accent: '#f43f5e', font: 'Outfit' })}
+                      onClick={() => applyDesignPreset({ template: 'default', blur: 15, radius: 30, isNeon: true, isCompact: false, accent: '#f43f5e', font: 'Outfit' })}
                     >
                       🌸 Sakura
+                    </button>
+                    <button
+                      className="notion-button secondary"
+                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                      onClick={() => applyDesignPreset({ template: 'claymorphism', blur: 0, radius: 24, isNeon: false, isCompact: false, accent: '#6366f1', font: 'Outfit' })}
+                    >
+                      🏺 Claymorphism
+                    </button>
+                    <button
+                      className="notion-button secondary"
+                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                      onClick={() => applyDesignPreset({ template: 'neumorphism', blur: 0, radius: 20, isNeon: false, isCompact: false, accent: '#4f8a8b', font: 'Inter' })}
+                    >
+                      ☁️ Neumorphism
+                    </button>
+                    <button
+                      className="notion-button secondary"
+                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                      onClick={() => applyDesignPreset({ template: 'aurora-ui', blur: 25, radius: 20, isNeon: true, isCompact: false, accent: '#ec4899', font: 'Outfit' })}
+                    >
+                      ✨ Aurora UI
                     </button>
                     <button
                       className="notion-button secondary"
@@ -699,13 +856,15 @@ export default function ProfileSettings() {
                       onClick={() => {
                         const fonts = ['Inter', 'Outfit', 'JetBrains Mono', 'Roboto'];
                         const colors = ['#ef4444', '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#0ea5e9', '#f43f5e'];
+                        const templates = ['default', 'cyberpunk', 'glassmorphism', 'neo-brutalism', 'retro-terminal', 'nordic-minimalist', 'obsidian-gold', 'claymorphism', 'neumorphism', 'aurora-ui'];
                         applyDesignPreset({
                           blur: Math.floor(Math.random() * 25),
                           radius: Math.floor(Math.random() * 30),
                           isNeon: Math.random() > 0.5,
                           isCompact: Math.random() > 0.7,
                           accent: colors[Math.floor(Math.random() * colors.length)],
-                          font: fonts[Math.floor(Math.random() * fonts.length)]
+                          font: fonts[Math.floor(Math.random() * fonts.length)],
+                          template: templates[Math.floor(Math.random() * templates.length)]
                         });
                       }}
                     >
@@ -893,6 +1052,20 @@ export default function ProfileSettings() {
             </span>
           </div>
 
+          <div className="form-group" style={{ maxWidth: '400px', marginBottom: '20px' }}>
+            <label className="form-label">Sync Passphrase / Passwort (E2EE)</label>
+            <input
+              type="password"
+              className="notion-input"
+              value={syncPassphrase}
+              onChange={(e) => setSyncPassphrase(e.target.value)}
+              placeholder="Choose a passphrase (Optional)..."
+            />
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+              Your data will be encrypted client-side using this passphrase before being uploaded.
+            </span>
+          </div>
+
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'stretch', marginBottom: '20px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <button
@@ -908,7 +1081,7 @@ export default function ProfileSettings() {
             {syncCode && (
               <div style={{ display: 'flex', gap: '20px', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', flex: 1, minWidth: '320px', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: '200px' }}>
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
                     <button
                       onClick={() => setQrType('local')}
                       className={`notion-button ${qrType === 'local' ? '' : 'secondary'}`}
@@ -923,6 +1096,39 @@ export default function ProfileSettings() {
                     >
                       Public Web
                     </button>
+
+                    {qrType === 'local' && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto' }}>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>IP:</span>
+                        {isEditingIp ? (
+                          <input
+                            type="text"
+                            value={localIp}
+                            onChange={(e) => setLocalIp(e.target.value)}
+                            onBlur={() => setIsEditingIp(false)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') setIsEditingIp(false); }}
+                            style={{
+                              background: 'var(--bg-input)',
+                              border: '1px solid var(--border-color)',
+                              color: 'var(--text-main)',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              fontSize: '0.7rem',
+                              width: '110px',
+                              outline: 'none'
+                            }}
+                            autoFocus
+                          />
+                        ) : (
+                          <span 
+                            onClick={() => setIsEditingIp(true)} 
+                            style={{ fontSize: '0.7rem', color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline', fontWeight: 600 }}
+                          >
+                            {localIp} ✏️
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <label className="form-label" style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your Sync Code</label>
@@ -979,31 +1185,50 @@ export default function ProfileSettings() {
 
           <div style={{ borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '15px' }}>
             <h4 style={{ margin: '0 0 10px 0', fontSize: '0.85rem', color: 'var(--text-main)' }}>Enter Sync Code from Another Device</h4>
-            <div style={{ display: 'flex', gap: '10px', maxWidth: '400px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '400px' }}>
               <input
                 type="text"
-                placeholder="e.g. a1b2c3d4"
+                placeholder="Enter Sync Code or Link (e.g. a1b2c3d4)"
                 value={inputSyncCode}
                 onChange={(e) => setInputSyncCode(e.target.value)}
                 style={{
-                  flex: 1,
+                  width: '100%',
                   background: 'var(--bg-input)',
                   border: '1px solid var(--border-color)',
                   color: 'var(--text-main)',
                   padding: '8px 12px',
                   borderRadius: '6px',
                   outline: 'none',
-                  fontSize: '0.85rem'
+                  fontSize: '0.85rem',
+                  boxSizing: 'border-box'
                 }}
               />
-              <button
-                onClick={handleRestoreSync}
-                className="notion-button secondary"
-                disabled={isRestoring}
-                style={{ padding: '8px 16px', fontSize: '0.8rem', whiteSpace: 'nowrap', margin: 0 }}
-              >
-                {isRestoring ? 'Downloading...' : 'Link & Restore'}
-              </button>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input
+                  type="password"
+                  placeholder="Sync Passphrase (If encrypted)"
+                  value={syncPassphrase}
+                  onChange={(e) => setSyncPassphrase(e.target.value)}
+                  style={{
+                    flex: 1,
+                    background: 'var(--bg-input)',
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-main)',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    outline: 'none',
+                    fontSize: '0.85rem'
+                  }}
+                />
+                <button
+                  onClick={handleRestoreSync}
+                  className="notion-button secondary"
+                  disabled={isRestoring}
+                  style={{ padding: '8px 16px', fontSize: '0.8rem', whiteSpace: 'nowrap', margin: 0 }}
+                >
+                  {isRestoring ? 'Downloading...' : 'Link & Restore'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

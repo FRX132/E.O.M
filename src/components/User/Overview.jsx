@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../Styles/Overview.css';
 import { useStore } from '../../store';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
@@ -20,9 +20,18 @@ export default function Overview({ navigate }) {
   const overviewSettings = useStore(state => state.overviewSettings);
   const setOverviewSettings = useStore(state => state.setOverviewSettings);
 
+  // Reminders Integration States
+  const timetableBlocks = useStore(state => state.timetableBlocks || []);
+  const setTimetableBlocks = useStore(state => state.setTimetableBlocks);
+  const habitsDays = useStore(state => state.habits || []);
+  const setHabitsDays = useStore(state => state.setHabits);
+  const addXP = useStore(state => state.addXP);
+  const customHabitTemplates = useStore(state => state.customHabitTemplates || []);
+  const [newReminderTitle, setNewReminderTitle] = useState('');
+
   const settings = overviewSettings || {
-    visibleWidgets: { clock: true, calendar: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true },
-    widgetTitles: { clock: "Clock", calendar: "Calendar", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats" },
+    visibleWidgets: { clock: true, calendar: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true, reminders: true },
+    widgetTitles: { clock: "Clock", calendar: "Calendar", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats", reminders: "Daily Reminders" },
     visibleStatsBars: { expenses: true, goals: true, habits: true, fridge: true, targets: true, library: true, cinema: true, quests: true }
   };
 
@@ -275,25 +284,108 @@ export default function Overview({ navigate }) {
     );
   };
 
+  // Get today's weekday name in en-US
+  const todayDayName = useMemo(() => {
+    const formatter = new Intl.DateTimeFormat('en-US', { weekday: 'long' });
+    return formatter.format(new Date());
+  }, []);
+
+  // Filter today's reminders
+  const todayReminders = useMemo(() => {
+    return timetableBlocks.filter(b => b.day === todayDayName && b.isReminder);
+  }, [timetableBlocks, todayDayName]);
+
+  // Translate weekday to date string
+  const getLocalDateOfWeekday = (targetDay) => {
+    const weekdaysOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const targetIdx = weekdaysOrder.indexOf(targetDay);
+    if (targetIdx === -1) return null;
+    const now = new Date();
+    const currentIdx = now.getDay();
+    const diff = targetIdx - currentIdx;
+    const targetDate = new Date(now);
+    targetDate.setDate(now.getDate() + diff);
+    return targetDate.toISOString().split('T')[0];
+  };
+
+  // Toggle habit done state from overview card
+  const toggleHabitInOverview = (block) => {
+    const dateStr = getLocalDateOfWeekday(block.day);
+    if (!dateStr) return;
+
+    const dayRecord = habitsDays.find(d => d.id === dateStr);
+    if (!dayRecord) return;
+
+    const habit = dayRecord.habits.find(h => h.id === block.habitId);
+    if (!habit) return;
+
+    // Toggle XP
+    const points = habit.done ? -50 : 50;
+    addXP(points);
+
+    // Update habits in store
+    const updatedDays = habitsDays.map(day => {
+      if (day.id !== dateStr) return day;
+      return {
+        ...day,
+        habits: day.habits.map(h => h.id === block.habitId ? { ...h, done: !h.done } : h)
+      };
+    });
+    setHabitsDays(updatedDays);
+  };
+
+  // Toggle custom reminder done state from overview card
+  const toggleReminderInOverview = (block) => {
+    const points = block.completed ? -10 : 10;
+    addXP(points);
+    const updated = timetableBlocks.map(b => b.id === block.id ? { ...b, completed: !b.completed } : b);
+    setTimetableBlocks(updated);
+  };
+
+  // Helper to get completion status of a reminder
+  const getReminderCompletion = (block) => {
+    if (block.habitId) {
+      const dateStr = getLocalDateOfWeekday(block.day);
+      if (!dateStr) return false;
+      const dayRecord = habitsDays.find(d => d.id === dateStr);
+      if (!dayRecord) return false;
+      const habit = dayRecord.habits.find(h => h.id === block.habitId);
+      return habit ? habit.done : false;
+    }
+    return !!block.completed;
+  };
+
+  // Add quick reminder for today from widget input
+  const handleAddQuickReminder = (e) => {
+    e.preventDefault();
+    if (!newReminderTitle.trim()) return;
+
+    const now = new Date();
+    const startH = String(now.getHours()).padStart(2, '0');
+    const startM = String(now.getMinutes()).padStart(2, '0');
+    const endH = String((now.getHours() + 1) % 24).padStart(2, '0');
+
+    const newBlock = {
+      id: window.crypto.randomUUID ? window.crypto.randomUUID() : Date.now().toString(),
+      title: newReminderTitle.trim(),
+      notes: '',
+      url: '',
+      day: todayDayName,
+      startTime: `${startH}:${startM}`,
+      endTime: `${endH}:${startM}`,
+      color: 'purple',
+      habitId: null,
+      isReminder: true,
+      completed: false
+    };
+
+    setTimetableBlocks([...timetableBlocks, newBlock]);
+    setNewReminderTitle('');
+  };
+
   return (
     <div className={`overview-container layout-theme-${overviewLayout}`} style={{ position: 'relative' }}>
 
-      {/* Floating Theme & Customization Toggle - Top Right */}
-      <div className="overview-controls">
-        <button
-          onClick={() => setOverviewLayout(s => (s + 1) % 4)}
-          className="overview-control-btn"
-        >
-          <span>🎨</span> {LAYOUT_NAMES[overviewLayout]}
-        </button>
-
-        <button
-          onClick={() => setIsCustomizeOpen(true)}
-          className="overview-control-btn"
-        >
-          <span>⚙️</span> Customize Page
-        </button>
-      </div>
 
       <div className="overview-hero">
         <div className="hero-cover">
@@ -573,6 +665,105 @@ export default function Overview({ navigate }) {
           </div>
         )}
 
+        {settings.visibleWidgets?.reminders !== false && (
+          <div className="overview-card reminders-card">
+            <div className="card-header">
+              <span className="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-check-square" viewBox="0 0 16 16" style={{ color: 'var(--primary)' }}>
+                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+                  <path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/>
+                </svg>
+              </span>
+              <h3>{settings.widgetTitles?.reminders || "Daily Reminders"}</h3>
+            </div>
+            <div className="card-content" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <form onSubmit={handleAddQuickReminder} style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  placeholder="New reminder..."
+                  value={newReminderTitle}
+                  onChange={e => setNewReminderTitle(e.target.value)}
+                  style={{
+                    flex: 1,
+                    background: 'var(--bg-card-alt)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '6px',
+                    padding: '6px 12px',
+                    fontSize: '0.8rem',
+                    color: 'var(--text-main)',
+                    outline: 'none'
+                  }}
+                />
+                <button
+                  type="submit"
+                  style={{
+                    background: 'var(--primary)',
+                    border: 'none',
+                    borderRadius: '6px',
+                    color: '#fff',
+                    padding: '0 12px',
+                    cursor: 'pointer',
+                    fontSize: '0.8rem',
+                    fontWeight: 700
+                  }}
+                >
+                  Add
+                </button>
+              </form>
+
+              <ul className="mini-list" style={{ flex: 1, overflowY: 'auto', maxHeight: '180px', display: 'flex', flexDirection: 'column', gap: '8px', margin: 0, padding: 0, listStyle: 'none' }}>
+                {todayReminders.map(block => {
+                  const isCompleted = getReminderCompletion(block);
+                  return (
+                    <li
+                      key={block.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        background: 'rgba(255, 255, 255, 0.02)',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border-light)',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                      onClick={() => block.habitId ? toggleHabitInOverview(block) : toggleReminderInOverview(block)}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isCompleted}
+                        onChange={() => {}} // onClick handles toggling
+                        style={{ cursor: 'pointer', accentColor: 'var(--primary)' }}
+                      />
+                      <span style={{
+                        fontSize: '0.82rem',
+                        color: isCompleted ? 'var(--text-muted)' : 'var(--text-main)',
+                        textDecoration: isCompleted ? 'line-through' : 'none',
+                        flex: 1,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}>
+                        {block.title}
+                      </span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                        {block.startTime}
+                      </span>
+                    </li>
+                  );
+                })}
+                {todayReminders.length === 0 && (
+                  <li className="empty-msg" style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem', padding: '20px 0' }}>
+                    No reminders scheduled for today.
+                  </li>
+                )}
+              </ul>
+            </div>
+            <button className="card-action" onClick={() => navigate('/timetable')}>View Schedule</button>
+          </div>
+        )}
+
         {upcomingBills.length > 0 && (
           <div className="overview-card bill-alert-card scale-in" style={{ border: '1px solid rgba(var(--primary-rgb), 0.3)', background: 'rgba(var(--primary-rgb), 0.05)' }}>
             <div className="card-header">
@@ -632,6 +823,23 @@ export default function Overview({ navigate }) {
         </div>
       )}
 
+      {/* Floating Theme & Customization Toggle - Moved to Bottom Center */}
+      <div className="overview-controls-bottom" style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '30px', paddingBottom: '20px' }}>
+        <button
+          onClick={() => setOverviewLayout(s => (s + 1) % 4)}
+          className="overview-control-btn"
+        >
+          <span>🎨</span> {LAYOUT_NAMES[overviewLayout]}
+        </button>
+
+        <button
+          onClick={() => setIsCustomizeOpen(true)}
+          className="overview-control-btn"
+        >
+          <span>⚙️</span> Customize Page
+        </button>
+      </div>
+
       {/* Customize Panel Modal Overlay */}
       {isCustomizeOpen && (
         <div className="mac-modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(10px)', zIndex: 10000 }} onClick={() => setIsCustomizeOpen(false)}>
@@ -653,7 +861,8 @@ export default function Overview({ navigate }) {
                   { key: 'goals', label: 'Active Goals Card', defaultTitle: 'Active Goals' },
                   { key: 'fridge', label: 'Fridge Status Card', defaultTitle: 'Fridge Status' },
                   { key: 'objective', label: 'Primary Objective Card', defaultTitle: 'Primary Objective' },
-                  { key: 'rule', label: 'Daily Rule Card', defaultTitle: 'Daily Rule' }
+                  { key: 'rule', label: 'Daily Rule Card', defaultTitle: 'Daily Rule' },
+                  { key: 'reminders', label: 'Daily Reminders Card', defaultTitle: 'Daily Reminders' }
                 ].map(widget => (
                   <div key={widget.key} style={{ display: 'flex', alignItems: 'center', gap: '15px', background: 'var(--bg-card-alt)', padding: '10px 15px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                     <label className="mac-switch" style={{ position: 'relative', display: 'inline-block', width: '40px', height: '22px', flexShrink: 0 }}>
@@ -781,8 +990,8 @@ export default function Overview({ navigate }) {
                   if (confirm("Reset overview customization to defaults?")) {
                     setOverviewSettings({
                       layout: 0,
-                      visibleWidgets: { clock: true, calendar: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true },
-                      widgetTitles: { clock: "Clock", calendar: "Calendar", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats" },
+                      visibleWidgets: { clock: true, calendar: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true, reminders: true },
+                      widgetTitles: { clock: "Clock", calendar: "Calendar", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats", reminders: "Daily Reminders" },
                       visibleStatsBars: { expenses: true, goals: true, habits: true, fridge: true, targets: true, library: true, cinema: true, quests: true }
                     });
                   }

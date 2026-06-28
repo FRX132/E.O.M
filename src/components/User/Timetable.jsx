@@ -82,9 +82,9 @@ export default function Timetable() {
     return customHabitTemplates;
   }, [customHabitTemplates]);
 
-  // Modal forms states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBlock, setEditingBlock] = useState(null); // null means adding a new block
+  const [modalTab, setModalTab] = useState('event'); // 'event' or 'reminder'
 
   // Form inputs
   const [title, setTitle] = useState('');
@@ -142,9 +142,20 @@ export default function Timetable() {
     setHabitsDays(updatedDays);
   };
 
+  // Toggle custom reminder done state from timetable card
+  const handleToggleReminder = (block, e) => {
+    e.stopPropagation();
+    // Toggle XP (+10 for simple reminder completion!)
+    const points = block.completed ? -10 : 10;
+    addXP(points);
+    const updated = timetableBlocks.map(b => b.id === block.id ? { ...b, completed: !b.completed } : b);
+    setTimetableBlocks(updated);
+  };
+
   // Open modal for adding
   const handleOpenAdd = (selectedDay = 'Monday') => {
     setEditingBlock(null);
+    setModalTab('event');
     setTitle('');
     setNotes('');
     setUrl('');
@@ -160,6 +171,7 @@ export default function Timetable() {
   const handleOpenEdit = (block, e) => {
     e.stopPropagation();
     setEditingBlock(block);
+    setModalTab(block.isReminder ? 'reminder' : 'event');
     setTitle(block.title);
     setNotes(block.notes || '');
     setUrl(block.url || '');
@@ -174,34 +186,57 @@ export default function Timetable() {
   // Save Add/Edit
   const handleSave = (e) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    
+    let finalTitle = title.trim();
+    let finalHabitId = habitId;
+    const isReminder = modalTab === 'reminder';
+
+    if (isReminder) {
+      if (!finalTitle && !finalHabitId) {
+        alert('Please enter a title or link a habit!');
+        return;
+      }
+      if (!finalTitle) {
+        finalTitle = uniqueHabits.find(h => h.id === finalHabitId)?.name || 'Reminder';
+      }
+    } else {
+      finalHabitId = null;
+      if (!finalTitle) {
+        alert('Please enter a title!');
+        return;
+      }
+    }
 
     if (editingBlock) {
       // Edit
       const updated = timetableBlocks.map(b => b.id === editingBlock.id ? {
         ...b,
-        title: title.trim(),
+        title: finalTitle,
         notes: notes.trim(),
         url: url.trim(),
         day,
         startTime,
         endTime,
         color,
-        habitId: habitId || null
+        habitId: finalHabitId || null,
+        isReminder,
+        completed: b.completed || false
       } : b);
       setTimetableBlocks(updated);
     } else {
       // Add
       const newBlock = {
         id: window.crypto.randomUUID ? window.crypto.randomUUID() : Date.now().toString(),
-        title: title.trim(),
+        title: finalTitle,
         notes: notes.trim(),
         url: url.trim(),
         day,
         startTime,
         endTime,
         color,
-        habitId: habitId || null
+        habitId: finalHabitId || null,
+        isReminder,
+        completed: false
       };
       setTimetableBlocks([...timetableBlocks, newBlock]);
     }
@@ -288,7 +323,7 @@ export default function Timetable() {
                         </a>
                       )}
 
-                      {block.habitId && (
+                      {block.habitId ? (
                         <div
                           className={`timetable-block-habit-link ${isCompleted ? 'completed' : ''}`}
                           onClick={(e) => handleToggleHabit(block, e)}
@@ -303,7 +338,22 @@ export default function Timetable() {
                             {linkedHabitName}
                           </span>
                         </div>
-                      )}
+                      ) : block.isReminder ? (
+                        <div
+                          className={`timetable-block-habit-link ${block.completed ? 'completed' : ''}`}
+                          onClick={(e) => handleToggleReminder(block, e)}
+                          title={block.completed ? "Reminder completed! Click to mark incomplete." : "Click to mark as completed!"}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={!!block.completed}
+                            onChange={(e) => handleToggleReminder(block, e)}
+                          />
+                          <span style={{ textDecoration: block.completed ? 'line-through' : 'none', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                            Erledigt
+                          </span>
+                        </div>
+                      ) : null}
 
                       <div className="timetable-block-footer">
                         <button className="timetable-block-action-btn edit" onClick={(e) => handleOpenEdit(block, e)} title="Edit Block">
@@ -334,16 +384,102 @@ export default function Timetable() {
           <div className="timetable-modal-content" onClick={(e) => e.stopPropagation()}>
             <form onSubmit={handleSave} className="mac-modal-form">
               
+              {/* Ereignis / Erinnerung Segmented Tab Selector */}
+              <div style={{
+                display: 'flex',
+                background: 'rgba(255, 255, 255, 0.05)',
+                padding: '3px',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                border: '1px solid rgba(255, 255, 255, 0.08)'
+              }} className="mac-modal-tab-selector">
+                <button
+                  type="button"
+                  onClick={() => setModalTab('event')}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    textAlign: 'center',
+                    background: modalTab === 'event' ? 'var(--primary)' : 'transparent',
+                    color: '#ffffff',
+                    opacity: modalTab === 'event' ? 1 : 0.6,
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  Ereignis
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModalTab('reminder')}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    textAlign: 'center',
+                    background: modalTab === 'reminder' ? 'var(--primary)' : 'transparent',
+                    color: '#ffffff',
+                    opacity: modalTab === 'reminder' ? 1 : 0.6,
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  Erinnerung
+                </button>
+              </div>
+
               {/* Header text inputs in a single iOS-like card block */}
               <div className="mac-text-fields-group">
-                <input
-                  type="text"
-                  required
-                  className="mac-title-input"
-                  placeholder="Title"
-                  value={title}
-                  onChange={e => setTitle(e.target.value)}
-                />
+                {modalTab === 'event' ? (
+                  <input
+                    type="text"
+                    required
+                    className="mac-title-input"
+                    placeholder="Title"
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                  />
+                ) : (
+                  <div className="mac-row" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                    <span className="mac-row-label" style={{ fontSize: '0.95rem' }}>
+                      <ChecklistIcon /> Habit to Link
+                    </span>
+                    <div className="mac-row-control">
+                      <select 
+                        required
+                        className="mac-select" 
+                        value={habitId} 
+                        onChange={e => {
+                          setHabitId(e.target.value);
+                          // Default title to habit name if not set
+                          const selectedName = uniqueHabits.find(h => h.id === e.target.value)?.name || '';
+                          if (!title) {
+                            setTitle(selectedName);
+                          }
+                        }}
+                      >
+                        <option value="" disabled>Select habit...</option>
+                        {uniqueHabits.map(h => (
+                          <option key={h.id} value={h.id}>{h.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+                
+                {modalTab === 'reminder' && (
+                  <input
+                    type="text"
+                    className="mac-title-input"
+                    placeholder="Custom Reminder Title (Optional)"
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                  />
+                )}
+
                 <textarea
                   className="mac-notes-textarea"
                   placeholder="Notes"
@@ -424,20 +560,6 @@ export default function Timetable() {
                           />
                         ))}
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mac-row">
-                    <span className="mac-row-label">
-                      <ChecklistIcon /> Link Habit
-                    </span>
-                    <div className="mac-row-control">
-                      <select className="mac-select" value={habitId} onChange={e => setHabitId(e.target.value)}>
-                        <option value="">None</option>
-                        {uniqueHabits.map(h => (
-                          <option key={h.id} value={h.id}>{h.name}</option>
-                        ))}
-                      </select>
                     </div>
                   </div>
                 </div>

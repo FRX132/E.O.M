@@ -1,5 +1,9 @@
 {
   "appId": "com.freakzy.lifeplanneros",
   "appName": "EOM",
-  "webDir": "dist"
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  }
 }

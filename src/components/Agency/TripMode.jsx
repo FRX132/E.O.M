@@ -25,6 +25,63 @@ export default function TripMode() {
   const [newType, setNewType] = useState('Vacation');
   const [isResolving, setIsResolving] = useState(false);
 
+  // Edit states for past trips
+  const [editingId, setEditingId] = useState(null);
+  const [editLocation, setEditLocation] = useState('');
+  const [editDate, setEditDate] = useState('');
+  const [editNotes, setEditNotes] = useState('');
+  const [editType, setEditType] = useState('Vacation');
+  const [isEditingResolving, setIsEditingResolving] = useState(false);
+
+  const startEditing = (trip) => {
+    setEditingId(trip.id);
+    setEditLocation(trip.location);
+    setEditDate(trip.date || '');
+    setEditNotes(trip.notes || '');
+    setEditType(trip.type || 'Vacation');
+  };
+
+  const handleSaveEdit = async (id) => {
+    if (!editLocation.trim()) return;
+
+    setIsEditingResolving(true);
+    let finalCountry = editLocation.trim();
+    const originalTrip = trips.find(t => t.id === id);
+
+    // Only geocode if the location has changed
+    if (originalTrip && originalTrip.location !== editLocation.trim()) {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(editLocation.trim())}&format=json&accept-language=en&addressdetails=1&limit=1`);
+        const data = await res.json();
+        if (data && data.length > 0 && data[0].address && data[0].address.country) {
+          finalCountry = data[0].address.country;
+        }
+      } catch (err) {
+        console.warn("Geocoding failed, using original input:", err);
+      }
+    } else if (originalTrip) {
+      finalCountry = originalTrip.resolvedCountry || originalTrip.location;
+    }
+
+    const updatedTrips = trips.map(t => {
+      if (t.id === id) {
+        return {
+          ...t,
+          location: editLocation.trim(),
+          resolvedCountry: finalCountry,
+          date: editDate || new Date().toISOString().split('T')[0],
+          notes: editNotes.trim(),
+          type: editType
+        };
+      }
+      return t;
+    });
+
+    setTrips(updatedTrips);
+    setEditingId(null);
+    setIsEditingResolving(false);
+  };
+
   const [countries, setCountries] = useState({ features: [] });
   const [globeWidth, setGlobeWidth] = useState(800);
   const containerRef = useRef();
@@ -251,57 +308,154 @@ export default function TripMode() {
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >
-              {/* Type Badge */}
-              <div style={{ position: 'absolute', top: '20px', right: '20px', background: 'var(--bg-input)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 600, color: getBadgeColor(trip.type), border: `1px solid ${getBadgeColor(trip.type)}40` }}>
-                {trip.type}
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '10px' }}>
-                <div style={{ color: 'var(--primary)', marginTop: '2px' }}>
-                  <PinIcon />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.2 }}>{trip.location}</h3>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                    {new Date(trip.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              {editingId === trip.id ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 600 }}>Location</label>
+                    <input
+                      type="text"
+                      value={editLocation}
+                      onChange={e => setEditLocation(e.target.value)}
+                      style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)', padding: '8px', borderRadius: '8px', color: 'var(--text-main)', fontSize: '0.85rem' }}
+                      required
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 600 }}>Date</label>
+                    <input
+                      type="date"
+                      value={editDate}
+                      onChange={e => setEditDate(e.target.value)}
+                      style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)', padding: '8px', borderRadius: '8px', color: 'var(--text-main)', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 600 }}>Type</label>
+                    <select
+                      value={editType}
+                      onChange={e => setEditType(e.target.value)}
+                      style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)', padding: '8px', borderRadius: '8px', color: 'var(--text-main)', fontSize: '0.85rem' }}
+                    >
+                      <option>Vacation</option>
+                      <option>Work</option>
+                      <option>Exploration</option>
+                      <option>Family</option>
+                    </select>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 600 }}>Notes / Memories</label>
+                    <textarea
+                      value={editNotes}
+                      onChange={e => setEditNotes(e.target.value)}
+                      rows="2"
+                      style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)', padding: '8px', borderRadius: '8px', color: 'var(--text-main)', fontSize: '0.85rem', resize: 'vertical' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '5px' }}>
+                    <button
+                      onClick={() => setEditingId(null)}
+                      style={{
+                        background: 'transparent',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '6px',
+                        padding: '4px 10px',
+                        fontSize: '0.75rem',
+                        cursor: 'pointer',
+                        color: 'var(--text-main)'
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => handleSaveEdit(trip.id)}
+                      disabled={isEditingResolving}
+                      style={{
+                        background: 'var(--primary)',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '4px 10px',
+                        fontSize: '0.75rem',
+                        cursor: 'pointer',
+                        color: 'white',
+                        opacity: isEditingResolving ? 0.7 : 1
+                      }}
+                    >
+                      {isEditingResolving ? 'Saving...' : 'Save'}
+                    </button>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <>
+                  {/* Type Badge */}
+                  <div style={{ position: 'absolute', top: '20px', right: '20px', background: 'var(--bg-input)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 600, color: getBadgeColor(trip.type), border: `1px solid ${getBadgeColor(trip.type)}40` }}>
+                    {trip.type}
+                  </div>
 
-              {trip.notes && (
-                <div style={{
-                  marginTop: '5px',
-                  fontSize: '0.9rem',
-                  color: 'var(--text-main)',
-                  opacity: 0.85,
-                  background: 'rgba(255,255,255,0.03)',
-                  padding: '12px',
-                  borderRadius: '10px',
-                  lineHeight: 1.5
-                }}>
-                  {trip.notes}
-                </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '10px' }}>
+                    <div style={{ color: 'var(--primary)', marginTop: '2px' }}>
+                      <PinIcon />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.2 }}>{trip.location}</h3>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                        {new Date(trip.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {trip.notes && (
+                    <div style={{
+                      marginTop: '5px',
+                      fontSize: '0.9rem',
+                      color: 'var(--text-main)',
+                      opacity: 0.85,
+                      background: 'rgba(255,255,255,0.03)',
+                      padding: '12px',
+                      borderRadius: '10px',
+                      lineHeight: 1.5
+                    }}>
+                      {trip.notes}
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: 'auto', borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
+                    <button
+                      onClick={() => startEditing(trip)}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--blue-text)',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        padding: '4px 8px',
+                        opacity: 0.7
+                      }}
+                      onMouseEnter={e => e.target.style.opacity = 1}
+                      onMouseLeave={e => e.target.style.opacity = 0.7}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(trip.id)}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--red-text)',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        padding: '4px 8px',
+                        opacity: 0.7
+                      }}
+                      onMouseEnter={e => e.target.style.opacity = 1}
+                      onMouseLeave={e => e.target.style.opacity = 0.7}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </>
               )}
-
-              <button
-                onClick={() => handleDelete(trip.id)}
-                style={{
-                  background: 'black',
-                  border: 'none',
-                  color: 'var(--red-text)',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  alignSelf: 'flex-end',
-                  cursor: 'pointer',
-                  padding: '4px 8px',
-                  opacity: 0.7,
-                  marginTop: 'auto'
-                }}
-                onMouseEnter={e => e.target.style.opacity = 1}
-                onMouseLeave={e => e.target.style.opacity = 0.7}
-              >
-                Delete
-              </button>
             </div>
           ))
         )}

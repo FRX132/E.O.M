@@ -6,7 +6,8 @@
 /* ==========================================================================
    1. CYBERPUNK NEON TEMPLATE
    ========================================================================== */
-:root[data-interface-template="cyberpunk"] {
+:root[data-interface-template="cyberpunk"],
+:root[data-theme="dark"][data-interface-template="cyberpunk"] {
   --bg-main: #0a0a0f;
   --bg-card: #12121c;
   --bg-header: #1a1a2e;
@@ -24,9 +25,27 @@
   --neon-glow: 0 0 10px rgba(255, 0, 127, 0.6);
   --border-neon: 1px solid #ff007f;
   
-  /* Additional overrides for scrollbars & headers */
   --bs-body-bg: var(--bg-main);
   --bs-body-color: var(--text-main);
+}
+
+/* Light Mode for Cyberpunk Neon */
+:root[data-theme="light"][data-interface-template="cyberpunk"] {
+  --bg-main: #f9f9fb;
+  --bg-card: #ffffff;
+  --bg-header: #f1f1f5;
+  --border-color: #ff007f;
+  --border-light: rgba(0, 203, 214, 0.3);
+  --bg-card-alt: rgba(255, 0, 127, 0.03);
+  --bg-input: #f1f1f5;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --card-shadow: 0 4px 20px rgba(255, 0, 127, 0.1);
+  --text-main: #12121c;
+  --text-muted: #64748b;
+  --primary: #ff007f;
+  --neon-glow: 0 0 8px rgba(255, 0, 127, 0.3);
+  --border-neon: 1.5px solid #ff007f;
 }
 
 :root[data-interface-template="cyberpunk"] body {
@@ -35,19 +54,24 @@
     linear-gradient(90deg, rgba(255, 0, 127, 0.03) 1px, transparent 1px);
   background-size: 20px 20px;
 }
+:root[data-theme="light"][data-interface-template="cyberpunk"] body {
+  background-image: 
+    linear-gradient(rgba(255, 0, 127, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 0, 127, 0.015) 1px, transparent 1px);
+}
 
 :root[data-interface-template="cyberpunk"] .notion-block,
 :root[data-interface-template="cyberpunk"] .overview-card,
 :root[data-interface-template="cyberpunk"] .premium-card {
-  border: 1px solid #ff007f !important;
-  box-shadow: 0 0 10px rgba(255, 0, 127, 0.25) !important;
+  border: 1.5px solid var(--border-color) !important;
+  box-shadow: var(--neon-glow) !important;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
 }
 
 :root[data-interface-template="cyberpunk"] h1,
 :root[data-interface-template="cyberpunk"] h2,
 :root[data-interface-template="cyberpunk"] h3 {
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
   font-weight: 700;
   letter-spacing: 1px;
 }
@@ -55,7 +79,8 @@
 /* ==========================================================================
    2. GLASSMORPHISM (AERO GLASS) TEMPLATE
    ========================================================================== */
-:root[data-interface-template="glassmorphism"] {
+:root[data-interface-template="glassmorphism"],
+:root[data-theme="dark"][data-interface-template="glassmorphism"] {
   --bg-main: #0d0f1a;
   --bg-card: rgba(255, 255, 255, 0.04);
   --bg-header: rgba(255, 255, 255, 0.06);
@@ -70,9 +95,24 @@
   --text-muted: #94a3b8;
   --primary: #818cf8;
   --font-main: 'Outfit', sans-serif;
-  
-  /* Additional glass settings */
   --glass-blur: 20px;
+}
+
+/* Light Mode Overrides for Glassmorphism */
+:root[data-theme="light"][data-interface-template="glassmorphism"] {
+  --bg-main: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.45);
+  --bg-header: rgba(255, 255, 255, 0.6);
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-light: rgba(0, 0, 0, 0.04);
+  --bg-card-alt: rgba(0, 0, 0, 0.01);
+  --bg-input: rgba(255, 255, 255, 0.5);
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(241, 245, 249, 0.7);
+  --card-shadow: 0 8px 32px 0 rgba(31, 41, 55, 0.08);
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --primary: #4f46e5;
 }
 
 :root[data-interface-template="glassmorphism"] body {
@@ -81,16 +121,21 @@
     radial-gradient(at 90% 80%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
   background-attachment: fixed;
 }
+:root[data-theme="light"][data-interface-template="glassmorphism"] body {
+  background-image: 
+    radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.06) 0px, transparent 50%),
+    radial-gradient(at 90% 80%, rgba(236, 72, 153, 0.06) 0px, transparent 50%);
+}
 
 :root[data-interface-template="glassmorphism"] .notion-block,
 :root[data-interface-template="glassmorphism"] .overview-card,
 :root[data-interface-template="glassmorphism"] .premium-card {
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
   border-radius: 16px !important;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+  box-shadow: var(--card-shadow) !important;
 }
 
 /* ==========================================================================
@@ -173,7 +218,6 @@
   box-shadow: 1px 1px 0px var(--neo-shadow-color) !important;
 }
 
-/* Input structures in Neo-Brutalism */
 :root[data-interface-template="neo-brutalism"] input,
 :root[data-interface-template="neo-brutalism"] textarea,
 :root[data-interface-template="neo-brutalism"] select {
@@ -191,7 +235,6 @@
   outline: none !important;
 }
 
-/* Header & Tabs structures in Neo-Brutalism */
 :root[data-interface-template="neo-brutalism"] .notion-header,
 :root[data-interface-template="neo-brutalism"] .notion-tabs {
   border-bottom: 3px solid var(--border-color) !important;
@@ -204,7 +247,8 @@
 /* ==========================================================================
    4. RETRO TERMINAL (FALLOUT CRT) TEMPLATE
    ========================================================================== */
-:root[data-interface-template="retro-terminal"] {
+:root[data-interface-template="retro-terminal"],
+:root[data-theme="dark"][data-interface-template="retro-terminal"] {
   --bg-main: #050d06;
   --bg-card: #081609;
   --bg-header: #0d260f;
@@ -221,6 +265,23 @@
   --font-main: 'JetBrains Mono', monospace;
 }
 
+/* Light Mode Overrides for Retro Terminal (Vintage Paper/Amber) */
+:root[data-theme="light"][data-interface-template="retro-terminal"] {
+  --bg-main: #faf6eb;
+  --bg-card: #e9e2ce;
+  --bg-header: #dfd7be;
+  --border-color: #8f5d00;
+  --border-light: rgba(143, 93, 0, 0.3);
+  --bg-card-alt: rgba(143, 93, 0, 0.05);
+  --bg-input: #faf6eb;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(233, 226, 206, 0.9);
+  --card-shadow: 0 0 8px rgba(143, 93, 0, 0.1);
+  --text-main: #1e1b18;
+  --text-muted: #6b5a50;
+  --primary: #b45309;
+}
+
 :root[data-interface-template="retro-terminal"] body::after {
   content: " ";
   display: block;
@@ -231,13 +292,25 @@
   background-size: 100% 4px, 6px 100%;
   pointer-events: none;
 }
+:root[data-theme="light"][data-interface-template="retro-terminal"] body::after {
+  background: linear-gradient(rgba(255, 255, 255, 0) 50%, rgba(143, 93, 0, 0.05) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.005), rgba(0, 0, 255, 0.01));
+  background-size: 100% 4px, 6px 100%;
+}
 
 :root[data-interface-template="retro-terminal"] .notion-block,
 :root[data-interface-template="retro-terminal"] .overview-card,
 :root[data-interface-template="retro-terminal"] .premium-card {
-  border: 1px solid #39ff14 !important;
+  border: 1px solid var(--border-color) !important;
   border-radius: 4px !important;
   box-shadow: inset 0 0 10px rgba(57, 255, 20, 0.2), 0 0 8px rgba(57, 255, 20, 0.1) !important;
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+}
+
+:root[data-theme="light"][data-interface-template="retro-terminal"] .notion-block,
+:root[data-theme="light"][data-interface-template="retro-terminal"] .overview-card,
+:root[data-theme="light"][data-interface-template="retro-terminal"] .premium-card {
+  box-shadow: inset 0 0 8px rgba(143, 93, 0, 0.05), 0 0 6px rgba(143, 93, 0, 0.05) !important;
 }
 
 :root[data-interface-template="retro-terminal"] h1,
@@ -247,11 +320,19 @@
 :root[data-interface-template="retro-terminal"] p {
   text-shadow: 0 0 4px rgba(57, 255, 20, 0.5);
 }
+:root[data-theme="light"][data-interface-template="retro-terminal"] h1,
+:root[data-theme="light"][data-interface-template="retro-terminal"] h2,
+:root[data-theme="light"][data-interface-template="retro-terminal"] h3,
+:root[data-theme="light"][data-interface-template="retro-terminal"] span,
+:root[data-theme="light"][data-interface-template="retro-terminal"] p {
+  text-shadow: none;
+}
 
 /* ==========================================================================
    5. NORDIC MINIMALIST (NORD) TEMPLATE
    ========================================================================== */
-:root[data-interface-template="nordic-minimalist"] {
+:root[data-interface-template="nordic-minimalist"],
+:root[data-theme="dark"][data-interface-template="nordic-minimalist"] {
   --bg-main: #2e3440;
   --bg-card: #3b4252;
   --bg-header: #434c5e;
@@ -268,18 +349,38 @@
   --font-main: 'Outfit', sans-serif;
 }
 
+/* Light Mode Overrides for Nordic Minimalist */
+:root[data-theme="light"][data-interface-template="nordic-minimalist"] {
+  --bg-main: #e5e9f0;
+  --bg-card: #eceff4;
+  --bg-header: #d8dee9;
+  --border-color: #d8dee9;
+  --border-light: #e5e9f0;
+  --bg-card-alt: rgba(46, 52, 64, 0.03);
+  --bg-input: #e5e9f0;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(236, 239, 244, 0.95);
+  --card-shadow: 0 4px 20px rgba(46, 52, 64, 0.05);
+  --text-main: #2e3440;
+  --text-muted: #4c566a;
+  --primary: #5e81ac;
+}
+
 :root[data-interface-template="nordic-minimalist"] .notion-block,
 :root[data-interface-template="nordic-minimalist"] .overview-card,
 :root[data-interface-template="nordic-minimalist"] .premium-card {
   border: 1px solid var(--border-color) !important;
   border-radius: 12px !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
 }
 
 /* ==========================================================================
    6. OBSIDIAN GOLD TEMPLATE
    ========================================================================== */
-:root[data-interface-template="obsidian-gold"] {
+:root[data-interface-template="obsidian-gold"],
+:root[data-theme="dark"][data-interface-template="obsidian-gold"] {
   --bg-main: #050505;
   --bg-card: #0f0f0f;
   --bg-header: #151515;
@@ -298,18 +399,291 @@
   --border-neon: 1px solid rgba(212, 175, 55, 0.7);
 }
 
+/* Light Mode Overrides for Obsidian Gold */
+:root[data-theme="light"][data-interface-template="obsidian-gold"] {
+  --bg-main: #fafafa;
+  --bg-card: #ffffff;
+  --bg-header: #f4f4f4;
+  --border-color: #b8901c;
+  --border-light: #e5e5e5;
+  --bg-card-alt: rgba(184, 144, 28, 0.02);
+  --bg-input: #f4f4f4;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  --text-main: #1a1a1a;
+  --text-muted: #666666;
+  --primary: #b8901c; /* Darker gold for text readability */
+  --neon-glow: 0 0 10px rgba(184, 144, 28, 0.15);
+  --border-neon: 1px solid rgba(184, 144, 28, 0.5);
+}
+
 :root[data-interface-template="obsidian-gold"] .notion-block,
 :root[data-interface-template="obsidian-gold"] .overview-card,
 :root[data-interface-template="obsidian-gold"] .premium-card {
   border: 1px solid rgba(212, 175, 55, 0.25) !important;
   border-radius: 10px !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-  background: linear-gradient(145deg, #0d0d0d, #141414) !important;
+  background: linear-gradient(145deg, var(--bg-card), rgba(212, 175, 55, 0.02)) !important;
+  color: var(--text-main) !important;
+}
+
+:root[data-theme="light"][data-interface-template="obsidian-gold"] .notion-block,
+:root[data-theme="light"][data-interface-template="obsidian-gold"] .overview-card,
+:root[data-theme="light"][data-interface-template="obsidian-gold"] .premium-card {
+  border: 1px solid rgba(184, 144, 28, 0.2) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04) !important;
+  background: #ffffff !important;
 }
 
 :root[data-interface-template="obsidian-gold"] .notion-block:hover,
 :root[data-interface-template="obsidian-gold"] .overview-card:hover,
 :root[data-interface-template="obsidian-gold"] .premium-card:hover {
-  border-color: #d4af37 !important;
+  border-color: var(--border-color) !important;
   box-shadow: 0 10px 30px rgba(212, 175, 55, 0.15) !important;
+}
+
+/* ==========================================================================
+   7. CLAYMORPHISM TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="claymorphism"] {
+  --bg-main: #eef2f7;
+  --bg-card: #ffffff;
+  --bg-header: #f8fafc;
+  --border-color: rgba(99, 102, 241, 0.1);
+  --border-light: rgba(99, 102, 241, 0.05);
+  --bg-card-alt: rgba(99, 102, 241, 0.03);
+  --bg-input: #f1f5f9;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --card-shadow: 10px 10px 20px rgba(0, 0, 0, 0.05), -10px -10px 20px rgba(255, 255, 255, 0.8);
+  --text-main: #2d3748;
+  --text-muted: #718096;
+  --primary: #6366f1;
+  --font-main: 'Outfit', sans-serif;
+}
+
+:root[data-theme="dark"][data-interface-template="claymorphism"] {
+  --bg-main: #0f101a;
+  --bg-card: #151624;
+  --bg-header: #1b1c30;
+  --border-color: rgba(99, 102, 241, 0.2);
+  --border-light: rgba(99, 102, 241, 0.1);
+  --bg-card-alt: rgba(99, 102, 241, 0.05);
+  --bg-input: #0f101a;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(21, 22, 36, 0.9);
+  --card-shadow: 10px 10px 25px rgba(0, 0, 0, 0.3), -10px -10px 25px rgba(255, 255, 255, 0.01);
+  --text-main: #f7fafc;
+  --text-muted: #a0aec0;
+}
+
+:root[data-interface-template="claymorphism"] .notion-block,
+:root[data-interface-template="claymorphism"] .overview-card,
+:root[data-interface-template="claymorphism"] .premium-card {
+  border: none !important;
+  border-radius: 24px !important;
+  background: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  box-shadow: 
+    10px 10px 20px rgba(0, 0, 0, 0.04),
+    -10px -10px 20px rgba(255, 255, 255, 0.8),
+    inset 3px 3px 6px rgba(255, 255, 255, 0.5),
+    inset -3px -3px 6px rgba(0, 0, 0, 0.04) !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+:root[data-theme="dark"][data-interface-template="claymorphism"] .notion-block,
+:root[data-theme="dark"][data-interface-template="claymorphism"] .overview-card,
+:root[data-theme="dark"][data-interface-template="claymorphism"] .premium-card {
+  box-shadow: 
+    10px 10px 25px rgba(0, 0, 0, 0.25),
+    -10px -10px 25px rgba(255, 255, 255, 0.01),
+    inset 3px 3px 6px rgba(255, 255, 255, 0.04),
+    inset -3px -3px 6px rgba(0, 0, 0, 0.18) !important;
+}
+
+:root[data-interface-template="claymorphism"] button,
+:root[data-interface-template="claymorphism"] .pill {
+  border-radius: 16px !important;
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.04),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.3),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.04) !important;
+  border: none !important;
+}
+
+/* ==========================================================================
+   8. NEUMORPHISM TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="neumorphism"] {
+  --bg-main: #e0e8f6;
+  --bg-card: #e0e8f6;
+  --bg-header: #d4dfef;
+  --border-color: transparent;
+  --border-light: transparent;
+  --bg-card-alt: rgba(0, 0, 0, 0.02);
+  --bg-input: #d4dfef;
+  --card-bg: var(--bg-card);
+  --glass-bg: #e0e8f6;
+  --card-shadow: 9px 9px 18px #beccd5, -9px -9px 18px #ffffff;
+  --text-main: #3a4750;
+  --text-muted: #6f8090;
+  --primary: #4f8a8b;
+  --font-main: 'Inter', sans-serif;
+}
+
+:root[data-theme="dark"][data-interface-template="neumorphism"] {
+  --bg-main: #181920;
+  --bg-card: #181920;
+  --bg-header: #121318;
+  --border-color: transparent;
+  --border-light: transparent;
+  --bg-card-alt: rgba(255, 255, 255, 0.02);
+  --bg-input: #121318;
+  --card-bg: var(--bg-card);
+  --glass-bg: #181920;
+  --card-shadow: 9px 9px 18px #0d0e11, -9px -9px 18px #23242f;
+  --text-main: #e0e0e0;
+  --text-muted: #707580;
+}
+
+:root[data-interface-template="neumorphism"] .notion-block,
+:root[data-interface-template="neumorphism"] .overview-card,
+:root[data-interface-template="neumorphism"] .premium-card {
+  border: none !important;
+  background: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  border-radius: 20px !important;
+  box-shadow: 9px 9px 18px #beccd5, -9px -9px 18px #ffffff !important;
+}
+
+:root[data-theme="dark"][data-interface-template="neumorphism"] .notion-block,
+:root[data-theme="dark"][data-interface-template="neumorphism"] .overview-card,
+:root[data-theme="dark"][data-interface-template="neumorphism"] .premium-card {
+  box-shadow: 9px 9px 18px #0d0e11, -9px -9px 18px #23242f !important;
+}
+
+:root[data-interface-template="neumorphism"] button,
+:root[data-interface-template="neumorphism"] .pill {
+  border-radius: 12px !important;
+  background: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  box-shadow: 4px 4px 8px #beccd5, -4px -4px 8px #ffffff !important;
+  border: none !important;
+  transition: all 0.2s ease;
+}
+
+:root[data-theme="dark"][data-interface-template="neumorphism"] button,
+:root[data-theme="dark"][data-interface-template="neumorphism"] .pill {
+  box-shadow: 4px 4px 8px #0d0e11, -4px -4px 8px #23242f !important;
+}
+
+:root[data-interface-template="neumorphism"] button:active,
+:root[data-interface-template="neumorphism"] button.active,
+:root[data-interface-template="neumorphism"] .pill.active {
+  box-shadow: inset 4px 4px 8px #beccd5, inset -4px -4px 8px #ffffff !important;
+}
+
+:root[data-theme="dark"][data-interface-template="neumorphism"] button:active,
+:root[data-theme="dark"][data-interface-template="neumorphism"] button.active,
+:root[data-theme="dark"][data-interface-template="neumorphism"] .pill.active {
+  box-shadow: inset 4px 4px 8px #0d0e11, inset -4px -4px 8px #23242f !important;
+}
+
+/* ==========================================================================
+   9. AURORA GLOW UI TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="aurora-ui"],
+:root[data-theme="dark"][data-interface-template="aurora-ui"] {
+  --bg-main: #070514;
+  --bg-card: rgba(13, 10, 31, 0.45);
+  --bg-header: rgba(13, 10, 31, 0.65);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-light: rgba(255, 255, 255, 0.04);
+  --bg-card-alt: rgba(255, 255, 255, 0.02);
+  --bg-input: rgba(13, 10, 31, 0.7);
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(13, 10, 31, 0.5);
+  --card-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --text-main: #ffffff;
+  --text-muted: #aca5cf;
+  --primary: #ec4899;
+  --font-main: 'Outfit', sans-serif;
+  --glass-blur: 25px;
+}
+
+/* Light Mode Overrides for Aurora Glow UI */
+:root[data-theme="light"][data-interface-template="aurora-ui"] {
+  --bg-main: #faf9ff;
+  --bg-card: rgba(255, 255, 255, 0.6);
+  --bg-header: rgba(255, 255, 255, 0.7);
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-light: rgba(0, 0, 0, 0.04);
+  --bg-card-alt: rgba(0, 0, 0, 0.01);
+  --bg-input: rgba(255, 255, 255, 0.8);
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(250, 249, 255, 0.7);
+  --card-shadow: 0 12px 40px rgba(45, 31, 102, 0.06);
+  --text-main: #1c0d45;
+  --text-muted: #6d61a8;
+  --primary: #db2777;
+}
+
+:root[data-interface-template="aurora-ui"] body {
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(236, 72, 153, 0.12) 0px, transparent 40%),
+    radial-gradient(at 90% 20%, rgba(139, 92, 246, 0.12) 0px, transparent 40%),
+    radial-gradient(at 50% 80%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+    radial-gradient(at 20% 90%, rgba(16, 185, 129, 0.08) 0px, transparent 40%) !important;
+  background-attachment: fixed !important;
+  background-size: cover !important;
+}
+
+:root[data-theme="light"][data-interface-template="aurora-ui"] body {
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(236, 72, 153, 0.04) 0px, transparent 40%),
+    radial-gradient(at 90% 20%, rgba(139, 92, 246, 0.04) 0px, transparent 40%),
+    radial-gradient(at 50% 80%, rgba(59, 130, 246, 0.04) 0px, transparent 50%),
+    radial-gradient(at 20% 90%, rgba(16, 185, 129, 0.03) 0px, transparent 40%) !important;
+}
+
+:root[data-interface-template="aurora-ui"] .notion-block,
+:root[data-interface-template="aurora-ui"] .overview-card,
+:root[data-interface-template="aurora-ui"] .premium-card {
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--card-shadow) !important;
+  color: var(--text-main) !important;
+}
+
+:root[data-interface-template="aurora-ui"] button,
+:root[data-interface-template="aurora-ui"] .pill {
+  backdrop-filter: blur(5px) !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--border-color) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-main) !important;
+  transition: all 0.2s ease !important;
+}
+
+:root[data-theme="light"][data-interface-template="aurora-ui"] button,
+:root[data-theme="light"][data-interface-template="aurora-ui"] .pill {
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+
+:root[data-interface-template="aurora-ui"] button:hover,
+:root[data-interface-template="aurora-ui"] .pill:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 12px rgba(236, 72, 153, 0.3) !important;
+}
+
+:root[data-theme="light"][data-interface-template="aurora-ui"] button:hover,
+:root[data-theme="light"][data-interface-template="aurora-ui"] .pill:hover {
+  background: rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 0 12px rgba(219, 39, 119, 0.2) !important;
 }

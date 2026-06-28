@@ -15,7 +15,7 @@
 .mac-modal {
   width: 480px;
   max-width: 90vw;
-  min-width: 320px;
+  min-width: min(320px, 95vw);
   min-height: 200px;
   background: var(--bg-card);
   border-radius: 12px;

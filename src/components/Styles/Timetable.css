@@ -38,17 +38,20 @@
   border-radius: 16px;
   min-height: 450px;
   padding: 16px;
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
 }
 
 .timetable-column.today {
   border-color: var(--primary);
-  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.15);
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--primary) 15%, transparent);
+  transform: translateY(-2px);
 }
 
 .timetable-column-header {
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
   color: var(--text-main);
   padding-bottom: 12px;
   margin-bottom: 16px;
@@ -62,11 +65,19 @@
   font-size: 0.65rem;
   background: var(--primary);
   color: #fff;
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: 20px;
   text-transform: uppercase;
   font-weight: 800;
   letter-spacing: 0.5px;
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--primary) 30%, transparent);
+  animation: pulseBadge 2s infinite;
+}
+
+@keyframes pulseBadge {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 .timetable-blocks-list {
@@ -83,31 +94,41 @@
   flex: 1;
   color: var(--text-muted);
   font-size: 0.8rem;
-  font-style: italic;
+  font-weight: 500;
   text-align: center;
-  border: 1px dashed var(--border-color);
-  border-radius: 10px;
-  padding: 20px 10px;
+  border: 1.5px dashed var(--border-color);
+  border-radius: 12px;
+  padding: 24px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(var(--text-main), 0.01);
+}
+
+.timetable-empty-state:hover {
+  background: rgba(var(--text-main), 0.03);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 /* Time Block Cards */
 .timetable-block-card {
   position: relative;
   border-radius: 12px;
-  padding: 12px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-card-alt);
   border: 1px solid var(--border-light);
-  border-left-width: 4px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: default;
+  border-left-width: 5px;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
 }
 
 .timetable-block-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border-color: var(--border-color);
 }
 
 /* Colors for left border and accent text */
@@ -130,9 +151,9 @@
 
 .timetable-block-title {
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .timetable-block-notes {
@@ -147,17 +168,22 @@
 .timetable-block-habit-link {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 0.75rem;
-  background: rgba(255, 255, 255, 0.04);
-  padding: 4px 8px;
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 6px 10px;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
   color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+:root[data-theme="light"] .timetable-block-habit-link {
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .timetable-block-habit-link.completed {
-  background: rgba(16, 185, 129, 0.1);
+  background: rgba(16, 185, 129, 0.08);
   border-color: rgba(16, 185, 129, 0.2);
   color: var(--green-text);
 }
@@ -165,8 +191,8 @@
 .timetable-block-habit-link input[type="checkbox"] {
   cursor: pointer;
   accent-color: var(--primary);
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   margin: 0;
 }
 
@@ -178,7 +204,7 @@
   color: var(--primary);
   text-decoration: none;
   margin-top: 2px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .timetable-block-url:hover {
@@ -203,8 +229,18 @@
   border: none;
   font-size: 0.75rem;
   cursor: pointer;
-  padding: 2px;
+  padding: 4px;
   line-height: 1;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.timetable-block-action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme="light"] .timetable-block-action-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .timetable-block-action-btn.edit {
@@ -229,8 +265,8 @@
 .timetable-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(10px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -239,13 +275,13 @@
 }
 
 .timetable-modal-content {
-  background: #1c1c1e; /* Darker macOS block background */
+  background: #1c1c1e; /* Default dark */
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border-radius: 16px;
   max-width: 420px;
   width: 100%;
   box-sizing: border-box;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.5);
   animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 }
@@ -263,7 +299,7 @@
 .mac-text-fields-group {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
@@ -297,6 +333,7 @@
   width: 100%;
   box-sizing: border-box;
   resize: none;
+  font-family: inherit;
 }
 
 .mac-notes-textarea::placeholder {
@@ -336,7 +373,7 @@
 .mac-group-list {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
 }
 
@@ -344,9 +381,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px;
+  padding: 12px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  min-height: 44px;
+  min-height: 46px;
   box-sizing: border-box;
 }
 
@@ -376,7 +413,7 @@
 .mac-select, .mac-time-input {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.75);
   font-size: 0.85rem;
   font-weight: 600;
   outline: none;
@@ -403,8 +440,8 @@
 }
 
 .mac-color-circle {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   cursor: pointer;
   border: 1.5px solid transparent;
@@ -461,5 +498,89 @@
 }
 
 .mac-btn-save:hover {
-  filter: brightness(1.1);
+  filter: brightness(1.15);
+}
+
+/* Light Mode Overrides for macOS Modal */
+:root[data-theme="light"] .timetable-modal-content {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.15);
+}
+
+:root[data-theme="light"] .mac-text-fields-group {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme="light"] .mac-title-input {
+  color: #000000;
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+:root[data-theme="light"] .mac-title-input::placeholder {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme="light"] .mac-notes-textarea {
+  color: #333333;
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+:root[data-theme="light"] .mac-notes-textarea::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="light"] .mac-url-input {
+  color: var(--primary);
+}
+
+:root[data-theme="light"] .mac-url-input::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="light"] .mac-group-title {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="light"] .mac-group-list {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme="light"] .mac-row {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+:root[data-theme="light"] .mac-row-label {
+  color: #1a1a1b;
+}
+
+:root[data-theme="light"] .mac-select, 
+:root[data-theme="light"] .mac-time-input {
+  color: #475569;
+}
+
+:root[data-theme="light"] .mac-select option {
+  background-color: #ffffff;
+  color: #333333;
+}
+
+:root[data-theme="light"] .mac-color-circle.selected {
+  border-color: #000000;
+}
+
+:root[data-theme="light"] .mac-btn-cancel {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #333333;
+}
+
+:root[data-theme="light"] .mac-btn-cancel:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme="light"] .mac-footer-actions {
+  background: rgba(0, 0, 0, 0.01);
+  border-top-color: rgba(0, 0, 0, 0.08);
 }
