@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const srcDir = path.join(__dirname, 'components');
+const srcDir = path.join(__dirname, '..', 'src', 'components');
 
 const fixFile = (filePath, replacements) => {
   let content = fs.readFileSync(filePath, 'utf8');
@@ -23,20 +23,20 @@ const fileReplacements = {
   'User/ExpenseTracker.jsx': [["from '../store'", "from '../../store'"]],
   'User/Auth.jsx': [["from '../store'", "from '../../store'"], ["from './Styles/", "from '../Styles/"]],
   'User/BigTargets.jsx': [["from '../store'", "from '../../store'"]],
-  'Inteligence/BookList.jsx': [
+  'Intelligence/BookList.jsx': [
     ["from '../store'", "from '../../store'"], 
     ["from './Styles/", "from '../Styles/"], 
     ["from './Agency/MediaModal'", "from '../Agency/MediaModal'"],
     ["from './MediaModal'", "from '../Agency/MediaModal'"]
   ],
-  'Inteligence/GoalPlanner.jsx': [["from '../store'", "from '../../store'"], ["from '../constants'", "from '../../constants'"]],
+  'Intelligence/GoalPlanner.jsx': [["from '../store'", "from '../../store'"], ["from '../constants'", "from '../../constants'"]],
   'Health/HabitTracker.jsx': [["from './Styles/", "from '../Styles/"]],
   'Health/WorkoutModal.jsx': [["from './Styles/", "from '../Styles/"]],
   'Agency/LanguageModal.jsx': [["from './Styles/", "from '../Styles/"]],
   'Agency/MediaModal.jsx': [["from './Styles/", "from '../Styles/"]],
   'User/Overview.jsx': [["from './Styles/", "from '../Styles/"]],
   'User/BigTargetModal.jsx': [["from './Styles/", "from '../Styles/"]],
-  'Inteligence/GoalModal.jsx': [["from './Styles/", "from '../Styles/"]],
+  'Intelligence/GoalModal.jsx': [["from './Styles/", "from '../Styles/"]],
 };
 
 for (const [relPath, replacements] of Object.entries(fileReplacements)) {
@@ -49,7 +49,7 @@ for (const [relPath, replacements] of Object.entries(fileReplacements)) {
 }
 
 // Global pass just in case we missed any './Styles' inside subfolders
-const dirs = ['Agency', 'Functions', 'Health', 'Inteligence', 'User'];
+const dirs = ['Agency', 'Functions', 'Health', 'Intelligence', 'User'];
 dirs.forEach(d => {
   const dPath = path.join(srcDir, d);
   if (fs.existsSync(dPath)) {

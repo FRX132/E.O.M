@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useStore } from '../../store';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, ResponsiveContainer, Cell } from 'recharts';
 
@@ -24,6 +24,12 @@ const PILL_COLORS = {
 const ASSET_TYPES = ['Bank', 'Cash', 'Stock', 'Crypto', 'Investment', 'Other'];
 
 export default function ExpenseTracker() {
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
+
   const expenses = useStore(state => state.expenses);
   const assets = useStore(state => state.assets);
   const financeSettings = useStore(state => state.financeSettings);
@@ -102,11 +108,11 @@ export default function ExpenseTracker() {
   };
 
   // --- Chart Data Logic ---
-  const getMonthlyData = () => {
+  const monthlyTotals = useMemo(() => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const data = months.map(m => ({ name: m, amount: 0 }));
 
-    expenses.forEach(exp => {
+    (expenses || []).forEach(exp => {
       const d = new Date(exp.date);
       if (!isNaN(d)) {
         const monthIdx = d.getMonth();
@@ -114,29 +120,40 @@ export default function ExpenseTracker() {
       }
     });
     return data;
-  };
+  }, [expenses]);
 
-  const monthlyTotals = getMonthlyData();
-  const currentMonthTotal = monthlyTotals[new Date().getMonth()].amount;
+  const currentMonthTotal = useMemo(() => {
+    return monthlyTotals[new Date().getMonth()].amount;
+  }, [monthlyTotals]);
 
-  const limits = financeSettings.limits || { daily: 50, weekly: 350, monthly: 2000, yearly: 24000 };
-  const budgetProgressMonthly = Math.min(100, (currentMonthTotal / limits.monthly) * 100);
-  const totalWealth = assets.reduce((sum, a) => sum + (a.amount || 0), 0);
+  const limits = useMemo(() => {
+    return financeSettings.limits || { daily: 50, weekly: 350, monthly: 2000, yearly: 24000 };
+  }, [financeSettings.limits]);
+
+  const budgetProgressMonthly = useMemo(() => {
+    return Math.min(100, (currentMonthTotal / limits.monthly) * 100);
+  }, [currentMonthTotal, limits.monthly]);
+
+  const totalWealth = useMemo(() => {
+    return (assets || []).reduce((sum, a) => sum + (a.amount || 0), 0);
+  }, [assets]);
 
   // --- Filter Logic ---
-  const filteredExpenses = expenses.filter(exp => {
-    if (activeTab === 'All') return true;
-    const expDate = new Date(exp.date);
-    const now = new Date();
-    if (activeTab === 'Today') return expDate.toDateString() === now.toDateString();
-    if (activeTab === 'This week') {
-      const weekAgo = new Date();
-      weekAgo.setDate(now.getDate() - 7);
-      return expDate >= weekAgo;
-    }
-    if (activeTab === 'This month') return expDate.getMonth() === now.getMonth() && expDate.getFullYear() === now.getFullYear();
-    return true;
-  });
+  const filteredExpenses = useMemo(() => {
+    return (expenses || []).filter(exp => {
+      if (activeTab === 'All') return true;
+      const expDate = new Date(exp.date);
+      const now = new Date();
+      if (activeTab === 'Today') return expDate.toDateString() === now.toDateString();
+      if (activeTab === 'This week') {
+        const weekAgo = new Date();
+        weekAgo.setDate(now.getDate() - 7);
+        return expDate >= weekAgo;
+      }
+      if (activeTab === 'This month') return expDate.getMonth() === now.getMonth() && expDate.getFullYear() === now.getFullYear();
+      return true;
+    });
+  }, [expenses, activeTab]);
 
   return (
     <div className="premium-container">
@@ -149,7 +166,7 @@ export default function ExpenseTracker() {
       </div>
 
       {/* --- Top Stats & Charts --- */}
-      <div className="finance-stats-grid" style={{ display: 'grid', gap: '20px', marginBottom: '30px' }}>
+      <div className="finance-stats-grid" style={{ marginBottom: '30px' }}>
         {/* Budget Progress limits */}
         <div className="premium-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -157,7 +174,7 @@ export default function ExpenseTracker() {
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Tap value to adjust</span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+          <div className="finance-limits-grid">
             {['Daily', 'Weekly', 'Monthly', 'Yearly'].map(timeframe => {
               const limit = limits[timeframe.toLowerCase()];
               // To be accurate, let's just display the limits as configurable inputs.
@@ -236,25 +253,27 @@ export default function ExpenseTracker() {
 
         {/* Yearly Bar Chart */}
         <div className="notion-block" style={{ padding: '20px', height: '200px', minHeight: '200px', minWidth: 0 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlyTotals}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 10 }} />
-              <ReTooltip
-                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                contentStyle={{ background: 'rgba(15,15,20,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                itemStyle={{ color: 'var(--primary)' }}
-              />
-              <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
-                {monthlyTotals.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={index === new Date().getMonth() ? 'var(--primary)' : 'rgba(255,255,255,0.1)'}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          {isMounted && (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={monthlyTotals}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 10 }} />
+                <ReTooltip
+                  cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                  contentStyle={{ background: 'rgba(15,15,20,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                  itemStyle={{ color: 'var(--primary)' }}
+                />
+                <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
+                  {monthlyTotals.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={index === new Date().getMonth() ? 'var(--primary)' : 'rgba(255,255,255,0.1)'}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 
@@ -322,7 +341,8 @@ export default function ExpenseTracker() {
             </button>
           </div>
 
-          <div className="notion-table-wrapper" style={{ overflowX: 'auto', padding: '0 20px 20px', minWidth: 0 }}>
+          {/* Desktop Table View */}
+          <div className="notion-table-wrapper desktop-only-table" style={{ overflowX: 'auto', padding: '0 20px 20px', minWidth: 0 }}>
             <table className="notion-table" style={{ minWidth: '1000px' }}>
               <thead>
                 <tr>
@@ -338,83 +358,14 @@ export default function ExpenseTracker() {
               </thead>
               <tbody>
                 {filteredExpenses.map((expense) => (
-                  <tr key={expense.id}>
-                    <td>
-                      <input
-                        value={expense.name}
-                        onChange={(e) => updateRow(expense.id, 'name', e.target.value)}
-                        style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%', outline: 'none' }}
-                      />
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--text-muted)', marginRight: '4px' }}>{currency}</span>
-                        <input
-                          type="number"
-                          value={expense.amount}
-                          onChange={(e) => updateRow(expense.id, 'amount', parseFloat(e.target.value) || 0)}
-                          style={{ background: 'transparent', border: 'none', color: 'inherit', width: '80px', outline: 'none', fontWeight: 600 }}
-                        />
-                      </div>
-                    </td>
-                    <td>
-                      <select
-                        value={expense.category}
-                        onChange={(e) => updateRow(expense.id, 'category', e.target.value)}
-                        className={`pill ${PILL_COLORS[expense.category]}`}
-                        style={{ border: 'none', appearance: 'none', outline: 'none', width: '100%' }}
-                      >
-                        {financeSettings.categories.map(c => <option key={c} value={c}>{c}</option>)}
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        value={expense.account}
-                        onChange={(e) => updateRow(expense.id, 'account', e.target.value)}
-                        style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%', outline: 'none', fontSize: '0.85rem' }}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="date"
-                        value={expense.date}
-                        onChange={(e) => updateRow(expense.id, 'date', e.target.value)}
-                        style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '0.8rem', outline: 'none' }}
-                      />
-                    </td>
-                    <td>
-                      <select
-                        value={expense.recurrence || 'None'}
-                        onChange={(e) => updateRow(expense.id, 'recurrence', e.target.value)}
-                        style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-main)', fontSize: '0.8rem', outline: 'none', borderRadius: '4px', padding: '2px 5px' }}
-                      >
-                        <option value="None">None</option>
-                        <option value="Daily">Daily</option>
-                        <option value="Weekly">Weekly</option>
-                        <option value="Monthly">Monthly</option>
-                        <option value="Yearly">Yearly</option>
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        type="date"
-                        value={expense.dueDate || ''}
-                        onChange={(e) => updateRow(expense.id, 'dueDate', e.target.value)}
-                        style={{
-                          background: expense.dueDate ? 'rgba(var(--primary-rgb), 0.1)' : 'transparent',
-                          border: 'none',
-                          color: expense.dueDate ? 'var(--primary)' : 'var(--text-muted)',
-                          fontSize: '0.8rem',
-                          outline: 'none',
-                          borderRadius: '4px',
-                          padding: '2px 5px'
-                        }}
-                      />
-                    </td>
-                    <td style={{ textAlign: 'right' }}>
-                      <button onClick={() => deleteRow(expense.id)} style={{ color: 'var(--red-text)', opacity: 0.5, fontSize: '1.2rem', padding: '0 5px' }}>×</button>
-                    </td>
-                  </tr>
+                  <ExpenseRow
+                    key={`${expense.id}-${expense.name}-${expense.amount}-${expense.account}-${expense.category}-${expense.date}-${expense.recurrence}-${expense.dueDate}`}
+                    expense={expense}
+                    categories={financeSettings.categories}
+                    currency={currency}
+                    updateRow={updateRow}
+                    deleteRow={deleteRow}
+                  />
                 ))}
                 <tr>
                   <td colSpan="7">
@@ -425,6 +376,23 @@ export default function ExpenseTracker() {
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Cards View */}
+          <div className="finance-mobile-cards mobile-only-cards">
+            {filteredExpenses.map((expense) => (
+              <MobileExpenseCard
+                key={`mob-${expense.id}-${expense.name}-${expense.amount}-${expense.account}-${expense.category}-${expense.date}-${expense.recurrence}-${expense.dueDate}`}
+                expense={expense}
+                categories={financeSettings.categories}
+                currency={currency}
+                updateRow={updateRow}
+                deleteRow={deleteRow}
+              />
+            ))}
+            <button className="mobile-add-btn" onClick={addRow}>
+              + Add Transaction
+            </button>
           </div>
         </div>
       ) : (
@@ -452,7 +420,8 @@ export default function ExpenseTracker() {
               })}
             </div>
 
-            <div className="notion-table-wrapper" style={{ overflowX: 'auto', minWidth: 0, marginBottom: '10px' }}>
+            {/* Desktop Table View */}
+            <div className="notion-table-wrapper desktop-only-table" style={{ overflowX: 'auto', minWidth: 0, marginBottom: '10px' }}>
               <table className="notion-table" style={{ minWidth: '600px' }}>
                 <thead>
                   <tr>
@@ -465,54 +434,33 @@ export default function ExpenseTracker() {
                 </thead>
                 <tbody>
                   {assets.map((asset) => (
-                    <tr key={asset.id}>
-                      <td>
-                        <input
-                          value={asset.name}
-                          onChange={(e) => updateAsset(asset.id, 'name', e.target.value)}
-                          style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%', outline: 'none' }}
-                        />
-                      </td>
-                      <td>
-                        <select
-                          value={asset.type}
-                          onChange={(e) => updateAsset(asset.id, 'type', e.target.value)}
-                          className={`pill blue`}
-                          style={{ border: 'none', appearance: 'none', outline: 'none' }}
-                        >
-                          {ASSET_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                        </select>
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <span style={{ color: 'var(--text-muted)', marginRight: '4px' }}>{currency}</span>
-                          <input
-                            type="number"
-                            value={asset.amount}
-                            onChange={(e) => updateAsset(asset.id, 'amount', parseFloat(e.target.value) || 0)}
-                            style={{ background: 'transparent', border: 'none', color: 'inherit', maxWidth: '100px', outline: 'none', fontWeight: 600 }}
-                          />
-                        </div>
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <span style={{
-                            color: asset.change >= 0 ? 'var(--green-text)' : 'var(--red-text)',
-                            fontWeight: 800,
-                            fontSize: '0.9rem'
-                          }}>
-                            {asset.change >= 0 ? '+' : ''}{asset.change?.toFixed(1)}%
-                          </span>
-                        </div>
-                      </td>
-                      <td>
-                        <button onClick={() => deleteAsset(asset.id)} style={{ color: 'var(--red-text)', opacity: 0.5, fontSize: '1.2rem' }}>×</button>
-                      </td>
-                    </tr>
+                    <AssetRow
+                      key={`${asset.id}-${asset.name}-${asset.amount}-${asset.type}`}
+                      asset={asset}
+                      types={ASSET_TYPES}
+                      currency={currency}
+                      updateAsset={updateAsset}
+                      deleteAsset={deleteAsset}
+                    />
                   ))}
                 </tbody>
               </table>
             </div>
+
+            {/* Mobile Cards View */}
+            <div className="finance-mobile-cards mobile-only-cards">
+              {assets.map((asset) => (
+                <MobileAssetCard
+                  key={`mob-asset-${asset.id}-${asset.name}-${asset.amount}-${asset.type}`}
+                  asset={asset}
+                  types={ASSET_TYPES}
+                  currency={currency}
+                  updateAsset={updateAsset}
+                  deleteAsset={deleteAsset}
+                />
+              ))}
+            </div>
+
             <button onClick={addAsset} style={{ color: 'var(--primary)', fontSize: '0.85rem', padding: '20px 0', width: '100%', textAlign: 'left', borderTop: '1px solid var(--border-color)', marginTop: '10px', fontWeight: 600 }}>
               + Register New Capital Asset
             </button>
@@ -522,3 +470,325 @@ export default function ExpenseTracker() {
     </div>
   );
 }
+
+// ── Memoized Child Components to Eliminate Mobile WebView Typing Lag ──
+
+const ExpenseRow = React.memo(({ expense, categories, currency, updateRow, deleteRow }) => {
+  const [name, setName] = useState(expense.name);
+  const [amount, setAmount] = useState(expense.amount);
+  const [account, setAccount] = useState(expense.account);
+
+  const handleBlur = (field, value) => {
+    if (expense[field] !== value) {
+      updateRow(expense.id, field, value);
+    }
+  };
+
+  return (
+    <tr>
+      <td>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onBlur={() => handleBlur('name', name)}
+          onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+          style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%', outline: 'none' }}
+        />
+      </td>
+      <td>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span style={{ color: 'var(--text-muted)', marginRight: '4px' }}>{currency}</span>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            onBlur={() => handleBlur('amount', parseFloat(amount) || 0)}
+            onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+            style={{ background: 'transparent', border: 'none', color: 'inherit', width: '80px', outline: 'none', fontWeight: 600 }}
+          />
+        </div>
+      </td>
+      <td>
+        <select
+          value={expense.category}
+          onChange={(e) => updateRow(expense.id, 'category', e.target.value)}
+          className={`pill ${PILL_COLORS[expense.category] || 'blue'}`}
+          style={{ border: 'none', appearance: 'none', outline: 'none', width: '100%' }}
+        >
+          {categories.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+      </td>
+      <td>
+        <input
+          value={account}
+          onChange={(e) => setAccount(e.target.value)}
+          onBlur={() => handleBlur('account', account)}
+          onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+          style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%', outline: 'none', fontSize: '0.85rem' }}
+        />
+      </td>
+      <td>
+        <input
+          type="date"
+          value={expense.date}
+          onChange={(e) => updateRow(expense.id, 'date', e.target.value)}
+          style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '0.8rem', outline: 'none' }}
+        />
+      </td>
+      <td>
+        <select
+          value={expense.recurrence || 'None'}
+          onChange={(e) => updateRow(expense.id, 'recurrence', e.target.value)}
+          style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-main)', fontSize: '0.8rem', outline: 'none', borderRadius: '4px', padding: '2px 5px' }}
+        >
+          <option value="None">None</option>
+          <option value="Daily">Daily</option>
+          <option value="Weekly">Weekly</option>
+          <option value="Monthly">Monthly</option>
+          <option value="Yearly">Yearly</option>
+        </select>
+      </td>
+      <td>
+        <input
+          type="date"
+          value={expense.dueDate || ''}
+          onChange={(e) => updateRow(expense.id, 'dueDate', e.target.value)}
+          style={{
+            background: expense.dueDate ? 'rgba(var(--primary-rgb), 0.1)' : 'transparent',
+            border: 'none',
+            color: expense.dueDate ? 'var(--primary)' : 'var(--text-muted)',
+            fontSize: '0.8rem',
+            outline: 'none',
+            borderRadius: '4px',
+            padding: '2px 5px'
+          }}
+        />
+      </td>
+      <td style={{ textAlign: 'right' }}>
+        <button onClick={() => deleteRow(expense.id)} style={{ color: 'var(--red-text)', opacity: 0.5, fontSize: '1.2rem', padding: '0 5px' }}>×</button>
+      </td>
+    </tr>
+  );
+});
+
+// Add display names for debugging
+ExpenseRow.displayName = 'ExpenseRow';
+
+const AssetRow = React.memo(({ asset, types, currency, updateAsset, deleteAsset }) => {
+  const [name, setName] = useState(asset.name);
+  const [amount, setAmount] = useState(asset.amount);
+
+  const handleBlur = (field, value) => {
+    if (asset[field] !== value) {
+      updateAsset(asset.id, field, value);
+    }
+  };
+
+  return (
+    <tr>
+      <td>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onBlur={() => handleBlur('name', name)}
+          onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+          style={{ background: 'transparent', border: 'none', color: 'inherit', width: '100%', outline: 'none' }}
+        />
+      </td>
+      <td>
+        <select
+          value={asset.type}
+          onChange={(e) => updateAsset(asset.id, 'type', e.target.value)}
+          className={`pill blue`}
+          style={{ border: 'none', appearance: 'none', outline: 'none' }}
+        >
+          {types.map(t => <option key={t} value={t}>{t}</option>)}
+        </select>
+      </td>
+      <td>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span style={{ color: 'var(--text-muted)', marginRight: '4px' }}>{currency}</span>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            onBlur={() => handleBlur('amount', parseFloat(amount) || 0)}
+            onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+            style={{ background: 'transparent', border: 'none', color: 'inherit', maxWidth: '100px', outline: 'none', fontWeight: 600 }}
+          />
+        </div>
+      </td>
+      <td>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{
+            color: asset.change >= 0 ? 'var(--green-text)' : 'var(--red-text)',
+            fontWeight: 800,
+            fontSize: '0.9rem'
+          }}>
+            {asset.change >= 0 ? '+' : ''}{asset.change?.toFixed(1)}%
+          </span>
+        </div>
+      </td>
+      <td>
+        <button onClick={() => deleteAsset(asset.id)} style={{ color: 'var(--red-text)', opacity: 0.5, fontSize: '1.2rem' }}>×</button>
+      </td>
+    </tr>
+  );
+});
+
+AssetRow.displayName = 'AssetRow';
+
+const MobileExpenseCard = React.memo(({ expense, categories, currency, updateRow, deleteRow }) => {
+  const [name, setName] = useState(expense.name);
+  const [amount, setAmount] = useState(expense.amount);
+  const [account, setAccount] = useState(expense.account);
+
+  const handleBlur = (field, value) => {
+    if (expense[field] !== value) {
+      updateRow(expense.id, field, value);
+    }
+  };
+
+  return (
+    <div className="finance-mobile-card">
+      <div className="mobile-card-row primary-row">
+        <input
+          className="mobile-card-title-input"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onBlur={() => handleBlur('name', name)}
+          onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+          placeholder="Expense title..."
+        />
+        <div className="mobile-card-amount">
+          <span style={{ color: 'var(--text-muted)', marginRight: '2px' }}>{currency}</span>
+          <input
+            type="number"
+            className="mobile-card-amount-input"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            onBlur={() => handleBlur('amount', parseFloat(amount) || 0)}
+            onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+          />
+        </div>
+      </div>
+
+      <div className="mobile-card-row tags-row">
+        <select
+          value={expense.category}
+          onChange={(e) => updateRow(expense.id, 'category', e.target.value)}
+          className={`pill ${PILL_COLORS[expense.category] || 'blue'} mobile-select`}
+        >
+          {categories.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <input
+          className="mobile-account-input"
+          value={account}
+          onChange={(e) => setAccount(e.target.value)}
+          onBlur={() => handleBlur('account', account)}
+          onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+          placeholder="Account..."
+        />
+        <select
+          value={expense.recurrence || 'None'}
+          onChange={(e) => updateRow(expense.id, 'recurrence', e.target.value)}
+          className="mobile-recurrence-select"
+        >
+          <option value="None">Once</option>
+          <option value="Daily">Daily</option>
+          <option value="Weekly">Weekly</option>
+          <option value="Monthly">Monthly</option>
+          <option value="Yearly">Yearly</option>
+        </select>
+      </div>
+
+      <div className="mobile-card-row footer-row">
+        <div className="mobile-date-field">
+          <span className="mobile-date-label">Trans:</span>
+          <input
+            type="date"
+            value={expense.date}
+            onChange={(e) => updateRow(expense.id, 'date', e.target.value)}
+          />
+        </div>
+        <div className="mobile-date-field">
+          <span className="mobile-date-label">Due:</span>
+          <input
+            type="date"
+            value={expense.dueDate || ''}
+            onChange={(e) => updateRow(expense.id, 'dueDate', e.target.value)}
+          />
+        </div>
+        <button
+          onClick={() => deleteRow(expense.id)}
+          className="mobile-delete-btn"
+          title="Delete entry"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  );
+});
+
+MobileExpenseCard.displayName = 'MobileExpenseCard';
+
+const MobileAssetCard = React.memo(({ asset, types, currency, updateAsset, deleteAsset }) => {
+  const [name, setName] = useState(asset.name);
+  const [amount, setAmount] = useState(asset.amount);
+
+  const handleBlur = (field, value) => {
+    if (asset[field] !== value) {
+      updateAsset(asset.id, field, value);
+    }
+  };
+
+  return (
+    <div className="finance-mobile-card">
+      <div className="mobile-card-row primary-row">
+        <input
+          className="mobile-card-title-input"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onBlur={() => handleBlur('name', name)}
+          onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+          placeholder="Asset name..."
+        />
+        <select
+          value={asset.type}
+          onChange={(e) => updateAsset(asset.id, 'type', e.target.value)}
+          className="pill blue mobile-select"
+        >
+          {types.map(t => <option key={t} value={t}>{t}</option>)}
+        </select>
+      </div>
+
+      <div className="mobile-card-row footer-row" style={{ marginTop: '8px' }}>
+        <div className="mobile-card-amount">
+          <span style={{ color: 'var(--text-muted)', marginRight: '2px' }}>{currency}</span>
+          <input
+            type="number"
+            className="mobile-card-amount-input"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            onBlur={() => handleBlur('amount', parseFloat(amount) || 0)}
+            onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+          />
+        </div>
+        <span className={`mobile-change-badge ${asset.change >= 0 ? 'pos' : 'neg'}`}>
+          {asset.change >= 0 ? '+' : ''}{asset.change?.toFixed(1)}%
+        </span>
+        <button
+          onClick={() => deleteAsset(asset.id)}
+          className="mobile-delete-btn"
+          title="Delete asset"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  );
+});
+
+MobileAssetCard.displayName = 'MobileAssetCard';
+

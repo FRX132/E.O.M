@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import MarkdownViewer from '../Functions/MarkdownViewer';
 import '../Styles/GoalModal.css';
 
 const getDefaultState = (initialColumn) => ({
@@ -69,6 +70,12 @@ export default function GoalModal({ isOpen, onClose, onSave, initialColumn, init
                 onChange={(e) => setGoalData({ ...goalData, notes: e.target.value })}
               />
             </div>
+            {goalData.notes && (
+              <div style={{ padding: '12px 16px', background: 'var(--bg-main)', borderBottom: '1px solid var(--border-color)', maxHeight: '180px', overflowY: 'auto' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Live Preview</div>
+                <MarkdownViewer content={goalData.notes} />
+              </div>
+            )}
             <div className="mac-row">
               <input 
                 className="mac-input" 

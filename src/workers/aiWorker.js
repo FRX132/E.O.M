@@ -16,6 +16,7 @@ class PipelineSingleton {
     }
 }
 
+// Add event listener to the worker
 self.addEventListener('message', async (event) => {
     const { text, type, context } = event.data;
 
@@ -43,14 +44,26 @@ self.addEventListener('message', async (event) => {
             const prompt = `Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n### Instruction:\n${systemContext}${text}\n\n### Response:\n`;
 
             let output = await generator(prompt, {
-                max_new_tokens: 100,
+                max_new_tokens: 150,
                 temperature: 0.7,
                 do_sample: true,
             });
 
             let generatedText = output[0].generated_text;
-            if (generatedText.includes("### Response:\n")) {
-                generatedText = generatedText.split("### Response:\n")[1].trim();
+
+            // Robustly extract only the generated response
+            if (generatedText.startsWith(prompt)) {
+                generatedText = generatedText.substring(prompt.length).trim();
+            } else {
+                // Fallback splits for formatting variances
+                const splitMarkers = ["### Response:\n", "### Response:", "Response:\n", "Response:"];
+                for (const marker of splitMarkers) {
+                    if (generatedText.includes(marker)) {
+                        const parts = generatedText.split(marker);
+                        generatedText = parts[parts.length - 1].trim();
+                        break;
+                    }
+                }
             }
 
             self.postMessage({

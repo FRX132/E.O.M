@@ -1,7 +1,7 @@
 {
   "name": "eom",
   "private": true,
-  "version": "1.6.6",
+  "version": "1.6.7",
   "description": "E.O.M",
   "author": "Freakzy",
   "type": "module",
@@ -13,6 +13,9 @@
     "electron:build:mac": "vite build && electron-builder --mac",
     "electron:build:win": "vite build && electron-builder --win --x64",
     "build": "vite build",
+    "cap:build": "vite build && cap sync ios",
+    "cap:sync": "cap sync ios",
+    "cap:open": "cap open ios",
     "lint": "eslint .",
     "preview": "vite preview"
   },

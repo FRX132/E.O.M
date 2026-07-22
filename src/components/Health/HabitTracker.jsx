@@ -219,7 +219,6 @@ export default function HabitTracker() {
   const [detailHabit, setDetailHabit] = useState(null);
 
   const todayId = new Date().toISOString().split('T')[0];
-  const todayDay = days.find(d => d.id === todayId);
 
   // Add a custom habit template to store
   const addCustomHabit = (name, notes, color, repeat, weekdays, startDate, streakGoal) => {

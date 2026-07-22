@@ -6,6 +6,11 @@ import { calculateRank, SKILL_DEF } from '../../constants';
 import { LIFE_RULES } from '../../data/lifeRules';
 
 export default function Overview({ navigate }) {
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const habits = useStore(state => state.habits) || [];
   const expenses = useStore(state => state.expenses) || [];
   const assets = useStore(state => state.assets) || [];
@@ -26,7 +31,6 @@ export default function Overview({ navigate }) {
   const habitsDays = useStore(state => state.habits || []);
   const setHabitsDays = useStore(state => state.setHabits);
   const addXP = useStore(state => state.addXP);
-  const customHabitTemplates = useStore(state => state.customHabitTemplates || []);
   const [newReminderTitle, setNewReminderTitle] = useState('');
 
   const settings = overviewSettings || {
@@ -50,7 +54,7 @@ export default function Overview({ navigate }) {
 
   const rankStats = calculateRank(profile.xp || 0);
 
-  const DEFAULT_HERO = "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=2000";
+  const DEFAULT_HERO = "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?fm=jpg&fit=crop&q=80&w=2000";
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -576,7 +580,7 @@ export default function Overview({ navigate }) {
                   </div>
                 </div>
               </div>
-              {chartData.length > 0 && (
+              {isMounted && chartData.length > 0 && (
                 <div className="finance-chart-container">
                   <ResponsiveContainer width="100%" height={200} minWidth={0} minHeight={0}>
                     <PieChart>

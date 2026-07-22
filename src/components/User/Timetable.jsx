@@ -95,6 +95,8 @@ export default function Timetable() {
   const [endTime, setEndTime] = useState('10:00');
   const [color, setColor] = useState('blue');
   const [habitId, setHabitId] = useState('');
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [selectedDays, setSelectedDays] = useState(['Monday']);
 
   // Get today's weekday name
   const todayDayName = useMemo(() => {
@@ -160,6 +162,8 @@ export default function Timetable() {
     setNotes('');
     setUrl('');
     setDay(selectedDay);
+    setIsRecurring(false);
+    setSelectedDays([selectedDay]);
     setStartTime('09:00');
     setEndTime('10:00');
     setColor('blue');
@@ -176,6 +180,8 @@ export default function Timetable() {
     setNotes(block.notes || '');
     setUrl(block.url || '');
     setDay(block.day);
+    setIsRecurring(false);
+    setSelectedDays([block.day]);
     setStartTime(block.startTime);
     setEndTime(block.endTime);
     setColor(block.color);
@@ -225,20 +231,37 @@ export default function Timetable() {
       setTimetableBlocks(updated);
     } else {
       // Add
-      const newBlock = {
-        id: window.crypto.randomUUID ? window.crypto.randomUUID() : Date.now().toString(),
-        title: finalTitle,
-        notes: notes.trim(),
-        url: url.trim(),
-        day,
-        startTime,
-        endTime,
-        color,
-        habitId: finalHabitId || null,
-        isReminder,
-        completed: false
-      };
-      setTimetableBlocks([...timetableBlocks, newBlock]);
+      if (isRecurring && selectedDays.length > 0) {
+        const newBlocks = selectedDays.map(d => ({
+          id: window.crypto.randomUUID ? window.crypto.randomUUID() : (Date.now().toString() + '-' + Math.random()),
+          title: finalTitle,
+          notes: notes.trim(),
+          url: url.trim(),
+          day: d,
+          startTime,
+          endTime,
+          color,
+          habitId: finalHabitId || null,
+          isReminder,
+          completed: false
+        }));
+        setTimetableBlocks([...timetableBlocks, ...newBlocks]);
+      } else {
+        const newBlock = {
+          id: window.crypto.randomUUID ? window.crypto.randomUUID() : Date.now().toString(),
+          title: finalTitle,
+          notes: notes.trim(),
+          url: url.trim(),
+          day,
+          startTime,
+          endTime,
+          color,
+          habitId: finalHabitId || null,
+          isReminder,
+          completed: false
+        };
+        setTimetableBlocks([...timetableBlocks, newBlock]);
+      }
     }
     setIsModalOpen(false);
   };
@@ -500,16 +523,89 @@ export default function Timetable() {
               <div className="mac-group">
                 <div className="mac-group-title">Datum & Uhrzeit</div>
                 <div className="mac-group-list">
-                  <div className="mac-row">
-                    <span className="mac-row-label">
-                      <CalendarIcon /> Weekday
-                    </span>
-                    <div className="mac-row-control">
-                      <select className="mac-select" value={day} onChange={e => setDay(e.target.value)}>
-                        {WEEKDAYS.map(w => <option key={w} value={w}>{w}</option>)}
-                      </select>
+                  {!editingBlock && (
+                    <div className="mac-row">
+                      <span className="mac-row-label">
+                        <CalendarIcon /> Wiederholend
+                      </span>
+                      <div className="mac-row-control">
+                        <label className="mac-switch">
+                          <input
+                            type="checkbox"
+                            className="mac-switch-checkbox"
+                            checked={isRecurring}
+                            onChange={e => {
+                              const checked = e.target.checked;
+                              setIsRecurring(checked);
+                              if (checked) {
+                                setSelectedDays(prev => prev.includes(day) ? prev : [...prev, day]);
+                              } else {
+                                setSelectedDays([day]);
+                              }
+                            }}
+                          />
+                          <span className="mac-switch-slider"></span>
+                        </label>
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {(!editingBlock && isRecurring) ? (
+                    <div className="mac-row mac-row-vertical">
+                      <span className="mac-row-label" style={{ marginBottom: '8px' }}>
+                        Wiederholen an:
+                      </span>
+                      <div className="mac-weekday-selector">
+                        {WEEKDAYS.map(w => {
+                          const isSelected = selectedDays.includes(w);
+                          const shortLabelsGerman = {
+                            'Monday': 'Mo',
+                            'Tuesday': 'Di',
+                            'Wednesday': 'Mi',
+                            'Thursday': 'Do',
+                            'Friday': 'Fr',
+                            'Saturday': 'Sa',
+                            'Sunday': 'So'
+                          };
+                          const label = shortLabelsGerman[w] || w.substring(0, 2);
+                          return (
+                            <button
+                              key={w}
+                              type="button"
+                              className={`mac-weekday-pill ${isSelected ? 'active' : ''}`}
+                              onClick={() => {
+                                setSelectedDays(prev => 
+                                  prev.includes(w)
+                                    ? (prev.length > 1 ? prev.filter(d => d !== w) : prev)
+                                    : [...prev, w]
+                                );
+                              }}
+                            >
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mac-row">
+                      <span className="mac-row-label">
+                        <CalendarIcon /> Weekday
+                      </span>
+                      <div className="mac-row-control">
+                        <select 
+                          className="mac-select" 
+                          value={day} 
+                          onChange={e => {
+                            setDay(e.target.value);
+                            setSelectedDays([e.target.value]);
+                          }}
+                        >
+                          {WEEKDAYS.map(w => <option key={w} value={w}>{w}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                  )}
                   <div className="mac-row">
                     <span className="mac-row-label">
                       <ClockIcon /> Start Time

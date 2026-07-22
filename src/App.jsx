@@ -8,11 +8,11 @@ import './components/Styles/Templates_Interface.css';
 
 // Components
 import ExpenseTracker from './components/User/ExpenseTracker';
-import GoalPlanner from './components/Inteligence/GoalPlanner';
+import GoalPlanner from './components/Intelligence/GoalPlanner';
 import HabitTracker from './components/Health/HabitTracker';
 import FridgeStock from './components/Health/FridgeStock';
 import BigTargets from './components/User/BigTargets';
-import BookList from './components/Inteligence/BookList';
+import BookList from './components/Intelligence/BookList';
 import MovieList from './components/Agency/MovieList';
 import ProfileSettings from './components/User/ProfileSettings';
 import SkillTree from './components/User/SkillTree';
@@ -206,7 +206,7 @@ function App() {
     setOpenFolders(prev => ({ ...prev, [title]: !prev[title] }));
   };
 
-  // Connect to Zustand Global Store
+  // Connect tonGlobal Storage
   const profile = useStore((state) => state.profile);
   const isAuthenticated = useStore((state) => state.isAuthenticated);
   const theme = useStore((state) => state.theme);
@@ -292,6 +292,7 @@ function App() {
       'theme',
       'accentColor',
       'designSettings',
+      'aiSettings',
       'financeSettings',
       'overviewSettings'
     ];

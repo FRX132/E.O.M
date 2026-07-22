@@ -1,14 +1,28 @@
 # E.O.M — Life Planner OS 🧠
 
-**E.O.M** (End of Month / Each One Matters) is a premium, minimalist desktop application designed to gamify and organize every facet of your life. Built with a "local-first" philosophy, it combines productivity with RPG-inspired progression mechanics.
+**E.O.M** (End of Month / Each One Matters) is a premium, minimalist personal operating system designed to gamify and organize every facet of your life. Built with a "local-first" philosophy, it combines productivity with RPG-inspired progression mechanics on Desktop, Web, and Mobile.
 
 ![E.O.M Dashboard](https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=400&fit=crop&q=80)
 
+---
+
 ## ✨ Core Modules
+
+### 🤖 AI Assistant & Connection Hub (Pseudo-MCP)
+An integrated agent that coordinates your workspace:
+- **Zero-Config Local AI**: Runs local LLMs directly inside a background Web Worker using `Transformers.js`.
+- **Custom Provider Integration**: Connect OpenAI, Anthropic Claude, or local API servers (Ollama, LM Studio) using custom endpoints and API keys.
+- **Pseudo-MCP Command Router**: Translate natural language prompt commands directly into system state actions:
+  - *"Log workout chest for 45 minutes"*
+  - *"Complete goal read 5 books"*
+  - *"Add goal learn React"*
+  - *"Delete expense 12"* or *"remove milk from fridge"*
+- **Cloud-Synced Settings**: Settings and API choices are synchronized along with your planner workspace.
 
 ### 💰 Finance Hub (Expense Tracker)
 Professional-grade financial management with:
 - **Automatic Calculations**: Real-time tracking of income, expenses, and total balance.
+- **Performance Optimized**: Sub-millisecond interface responsiveness via memoized render-trees, optimized local state bounds, and delayed state writes on text input blur.
 - **Recurring Payments**: Automated monthly deductions for bills and subscriptions.
 - **Budgeting**: Set and monitor budgets across custom categories.
 - **Visual Analytics**: Dynamic charts showing cash flow trends throughout the year.
@@ -40,6 +54,7 @@ The heart of the gamification engine:
 - **Vite + React**: Blazing fast development and optimized production bundles.
 - **Zustand**: State management with local persistence (Privacy First).
 - **Electron**: Cross-platform desktop experience.
+- **Capacitor (iOS)**: Runs built web assets in native Apple Web View wraps for iPhone.
 - **Glassmorphism UI**: High-end aesthetic with customizable accent colors and neon modes.
 
 ---
@@ -62,19 +77,25 @@ The heart of the gamification engine:
    ```
 3. Launch development mode:
    ```sh
-   npm run electron:dev
+   npm run dev
    ```
 
 ---
 
 ## 📦 Building for Production
-To generate installers for testers or personal use:
 
+### Desktop Build (Electron)
 - **Windows Build**: `npm run electron:build:win`
 - **Mac Build**: `npm run electron:build`
 - **Web Preview**: `npm run build && npm run preview`
 
-Generated binaries will be located in the `release/` directory.
+### Mobile Build (iOS / iPhone)
+Build assets and copy them into the Xcode Capacitor project:
+```sh
+npm run build
+npx cap sync ios
+```
+Then open the `ios/App` directory in Xcode to build and run on your physical iPhone or Simulator.
 
 ---
 
@@ -83,6 +104,7 @@ Generated binaries will be located in the `release/` directory.
 - `src/store.js` — Global state, persistence logic, and profile data.
 - `src/data/` — Anatomical path data and asset JSONs.
 - `electron/` — Main process and desktop integration scripts.
+- `ios/` — Native iOS container files for Apple devices.
 
 ---
 

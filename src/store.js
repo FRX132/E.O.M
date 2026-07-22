@@ -161,6 +161,12 @@ const EMPTY_STATE = {
   autoBackupPath: null,
   theme: 'dark',
   accentColor: '#d48f48',
+  aiSettings: {
+    provider: 'local',
+    apiKey: '',
+    model: 'gpt-4o-mini',
+    endpoint: ''
+  },
   designSettings: {
     enabled: false,
     blur: 10,
@@ -252,6 +258,7 @@ const initialState = {
   autoBackupPath: migrateLegacyData('os_auto_backup_path', EMPTY_STATE.autoBackupPath),
   theme: migrateLegacyData('os_theme', EMPTY_STATE.theme),
   accentColor: migrateLegacyData('os_accent_color', EMPTY_STATE.accentColor),
+  aiSettings: migrateLegacyData('os_ai_settings', EMPTY_STATE.aiSettings),
   designSettings: migrateLegacyData('os_design_settings', EMPTY_STATE.designSettings),
   financeSettings: migrateLegacyData('os_finance_settings', EMPTY_STATE.financeSettings),
   overviewSettings: migrateLegacyData('os_overview_settings', EMPTY_STATE.overviewSettings),
@@ -449,6 +456,9 @@ export const useStore = create(
       setAutoBackupPath: (path) => set({ autoBackupPath: path }),
       toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
       setAccentColor: (color) => set({ accentColor: color }),
+      setAiSettings: (newSettings) => set((state) => ({
+        aiSettings: { ...state.aiSettings, ...newSettings }
+      })),
       setDesignSettings: (newSettings) => set((state) => ({
         designSettings: { ...state.designSettings, ...newSettings }
       })),
@@ -600,6 +610,7 @@ export const useStore = create(
 
 // Automatic Background Backup Hook
 useStore.subscribe((state) => {
+  window.__EOM_STORE_STATE__ = state;
   if (state.autoBackupPath && window.electronAPI && window.electronAPI.autoBackupSave) {
     // Small delay to prevent blocking the main UI thread during rapid state changes (e.g. typing)
     clearTimeout(window._autoBackupTimeout);
@@ -611,3 +622,10 @@ useStore.subscribe((state) => {
     }, 1000);
   }
 });
+
+// Bind initial state
+try {
+  window.__EOM_STORE_STATE__ = useStore.getState();
+} catch {
+  void 0;
+}

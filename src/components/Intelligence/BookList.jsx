@@ -68,22 +68,20 @@ export default function BookList() {
       </div>
 
       <div className="notion-block book-list-notion-block">
-        <div className="notion-tabs book-list-tabs">
-          <div className="tab-group book-list-tab-group">
-            {['All', 'Reading', 'Finished', 'Want to Read'].map(tab => (
-              <button
-                key={tab}
-                className={`tab-item ${activeTab === tab ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab)}
-              >
-                {tab}
-              </button>
-            ))}
+        <div className="notion-tabs">
+          {['All', 'Reading', 'Finished', 'Want to Read'].map(tab => (
             <button
-              className="book-list-new-btn" onClick={openAddModal}>
-              New Book +
+              key={tab}
+              className={`notion-tab ${activeTab === tab ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
             </button>
-          </div>
+          ))}
+          <button
+            className="book-list-new-btn" style={{ alignSelf: 'center', marginBottom: '8px' }} onClick={openAddModal}>
+            New Book +
+          </button>
         </div>
 
         <div className="card-content book-list-card-content">

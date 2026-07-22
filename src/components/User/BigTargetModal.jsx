@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import MarkdownViewer from '../Functions/MarkdownViewer';
 // Styling
 import '../Styles/GoalModal.css';
 
@@ -75,6 +76,12 @@ export default function BigTargetModal({ isOpen, onClose, onSave, initialData })
                 onChange={(e) => setTargetData({ ...targetData, notes: e.target.value })}
               />
             </div>
+            {targetData.notes && (
+              <div style={{ padding: '12px 16px', background: 'var(--bg-main)', borderBottom: '1px solid var(--border-color)', maxHeight: '180px', overflowY: 'auto' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Live Preview</div>
+                <MarkdownViewer content={targetData.notes} />
+              </div>
+            )}
             <div className="mac-row">
               <span className="mac-row-label">Category</span>
               <select

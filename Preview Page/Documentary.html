@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E.O.M — System Documentation & Guides</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Official documentation for E.O.M (Escape Of Matrix) Life Planner OS. Learn how to configure local LLMs, deploy to iPhone, optimize finance inputs, and use the MCP command router.">
+    <meta name="keywords" content="EOM Documentation, EOM Guide, Life Planner OS, Local AI, iOS Deployment, Capacitor Xcode, React Memoization">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Share+Tech+Mono&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- External Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* Special layout extensions for Documentation Page */
+        .docs-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+            margin: 40px 0 80px;
+        }
+
+        .docs-sidebar {
+            position: sticky;
+            top: 100px;
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding-right: 15px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .docs-search {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .docs-search:focus {
+            border-color: var(--primary);
+        }
+
+        .docs-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .docs-menu-title {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--primary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .docs-menu-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: block;
+        }
+
+        .docs-menu-item:hover, .docs-menu-item.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .docs-menu-item.active {
+            border-left: 2px solid var(--primary);
+            padding-left: 10px;
+            color: var(--primary);
+        }
+
+        .docs-content {
+            min-width: 0; /* Prevents flexbox items from overflowing */
+        }
+
+        .docs-section {
+            margin-bottom: 60px;
+            scroll-margin-top: 120px;
+        }
+
+        .docs-section h2 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #fff;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .docs-section h3 {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 30px 0 15px;
+            color: #fff;
+        }
+
+        .docs-section p {
+            margin-bottom: 18px;
+            color: var(--text-main);
+            opacity: 0.9;
+        }
+
+        /* Alert Callouts */
+        .docs-alert {
+            background: rgba(212, 143, 72, 0.05);
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .docs-alert-title {
+            font-weight: bold;
+            font-family: var(--font-display);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .docs-alert.warning {
+            background: rgba(255, 107, 107, 0.05);
+            border-left-color: var(--accent);
+        }
+
+        .docs-alert.info {
+            background: rgba(0, 240, 255, 0.05);
+            border-left-color: var(--secondary);
+        }
+
+        /* Code Blocks */
+        pre {
+            background: #0d0d14;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--secondary);
+        }
+
+        pre code {
+            color: #f0f2f5;
+        }
+
+        /* Command Table */
+        .docs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .docs-table th, .docs-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .docs-table th {
+            background: rgba(255, 255, 255, 0.02);
+            font-family: var(--font-display);
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .docs-table td {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        @media (max-width: 900px) {
+            .docs-container {
+                grid-template-columns: 1fr;
+            }
+
+            .docs-sidebar {
+                position: static;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 20px;
+                padding-right: 0;
+            }
+        }
+    </style>
+</head>
+<body class="theme-eom">
+
+    <!-- Glowing Background Canvas -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <div class="wrapper">
+        <!-- Header -->
+        <header>
+            <div class="nav-container">
+                <a href="EscapeOfMatrix.html" class="logo">
+                    <span>E.O.M</span> OS Docs
+                </a>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <button class="btn btn-secondary" onclick="toggleTheme()" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 20px; font-family: var(--font-display); cursor: pointer;">
+                        🌓 Style: <span id="theme-name" style="color: var(--primary); font-weight: bold; margin-left: 4px;">E.O.M Obsidian Gold</span>
+                    </button>
+                    <a href="EscapeOfMatrix.html" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 20px; text-decoration: none; color: #000;">
+                        🎮 Simulator
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Docs Container -->
+        <div class="docs-container">
+            <!-- Sidebar Menu -->
+            <aside class="docs-sidebar">
+                <input type="text" placeholder="Search guides..." class="docs-search" id="docs-search" oninput="filterDocs()">
+                
+                <div class="docs-menu">
+                    <div class="docs-menu-title">Get Started</div>
+                    <a href="#intro" class="docs-menu-item active">Architecture Overview</a>
+                    <a href="#quickstart" class="docs-menu-item">Quick Start & Setup</a>
+                </div>
+
+                <div class="docs-menu">
+                    <div class="docs-menu-title">Core Modules</div>
+                    <a href="#ai-mcp" class="docs-menu-item">AI Connection & MCP Router</a>
+                    <a href="#finance" class="docs-menu-item">Finance & Memoization</a>
+                    <a href="#workout" class="docs-menu-item">Anatomical Muscle Map</a>
+                    <a href="#progression" class="docs-menu-item">RPG Skill Tree & Ranks</a>
+                </div>
+
+                <div class="docs-menu">
+                    <div class="docs-menu-title">Deployment</div>
+                    <a href="#ios-build" class="docs-menu-item">Capacitor & iOS Xcode Guide</a>
+                    <a href="#troubleshoot" class="docs-menu-item">Platform Troubleshooting</a>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="docs-content">
+                <!-- 1. INTRO -->
+                <section class="docs-section" id="intro">
+                    <h2>Architecture Overview</h2>
+                    <p>
+                        <strong>Escape Of Matrix (E.O.M)</strong> is a state-of-the-art local-first application designed to gamify every element of your life. 
+                        By combining modular components with an RPG progression system, you can build positive habits, manage transactions, log workouts, and track progress under one private workspace.
+                    </p>
+                    <div class="docs-alert info">
+                        <div class="docs-alert-title">💡 Privacy First Principle</div>
+                        Your data never leaves your device. E.O.M uses a synchronized local storage layer bound to a Zustand state manager. Backup files are exported to your local file system directly.
+                    </div>
+                    <p>
+                        The core codebase is structured as a single-page React application powered by Vite, with multi-platform wrappers:
+                    </p>
+                    <ul>
+                        <li><strong>Vite + React:</strong> Handles responsive rendering, dynamic components, and reactive states.</li>
+                        <li><strong>Zustand:</strong> Directs user state, transaction ledgers, workout logs, habit histories, and AI parameters.</li>
+                        <li><strong>Capacitor (iOS):</strong> Transpiles and syncs front-end code directly into an iOS-native Xcode build for iPhone compatibility.</li>
+                        <li><strong>Electron:</strong> Provides cross-platform desktop shells for macOS and Windows.</li>
+                    </ul>
+                </section>
+
+                <!-- 2. QUICKSTART -->
+                <section class="docs-section" id="quickstart">
+                    <h2>Quick Start & Setup</h2>
+                    <p>
+                        Set up the development environment on your local macOS workstation:
+                    </p>
+                    
+                    <h3>Prerequisites</h3>
+                    <p>Ensure you have Node.js (v18+) and npm installed. Check by running:</p>
+                    <pre><code>node -v
+npm -v</code></pre>
+
+                    <h3>Installation Steps</h3>
+                    <p>1. Clone the project and navigate into the workspace directory:</p>
+                    <pre><code>git clone https://github.com/FRX132/E.O.M.git
+cd E.O.M</code></pre>
+
+                    <p>2. Install package dependencies:</p>
+                    <pre><code>npm install</code></pre>
+
+                    <p>3. Launch Vite development mode:</p>
+                    <pre><code>npm run dev</code></pre>
+                    <p>The application is now hosted locally, usually at <code>http://localhost:5173</code>.</p>
+                </section>
+
+                <!-- 3. AI CONNECTION & MCP -->
+                <section class="docs-section" id="ai-mcp">
+                    <h2>AI Connection & MCP Router</h2>
+                    <p>
+                        E.O.M features an intelligent <strong>AI Assistant Panel</strong> which acts as an intent parser. 
+                        It processes natural language and translates your statements into app states through our Pseudo-MCP router.
+                    </p>
+
+                    <h3>Configuring Providers</h3>
+                    <p>
+                        You can connect several types of AI backend servers in the <strong>Connection Settings Hub</strong> inside the Assistant panel:
+                    </p>
+                    <ol>
+                        <li><strong>Local Client (Transformers.js):</strong> Run lightweight models directly inside a background Web Worker in your browser. Zero-cost, 100% offline.</li>
+                        <li><strong>Ollama:</strong> Run models locally. Direct prompts to: <br><code>http://localhost:11434/api/generate</code></li>
+                        <li><strong>LM Studio:</strong> Route execution to local OpenAI-compatible endpoints: <br><code>http://localhost:1234/v1</code></li>
+                        <li><strong>OpenAI / Anthropic:</strong> Connect global cloud models by providing API keys.</li>
+                    </ol>
+
+                    <h3>MCP Commands & Prompts Router</h3>
+                    <p>
+                        The app uses a keyword-based syntax parser to map prompt texts to Zustand actions. 
+                        Here is a quick reference table of active commands:
+                    </p>
+
+                    <table class="docs-table">
+                        <thead>
+                            <tr>
+                                <th>Intent Route</th>
+                                <th>Keywords Matched</th>
+                                <th>Result / Action Taken</th>
+                                <th>Example Prompt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>LOG_WORKOUT</code></td>
+                                <td>workout, training, gym, log</td>
+                                <td>Logs a target workout to the fitness calendar.</td>
+                                <td>"log chest workout for 45 mins"</td>
+                            </tr>
+                            <tr>
+                                <td><code>COMPLETE_GOAL</code></td>
+                                <td>complete, check off, fertig</td>
+                                <td>Marks an active goal as completed and awards XP.</td>
+                                <td>"complete goal read React docs"</td>
+                            </tr>
+                            <tr>
+                                <td><code>ADD_GOAL</code></td>
+                                <td>goal, add, neu, ziel</td>
+                                <td>Adds a new goal to the weekly list.</td>
+                                <td>"add goal write portfolio code"</td>
+                            </tr>
+                            <tr>
+                                <td><code>DELETE_ITEM</code></td>
+                                <td>delete, remove, expense, loeschen</td>
+                                <td>Deletes a matching expense item or clear a list index.</td>
+                                <td>"delete expense subscription"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="docs-alert warning">
+                        <div class="docs-alert-title">⚠️ Router Order Notice</div>
+                        The intent router matches <code>COMPLETE_GOAL</code> prior to <code>ADD_GOAL</code> to prevent wildcard requests from adding new goals rather than checking them off.
+                    </div>
+                </section>
+
+                <!-- 4. FINANCE & MEMOIZATION -->
+                <section class="docs-section" id="finance">
+                    <h2>Finance Hub & Performance Memoization</h2>
+                    <p>
+                        The <strong>Finance Hub (Expense Tracker)</strong> is built to manage capital entries, monthly recurring subscriptions, budgets, and net worth tallies.
+                    </p>
+
+                    <h3>iPhone Input Typing Lag Fix</h3>
+                    <p>
+                        In webview wrappers (like Capacitor on iOS), re-rendering huge lists on every single keystroke causes CPU spikes, making text input extremely laggy. E.O.M uses a multi-tier optimization strategy to prevent this:
+                    </p>
+                    
+                    <div class="docs-alert info">
+                        <div class="docs-alert-title">⚡ Performance Implementation Details</div>
+                        <ul>
+                            <li><strong>Local Key-State Bounds:</strong> Input values write to local component states (e.g. <code>useState</code>) on keystroke.</li>
+                            <li><strong>Deferred Store Sync:</strong> Zustand store writes are deferred until <code>onBlur</code> or <code>Enter</code> key presses, keeping inputs lag-free.</li>
+                            <li><strong>React.memo Subcomponents:</strong> Rows are extracted into <code>&lt;ExpenseRow&gt;</code> and <code>&lt;AssetRow&gt;</code> wrapped in <code>useMemo</code>, eliminating unnecessary calculations.</li>
+                            <li><strong>Key-Based Reset Sync:</strong> A hash combination (e.g. <code>key={id-name-amount}</code>) is bound to rows, allowing values to sync automatically when changed externally without firing side-effects.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- 5. MUSCLE MAP -->
+                <section class="docs-section" id="workout">
+                    <h2>Anatomical Muscle Map</h2>
+                    <p>
+                        The <strong>Workout Hub</strong> displays an interactive anatomical model. Clicking a muscle group lets you register exercise sets, view muscle stress levels, and get custom sport recommendations.
+                    </p>
+                    <h3>Technical Details</h3>
+                    <ul>
+                        <li><strong>Dual Anatomy SVGs:</strong> Integrated path bindings representing male and female body vectors.</li>
+                        <li><strong>Smart Synchronization:</strong> Muscle maps load the appropriate vector based on the profile gender setting.</li>
+                        <li><strong>Zustand Integrations:</strong> Registered workouts automatically update the main calendar, granting progress logs.</li>
+                    </ul>
+                </section>
+
+                <!-- 6. PROGRESSION -->
+                <section class="docs-section" id="progression">
+                    <h2>RPG Skill Tree & Ranks</h2>
+                    <p>
+                        E.O.M turns life tracking into an RPG. Completing daily habits and goals earns XP, pushing you through various ranks.
+                    </p>
+                    
+                    <h3>XP Tiers & Rank Progression</h3>
+                    <p>Your overall rank is calculated using the following XP tiers:</p>
+                    <table class="docs-table">
+                        <thead>
+                            <tr>
+                                <th>Rank Name</th>
+                                <th>Required XP</th>
+                                <th>Tier Level</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Rank Z</strong></td>
+                                <td>0 - 20,000 XP</td>
+                                <td>Beginner</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rank W</strong></td>
+                                <td>20,000 - 60,000 XP</td>
+                                <td>Novice</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rank F</strong></td>
+                                <td>60,000 - 80,000 XP</td>
+                                <td>Apprentice</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rank C</strong></td>
+                                <td>80,000 - 100,000 XP</td>
+                                <td>Intermediate</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rank B</strong></td>
+                                <td>100,000 - 150,000 XP</td>
+                                <td>Adept</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rank A</strong></td>
+                                <td>150,000 - 200,000 XP</td>
+                                <td>Expert</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rank S</strong></td>
+                                <td>200,000 - 300,000 XP</td>
+                                <td>Master</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rank S+</strong></td>
+                                <td>300,000+ XP</td>
+                                <td>Legendary Agent</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- 7. IOS Xcode Guide -->
+                <section class="docs-section" id="ios-build">
+                    <h2>Capacitor & iOS Xcode Guide</h2>
+                    <p>
+                        Deploying your React code to run native 1:1 on your iPhone or simulated Apple environment:
+                    </p>
+
+                    <h3>Step-by-Step Compile Workflow</h3>
+                    <p>1. Open your terminal in the workspace directory and build the production bundle:</p>
+                    <pre><code>npm run build</code></pre>
+                    <p>This creates static HTML, JS, and CSS resources inside the <code>dist/</code> directory.</p>
+
+                    <p>2. Copy the files into the Xcode native project:</p>
+                    <pre><code>npx cap sync ios</code></pre>
+
+                    <p>3. Launch Xcode and compile:</p>
+                    <pre><code>npx cap open ios</code></pre>
+
+                    <div class="docs-alert warning">
+                        <div class="docs-alert-title">⚠️ Bundle Sync Required</div>
+                        Always run <code>npm run build && npx cap sync ios</code> after modifying React components to update the native iOS project files.
+                    </div>
+                </section>
+
+                <!-- 8. PLATFORM TROUBLESHOOTING -->
+                <section class="docs-section" id="troubleshoot">
+                    <h2>Platform Troubleshooting</h2>
+                    <p>
+                        Here are some common platform issues when building E.O.M:
+                    </p>
+
+                    <h3>Electron API Blocks in Web and iOS</h3>
+                    <p>
+                        E.O.M contains desktop features like PDF backups that use <code>window.electronAPI</code>. 
+                        In Web browsers or iOS WebViews, this will throw an undefined error.
+                    </p>
+                    <pre><code>// Safe API execution pattern
+if (window.electronAPI) {
+    window.electronAPI.backupData(payload);
+} else {
+    console.log("Running in non-desktop client: Fallback to local storage export.");
+    // Web/Capacitor backup export logic
+}</code></pre>
+                </section>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-container">
+                <div class="footer-left">
+                    <a href="#" class="logo" style="font-size: 1.2rem; margin-bottom: 8px; display: inline-flex;">
+                        <span>E.O.M</span> OS
+                    </a>
+                    <p>&copy; 2026 E.O.M OS. Created by Chetan Kaushal. All rights reserved.</p>
+                </div>
+                <div class="footer-right">
+                    <div class="social-links">
+                        <a href="https://github.com/FRX132" target="_blank">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+                              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+                            </svg>
+                            GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Script Block for Sidebar and Search -->
+    <script>
+        // --- Theme Switcher Logic ---
+        let activeTheme = 'eom';
+        function toggleTheme() {
+            const canvasEl = document.getElementById('matrix-canvas');
+            const themeName = document.getElementById('theme-name');
+            if (activeTheme === 'eom') {
+                document.body.classList.remove('theme-eom');
+                activeTheme = 'matrix';
+                themeName.innerText = 'Matrix Green';
+                if (canvasEl) canvasEl.style.opacity = '0.15';
+            } else {
+                document.body.classList.add('theme-eom');
+                activeTheme = 'eom';
+                themeName.innerText = 'E.O.M Obsidian Gold';
+                if (canvasEl) canvasEl.style.opacity = '0.04';
+            }
+        }
+
+        // --- 1. Matrix Digital Rain Animation ---
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const alphabet = katakana.split('');
+
+        const fontSize = 14;
+        let columns = canvas.width / fontSize;
+
+        const rainDrops = [];
+        for (let x = 0; x < columns; x++) {
+            rainDrops[x] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = activeTheme === 'matrix' ? 'rgba(10, 10, 15, 0.05)' : 'rgba(17, 17, 17, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = activeTheme === 'matrix' ? '#00ff66' : '#d48f48';
+            ctx.font = fontSize + 'px Share Tech Mono';
+
+            for (let i = 0; i < rainDrops.length; i++) {
+                const text = alphabet[Math.floor(Math.random() * alphabet.length)];
+                ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+
+                if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    rainDrops[i] = 0;
+                }
+                rainDrops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 30);
+
+        // --- 2. Live Docs Navigation Scrollspy & Search ---
+        const menuItems = document.querySelectorAll('.docs-menu-item');
+        const sections = document.querySelectorAll('.docs-section');
+
+        // Scrollspy to set active menu item based on viewport scroll
+        window.addEventListener('scroll', () => {
+            let currentSectionId = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.pageYOffset >= sectionTop - 150) {
+                    currentSectionId = section.getAttribute('id');
+                }
+            });
+
+            menuItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + currentSectionId) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Instant docs filtering function
+        function filterDocs() {
+            const query = document.getElementById('docs-search').value.toLowerCase();
+            
+            sections.forEach(section => {
+                const text = section.innerText.toLowerCase();
+                const menuLink = document.querySelector(`.docs-menu-item[href="#${section.id}"]`);
+                
+                if (text.includes(query)) {
+                    section.style.display = 'block';
+                    if (menuLink) menuLink.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                    if (menuLink) menuLink.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

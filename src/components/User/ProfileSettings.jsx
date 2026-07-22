@@ -90,7 +90,7 @@ export default function ProfileSettings() {
         result += String.fromCharCode(charCode);
       }
       return result;
-    } catch (e) {
+    } catch {
       throw new Error('Decryption failed. Please check your passphrase.');
     }
   };

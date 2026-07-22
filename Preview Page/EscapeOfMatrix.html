@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Of Matrix (E.O.M) — Gamified Life Planner OS</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="E.O.M (Escape Of Matrix) is a premium, local-first gamified Life Planner OS that turns your real life habits, finances, workouts, and goals into an RPG-style progression system.">
+    <meta name="keywords" content="Life Planner, Gamification, Personal Development, Finance Tracker, Workout Tracker, Escape the Matrix, RPG Life, Local First">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <!-- External Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-eom">
+
+    <!-- Matrix Glowing Particles Backdrop -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <div class="wrapper">
+        <!-- Header -->
+        <header>
+            <div class="nav-container">
+                <a href="#" class="logo">
+                    <span>E.O.M</span> OS
+                </a>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <button class="btn btn-secondary" onclick="toggleTheme()" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 20px; font-family: var(--font-display); cursor: pointer;">
+                        🌓 Style: <span id="theme-name" style="color: var(--primary); font-weight: bold; margin-left: 4px;">E.O.M Obsidian Gold</span>
+                    </button>
+                    <a href="Documentary.html" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 20px; font-family: var(--font-display); text-decoration: none; color: #fff;">
+                        📖 Docs
+                    </a>
+                    <span class="badge-mono">Local First</span>
+                    <span class="badge-mono" style="border-color: var(--secondary); color: var(--secondary);">V1.6.6</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1 class="hero-glitch-title">ESCAPE OF MATRIX</h1>
+            <p class="hero-subtitle">
+                A premium, minimalist local-first operating system designed to gamify and organize every facet of your life. Earn XP, track capital, map fitness, and code goals.
+            </p>
+            <div class="btn-group">
+                <a href="#demo" class="btn btn-primary">
+                    Interactive Preview
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                    </svg>
+                </a>
+                <a href="https://github.com/FRX132/E.O.M" target="_blank" class="btn btn-secondary">
+                    View on GitHub
+                </a>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px; margin-top: -30px;">
+                <button class="btn btn-secondary" onclick="openDownloadModal('ios')" style="font-size: 0.9rem; border-color: var(--primary); color: #fff; cursor: pointer;">
+                     Download iOS Bundle
+                </button>
+                <button class="btn btn-secondary" onclick="openDownloadModal('android')" style="font-size: 0.9rem; border-color: var(--secondary); color: #fff; cursor: pointer;">
+                    🤖 Download Android APK
+                </button>
+            </div>
+
+            <!-- Live XP Status Banner -->
+            <div class="stats-bar-banner">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 1.5rem;">🛡️</span>
+                    <div>
+                        <div style="font-weight: bold; font-family: var(--font-display);">Your Level Progression</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Check habits or log workouts below to earn XP!</div>
+                    </div>
+                </div>
+                <div class="progress-container-live">
+                    <div class="progress-header">
+                        <span>Rank: <strong id="rank-tag">Z</strong></span>
+                        <span id="progress-percent">35%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="xp-fill-bar"></div>
+                    </div>
+                </div>
+                <div class="live-xp-counter">
+                    <span id="xp-current">7,000</span> / <span id="xp-max">20,000</span> XP
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Demo Mockup Widget -->
+        <section id="demo" style="padding: 20px 0;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h2 style="font-family: var(--font-display); font-size: 2rem; font-weight: 800; margin-bottom: 10px;">Workspace Simulator</h2>
+                <p style="color: var(--text-muted);">Click sidebar items and interact with the modules directly inside the live showcase!</p>
+            </div>
+
+            <div class="mockup-window">
+                <!-- Sidebar -->
+                <div class="mockup-sidebar">
+                    <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary); opacity: 0.8; letter-spacing: 1px;">
+                        SYSTEM NAVIGATION
+                    </div>
+                    <div class="mockup-nav">
+                        <button class="mockup-nav-item active" onclick="switchMockupTab('overview')">
+                            📊 Overview
+                        </button>
+                        <button class="mockup-nav-item" onclick="switchMockupTab('finance')">
+                            💸 Finance Hub
+                        </button>
+                        <button class="mockup-nav-item" onclick="switchMockupTab('workout')">
+                            🏋️‍♂️ Workout Map
+                        </button>
+                        <button class="mockup-nav-item" onclick="switchMockupTab('ai')">
+                            🤖 AI Assistant
+                        </button>
+                    </div>
+                    <div style="margin-top: auto; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">
+                        ⚡ CLIENT: ONLINE
+                    </div>
+                </div>
+
+                <!-- Content Area -->
+                <div class="mockup-content">
+                    <!-- 1. OVERVIEW VIEW -->
+                    <div class="mockup-view active" id="view-overview">
+                        <div class="mockup-content-header">
+                            <h2 class="mockup-content-title">Welcome Back, Agent</h2>
+                            <span class="badge-mono" style="background: rgba(0, 240, 255, 0.05); color: var(--secondary); border-color: var(--secondary);">Overview</span>
+                        </div>
+                        <div class="overview-grid">
+                            <!-- Habits Card -->
+                            <div class="mockup-card">
+                                <span class="card-header-icon">🛡️</span>
+                                <div class="card-label">Daily Habits</div>
+                                <div class="card-value" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 15px;">Complete & Earn XP</div>
+                                <div class="habit-list-interactive">
+                                    <div class="habit-item-interactive" onclick="toggleHabitLive(this, 150)">
+                                        <input type="checkbox" id="h-1">
+                                        <span>10m Mindful Meditation (+150 XP)</span>
+                                    </div>
+                                    <div class="habit-item-interactive" onclick="toggleHabitLive(this, 200)">
+                                        <input type="checkbox" id="h-2">
+                                        <span>Read 10 Pages of Non-Fiction (+200 XP)</span>
+                                    </div>
+                                    <div class="habit-item-interactive" onclick="toggleHabitLive(this, 100)">
+                                        <input type="checkbox" id="h-3">
+                                        <span>Drink 2 Litres of Water (+100 XP)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Finance summary card -->
+                            <div class="mockup-card">
+                                <span class="card-header-icon">💰</span>
+                                <div class="card-label">Total Balance</div>
+                                <div class="card-value" id="overview-balance-val">€14,250.00</div>
+                                <div style="margin-top: 25px;">
+                                    <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px;">Active Weekly Goal</div>
+                                    <div style="font-size: 0.85rem; font-weight: 600; border-left: 2px solid var(--primary); padding-left: 10px; margin-bottom: 10px;" id="overview-goal-text">
+                                        Diversify cash assets in Bank accounts
+                                    </div>
+                                    <span class="badge-mono" style="font-size: 0.65rem;">Priority: Medium</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. FINANCE HUB VIEW -->
+                    <div class="mockup-view" id="view-finance">
+                        <div class="mockup-content-header">
+                            <h2 class="mockup-content-title">Finance Hub & Assets</h2>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <span style="font-size: 0.85rem; color: var(--text-muted);">Cash:</span>
+                                <span class="badge-mono" style="border-color: var(--primary); color: #fff;" id="finance-net-worth">€14,250.00</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">
+                                Add transactions or adjust items. Changes are computed instantly with zero latency.
+                            </div>
+                            <div class="finance-ledger-preview" id="ledger-box">
+                                <!-- Row 1 -->
+                                <div class="ledger-row">
+                                    <input type="text" value="Grocery Store (Healthy Meals)" onchange="recalculateFinanceMockup()">
+                                    <div>
+                                        <span class="currency">€</span>
+                                        <input type="number" value="78.50" style="width: 60px; font-weight: bold; color: var(--accent);" onchange="recalculateFinanceMockup()" class="finance-amount">
+                                    </div>
+                                    <select>
+                                        <option>Food</option>
+                                        <option>Utilities</option>
+                                        <option>Home</option>
+                                    </select>
+                                    <button class="ledger-delete-btn" onclick="deleteLedgerRow(this)">×</button>
+                                </div>
+                                <!-- Row 2 -->
+                                <div class="ledger-row">
+                                    <input type="text" value="Subscription Cloud Storage" onchange="recalculateFinanceMockup()">
+                                    <div>
+                                        <span class="currency">€</span>
+                                        <input type="number" value="9.99" style="width: 60px; font-weight: bold; color: var(--accent);" onchange="recalculateFinanceMockup()" class="finance-amount">
+                                    </div>
+                                    <select>
+                                        <option>Utilities</option>
+                                        <option>Food</option>
+                                        <option>Entertainment</option>
+                                    </select>
+                                    <button class="ledger-delete-btn" onclick="deleteLedgerRow(this)">×</button>
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addLedgerRow()" style="padding: 10px 20px; align-self: flex-start; font-size: 0.85rem;">
+                                + Add Transaction
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3. WORKOUT MAP VIEW -->
+                    <div class="mockup-view" id="view-workout">
+                        <div class="mockup-content-header">
+                            <h2 class="mockup-content-title">Interactive Muscle Map</h2>
+                            <span class="badge-mono" style="border-color: var(--secondary); color: var(--secondary);">Workout Hub</span>
+                        </div>
+                        <div class="muscle-map-preview">
+                            <!-- Mini Body Silhouette SVG -->
+                            <div class="muscle-svg-container">
+                                <svg class="muscle-svg" viewBox="0 0 100 200">
+                                    <!-- Head -->
+                                    <circle cx="50" cy="20" r="12" class="muscle-path" onclick="clickMuscle('Traps / Neck')" />
+                                    <!-- Chest -->
+                                    <path d="M35 38 C 35 38, 50 45, 65 38 L 60 62 L 40 62 Z" class="muscle-path" onclick="clickMuscle('Chest')" id="muscle-chest" />
+                                    <!-- Abs / Core -->
+                                    <rect x="40" y="65" width="20" height="35" rx="3" class="muscle-path" onclick="clickMuscle('Core / Abs')" />
+                                    <!-- Left Arm -->
+                                    <path d="M22 38 L 32 38 L 30 75 L 20 75 Z" class="muscle-path" onclick="clickMuscle('Left Bicep/Arm')" />
+                                    <!-- Right Arm -->
+                                    <path d="M68 38 L 78 38 L 80 75 L 70 75 Z" class="muscle-path" onclick="clickMuscle('Right Bicep/Arm')" />
+                                    <!-- Legs -->
+                                    <path d="M38 105 L 48 105 L 46 175 L 34 175 Z" class="muscle-path" onclick="clickMuscle('Left Quad/Leg')" />
+                                    <path d="M52 105 L 62 105 L 66 175 L 54 175 Z" class="muscle-path" onclick="clickMuscle('Right Quad/Leg')" />
+                                </svg>
+                            </div>
+
+                            <div style="flex: 1;">
+                                <h3 style="font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 12px;">Active Training Log</h3>
+                                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">
+                                    Tap body zones in the interactive SVG model to select and register target workouts instantly.
+                                </p>
+                                <div class="muscle-log-list" id="muscle-logs">
+                                    <div class="muscle-log-item">
+                                        <span>💪 Chest Exercise logged (Bench Press)</span>
+                                        <span style="color: var(--secondary);">Sets: 3 reps: 8-12</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. AI ASSISTANT VIEW -->
+                    <div class="mockup-view" id="view-ai">
+                        <div class="mockup-content-header">
+                            <h2 class="mockup-content-title">Agent Chat & Intent Router</h2>
+                            <span class="badge-mono" style="border-color: var(--primary); color: var(--primary);">System MCP</span>
+                        </div>
+                        <div class="ai-chat-preview">
+                            <div class="ai-chat-history" id="chat-box-history">
+                                <div class="chat-bubble chat-bubble-ai">
+                                    Welcome back, agent. I am your system coordinator. What action can I help route today?
+                                </div>
+                            </div>
+                            
+                            <!-- Preset helper prompt buttons -->
+                            <div class="preset-prompts-row">
+                                <button class="preset-prompt-btn" onclick="submitAIPrompt('log workout chest for 45 minutes')">Log Workout</button>
+                                <button class="preset-prompt-btn" onclick="submitAIPrompt('complete goal read 5 books')">Complete Goal</button>
+                                <button class="preset-prompt-btn" onclick="submitAIPrompt('delete expense subscription')">Remove Expense</button>
+                            </div>
+
+                            <div class="chat-input-area">
+                                <input type="text" placeholder="Tell the agent to log, complete, or delete items..." id="chat-input" onkeydown="if(event.key === 'Enter') triggerAIChat()">
+                                <button onclick="triggerAIChat()">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Premium Feature Showcase -->
+        <section style="padding: 40px 0;">
+            <div style="text-align: center; margin-bottom: 60px;">
+                <h2 style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 900; margin-bottom: 12px;">Architectural Superiority</h2>
+                <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">E.O.M is designed to give you ultimate control over your metrics, data privacy, and level expansion.</p>
+            </div>
+
+            <div class="features-grid">
+                <!-- Card 1 -->
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">Local-First Privacy</h3>
+                    <p class="feature-description">Your data never leaves your device. Fully persisted locally using Zustand store bindings with optional native local-path backups.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Lag-Free Ledger</h3>
+                    <p class="feature-description">Memoisierte React-Trees verarbeiten Hunderte von Ausgaben, Budgets und Kontoständen flüssig und ohne spürbare Eingabeverzögerung.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">Agent Router (MCP)</h3>
+                    <p class="feature-description">Automate commands using built-in offline Web Workers or plug in custom LLM servers like Ollama, LM Studio, OpenAI, and Claude.</p>
+                </div>
+                <!-- Card 4 -->
+                <div class="feature-card">
+                    <div class="feature-icon">📲</div>
+                    <h3 class="feature-title">Mobile Ready</h3>
+                    <p class="feature-description">Built with Capacitor wrapper support, enabling you to build, compile, and run your workspace 1:1 on your iPhone or Apple Simulator.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-container">
+                <div class="footer-left">
+                    <a href="#" class="logo" style="font-size: 1.2rem; margin-bottom: 8px; display: inline-flex;">
+                        <span>E.O.M</span> OS
+                    </a>
+                    <p>&copy; 2026 E.O.M <br> Created by Chetan Kaushal. <br>All rights reserved.</p>
+                </div>
+                <div class="footer-right">
+                    <div class="social-links">
+                        <a href="https://github.com/FRX132" target="_blank">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+                              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+                            </svg>
+                            GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Download Modal -->
+    <div id="download-modal" class="download-modal-overlay" style="display: none;">
+        <div class="download-modal-card">
+            <button class="download-modal-close" onclick="closeDownloadModal()">&times;</button>
+            <h3 id="modal-title" style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; margin-bottom: 15px; color: #fff;">Download E.O.M Bundle</h3>
+            <div id="modal-body-content" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;"></div>
+        </div>
+    </div>
+
+    <!-- External Script -->
+    <script src="app.js"></script>
+</body>
+</html>

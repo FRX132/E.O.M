@@ -190,3 +190,73 @@
     border-bottom: 1px solid var(--border-color);
   }
 }
+
+/* Editor Responsive Layout Styles */
+.editor-panels-container {
+  display: flex;
+  flex: 1;
+  gap: 20px;
+  min-height: 0;
+  width: 100%;
+}
+
+.editor-left-panel {
+  width: 280px;
+  min-width: 220px;
+  max-width: 400px;
+  resize: horizontal;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+}
+
+.editor-center-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.editor-right-panel {
+  width: 320px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+  border-left: 1px solid var(--border-color);
+  background: var(--bg-card-alt);
+}
+
+@media (max-width: 768px) {
+  .editor-panels-container {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    gap: 15px !important;
+  }
+
+  .editor-left-panel {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    resize: none !important;
+    height: auto !important;
+    max-height: 300px !important;
+  }
+
+  .editor-center-panel {
+    width: 100% !important;
+    height: 550px !important;
+    min-height: 450px !important;
+  }
+
+  .editor-right-panel {
+    width: 100% !important;
+    border-left: none !important;
+    border-top: 1px solid var(--border-color) !important;
+    max-height: 400px !important;
+  }
+}

@@ -33,7 +33,7 @@ const decryptText = (encoded, key) => {
       result += String.fromCharCode(charCode);
     }
     return result;
-  } catch (e) {
+  } catch {
     return 'Decryption Error';
   }
 };

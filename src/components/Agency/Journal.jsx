@@ -17,6 +17,15 @@ export default function Journal() {
   const [activeEntryId, setActiveEntryId] = useState(journal.length > 0 ? journal[0].id : null);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({ title: '', content: '' });
+  const [viewMode, setViewMode] = useState(() => {
+    return localStorage.getItem('journal_view_mode') || 'split';
+  });
+
+  const changeViewMode = (mode) => {
+    setViewMode(mode);
+    localStorage.setItem('journal_view_mode', mode);
+  };
+
   const [search, setSearch] = useState('');
 
   const activeEntry = journal.find(e => e.id === activeEntryId);
@@ -136,12 +145,12 @@ export default function Journal() {
         </div>
 
         {/* RIGHT PANEL: EDITOR/VIEWER */}
-        <div className="premium-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '24px', overflowY: 'auto' }}>
+        <div className="premium-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '24px', overflow: 'hidden' }}>
           {activeEntry ? (
             isEditing ? (
               // EDIT MODE
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', flexShrink: 0 }}>
                   <input 
                     type="text"
                     value={editForm.title}
@@ -159,29 +168,69 @@ export default function Journal() {
                       padding: '8px 0'
                     }}
                   />
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    
+                    {/* Segmented view mode selector */}
+                    <div style={{ display: 'flex', background: 'var(--bg-main)', padding: '2px', borderRadius: '6px', border: '1px solid var(--border-color)', gap: '2px', marginRight: '8px' }}>
+                      <button 
+                        onClick={() => changeViewMode('edit')} 
+                        className={`pill ${viewMode === 'edit' ? 'blue' : ''}`}
+                        style={{ fontSize: '0.75rem', padding: '4px 10px', background: viewMode === 'edit' ? 'var(--blue-bg)' : 'transparent', border: 'none', color: viewMode === 'edit' ? 'var(--blue-text)' : 'var(--text-muted)', cursor: 'pointer' }}
+                        title="Editor Mode"
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button 
+                        onClick={() => changeViewMode('split')} 
+                        className={`pill ${viewMode === 'split' ? 'blue' : ''}`}
+                        style={{ fontSize: '0.75rem', padding: '4px 10px', background: viewMode === 'split' ? 'var(--blue-bg)' : 'transparent', border: 'none', color: viewMode === 'split' ? 'var(--blue-text)' : 'var(--text-muted)', cursor: 'pointer' }}
+                        title="Split Live Preview Mode"
+                      >
+                        🥞 Split
+                      </button>
+                      <button 
+                        onClick={() => changeViewMode('preview')} 
+                        className={`pill ${viewMode === 'preview' ? 'blue' : ''}`}
+                        style={{ fontSize: '0.75rem', padding: '4px 10px', background: viewMode === 'preview' ? 'var(--blue-bg)' : 'transparent', border: 'none', color: viewMode === 'preview' ? 'var(--blue-text)' : 'var(--text-muted)', cursor: 'pointer' }}
+                        title="Preview Mode"
+                      >
+                        👁️ Preview
+                      </button>
+                    </div>
+
                     <button onClick={() => setIsEditing(false)} className="pill">Cancel</button>
                     <button onClick={handleSave} className="pill green">Save</button>
                   </div>
                 </div>
-                <textarea 
-                  value={editForm.content}
-                  onChange={(e) => setEditForm({...editForm, content: e.target.value})}
-                  placeholder="Start typing your entry... Markdown is supported."
-                  style={{
-                    flex: 1,
-                    background: 'var(--bg-input)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '8px',
-                    color: 'var(--text-main)',
-                    padding: '16px',
-                    fontSize: '0.9rem',
-                    lineHeight: '1.6',
-                    outline: 'none',
-                    resize: 'none',
-                    fontFamily: 'var(--font-main)'
-                  }}
-                />
+                
+                <div className={`editor-split-workspace ${viewMode === 'split' ? 'split' : ''}`} style={{ flex: 1, display: 'flex', minHeight: 0, border: '1px solid var(--border-color)', borderRadius: '8px', overflow: 'hidden', background: 'var(--bg-input)' }}>
+                  {(viewMode === 'edit' || viewMode === 'split') && (
+                    <textarea 
+                      value={editForm.content}
+                      onChange={(e) => setEditForm({...editForm, content: e.target.value})}
+                      placeholder="Start typing your entry... Markdown is supported."
+                      className="editor-textarea"
+                      style={{
+                        fontFamily: 'var(--font-main)',
+                        fontSize: '0.9rem',
+                        padding: '16px'
+                      }}
+                    />
+                  )}
+                  {(viewMode === 'preview' || viewMode === 'split') && (
+                    <div 
+                      className="editor-preview-panel"
+                      style={{
+                        padding: '16px'
+                      }}
+                    >
+                      <MarkdownViewer 
+                        content={editForm.content || '*Empty entry.*'}
+                        onUpdate={(newContent) => setEditForm({...editForm, content: newContent})}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               // VIEW MODE

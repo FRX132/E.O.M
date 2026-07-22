@@ -58,25 +58,25 @@ export default function LanguageHub() {
 
       <div className="notion-block" style={{ minHeight: '60vh' }}>
         <div className="notion-tabs">
-          <div className="tab-group" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-            <div className="tab-item active">All Languages</div>
-            <button
-              style={{
-                marginLeft: 'auto',
-                background: 'var(--blue-bg)',
-                color: 'var(--blue-text)',
-                padding: '6px 16px',
-                borderRadius: '6px',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                border: 'none',
-                cursor: 'pointer'
-              }}
-              onClick={openAddModal}
-            >
-              New Language +
-            </button>
-          </div>
+          <div className="notion-tab active">All Languages</div>
+          <button
+            style={{
+              marginLeft: 'auto',
+              background: 'var(--blue-bg)',
+              color: 'var(--blue-text)',
+              padding: '6px 16px',
+              borderRadius: '6px',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              border: 'none',
+              cursor: 'pointer',
+              alignSelf: 'center',
+              marginBottom: '8px'
+            }}
+            onClick={openAddModal}
+          >
+            New Language +
+          </button>
         </div>
 
         <div className="card-content" style={{ padding: '0 20px 40px' }}>

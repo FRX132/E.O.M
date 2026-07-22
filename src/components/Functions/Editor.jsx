@@ -15,7 +15,14 @@ export default function Editor() {
 
   const [activeFileId, setActiveFileId] = useState(files.length > 0 ? files[0].id : null);
   const [search, setSearch] = useState('');
-  const [viewMode, setViewMode] = useState('edit'); // 'edit', 'split', 'preview'
+  const [viewMode, setViewMode] = useState(() => {
+    return localStorage.getItem('editor_view_mode') || 'split';
+  });
+
+  const changeViewMode = (mode) => {
+    setViewMode(mode);
+    localStorage.setItem('editor_view_mode', mode);
+  };
   const [isHelperOpen, setIsHelperOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [collapsedFolders, setCollapsedFolders] = useState({});
@@ -76,7 +83,9 @@ export default function Editor() {
     };
     setFiles([newFile, ...files]);
     setActiveFileId(newFile.id);
-    setViewMode('edit');
+    if (viewMode === 'preview') {
+      changeViewMode('split');
+    }
   };
 
   const handleCreateFileInFolder = (folderName) => {
@@ -89,7 +98,9 @@ export default function Editor() {
     };
     setFiles([newFile, ...files]);
     setActiveFileId(newFile.id);
-    setViewMode('edit');
+    if (viewMode === 'preview') {
+      changeViewMode('split');
+    }
   };
 
   const handleCreateFolder = () => {
@@ -118,7 +129,9 @@ export default function Editor() {
       }));
       setFiles([...imported, ...files]);
       setActiveFileId(imported[0].id);
-      setViewMode('edit');
+      if (viewMode === 'preview') {
+        changeViewMode('split');
+      }
     } else if (res.error && res.error !== 'No files selected') {
       alert(`Error importing files: ${res.error}`);
     }
@@ -141,7 +154,9 @@ export default function Editor() {
       }));
       setFiles([...imported, ...files]);
       setActiveFileId(imported[0].id);
-      setViewMode('edit');
+      if (viewMode === 'preview') {
+        changeViewMode('split');
+      }
     } else if (res.error && res.error !== 'No directory selected') {
       alert(`Error importing folder: ${res.error}`);
     }
@@ -196,7 +211,9 @@ export default function Editor() {
       }));
       setFiles([...imported, ...files]);
       setActiveFileId(imported[0].id);
-      setViewMode('edit');
+      if (viewMode === 'preview') {
+        changeViewMode('split');
+      }
     } else if (res.error && res.error !== 'No files selected') {
       alert(`Error importing files: ${res.error}`);
     }
@@ -235,10 +252,10 @@ export default function Editor() {
         <p className="premium-subtitle">Standalone text and markdown editor with folders.<br />Draft notes, wikis, and organize your files.</p>
       </div>
 
-      <div style={{ display: 'flex', flex: 1, gap: '20px', minHeight: 0 }}>
+      <div className="editor-panels-container">
         
         {/* LEFT PANEL: FILE TREE */}
-        <div className="premium-card" style={{ width: '280px', minWidth: '220px', maxWidth: '400px', resize: 'horizontal', overflow: 'auto', display: 'flex', flexDirection: 'column', padding: '16px', gap: '12px' }}>
+        <div className="premium-card editor-left-panel">
           
           <div style={{ display: 'flex', gap: '6px' }}>
             <button 
@@ -489,7 +506,7 @@ export default function Editor() {
         </div>
 
         {/* CENTER PANEL: WORKSPACE */}
-        <div className="premium-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '0', overflow: 'hidden' }}>
+        <div className="premium-card editor-center-panel">
           {activeFile ? (
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               
@@ -541,7 +558,7 @@ export default function Editor() {
                   {/* Segmented view mode selector */}
                   <div style={{ display: 'flex', background: 'var(--bg-main)', padding: '2px', borderRadius: '6px', border: '1px solid var(--border-color)', gap: '2px' }}>
                     <button 
-                      onClick={() => setViewMode('edit')} 
+                      onClick={() => changeViewMode('edit')} 
                       className={`pill ${viewMode === 'edit' ? 'blue' : ''}`}
                       style={{ fontSize: '0.75rem', padding: '4px 10px', background: viewMode === 'edit' ? 'var(--blue-bg)' : 'transparent', border: 'none', color: viewMode === 'edit' ? 'var(--blue-text)' : 'var(--text-muted)', cursor: 'pointer' }}
                       title="Editor Mode"
@@ -549,7 +566,7 @@ export default function Editor() {
                       ✏️ Edit
                     </button>
                     <button 
-                      onClick={() => setViewMode('split')} 
+                      onClick={() => changeViewMode('split')} 
                       className={`pill ${viewMode === 'split' ? 'blue' : ''}`}
                       style={{ fontSize: '0.75rem', padding: '4px 10px', background: viewMode === 'split' ? 'var(--blue-bg)' : 'transparent', border: 'none', color: viewMode === 'split' ? 'var(--blue-text)' : 'var(--text-muted)', cursor: 'pointer' }}
                       title="Split Live Preview Mode"
@@ -557,7 +574,7 @@ export default function Editor() {
                       🥞 Split
                     </button>
                     <button 
-                      onClick={() => setViewMode('preview')} 
+                      onClick={() => changeViewMode('preview')} 
                       className={`pill ${viewMode === 'preview' ? 'blue' : ''}`}
                       style={{ fontSize: '0.75rem', padding: '4px 10px', background: viewMode === 'preview' ? 'var(--blue-bg)' : 'transparent', border: 'none', color: viewMode === 'preview' ? 'var(--blue-text)' : 'var(--text-muted)', cursor: 'pointer' }}
                       title="Preview Mode"
@@ -617,7 +634,7 @@ export default function Editor() {
 
         {/* RIGHT PANEL: MARKDOWN GUIDE */}
         {isHelperOpen && (
-          <div className="premium-card" style={{ width: '320px', overflowY: 'auto', display: 'flex', flexDirection: 'column', padding: '16px', gap: '12px', borderLeft: '1px solid var(--border-color)', background: 'var(--bg-card-alt)' }}>
+          <div className="premium-card editor-right-panel">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>
               <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--primary)' }}>📖 Obsidian Manual</span>
               <button 

@@ -267,7 +267,7 @@ function TradeImportModal({ isOpen, onClose, currency }) {
   const setTrades = useStore(s => s.setTrades);
 
   const [step, setStep] = useState(1);
-  const [fileType, setFileType] = useState(null);
+  const [_fileType, setFileType] = useState(null);
   const [fileName, setFileName] = useState('');
   const [rawText, setRawText] = useState('');
   const [csvRows, setCsvRows] = useState([]);
@@ -283,18 +283,21 @@ function TradeImportModal({ isOpen, onClose, currency }) {
   // Reset states when modal is closed
   useEffect(() => {
     if (!isOpen) {
-      setStep(1);
-      setFileType(null);
-      setFileName('');
-      setRawText('');
-      setCsvRows([]);
-      setMappings({
-        symbol: -1, type: -1, entry: -1, exit: -1, size: -1, pnl: -1, date: -1, notes: -1
-      });
-      setHeaderRowIndex(0);
-      setParsedTrades([]);
-      setSelectedTrades(new Set());
-      setDragging(false);
+      const timer = setTimeout(() => {
+        setStep(1);
+        setFileType(null);
+        setFileName('');
+        setRawText('');
+        setCsvRows([]);
+        setMappings({
+          symbol: -1, type: -1, entry: -1, exit: -1, size: -1, pnl: -1, date: -1, notes: -1
+        });
+        setHeaderRowIndex(0);
+        setParsedTrades([]);
+        setSelectedTrades(new Set());
+        setDragging(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 

@@ -397,3 +397,16 @@ button {
   resize: both !important;
   overflow: auto !important;
 }
+
+/* Ensure responsiveness on all desktop modal templates on iPhone / Mobile screens */
+@media (max-width: 768px) {
+  .mac-modal, .profile-modal-content, .modal-content, .media-modal-content {
+    width: 95% !important;
+    max-width: 95vw !important;
+    min-width: 0 !important;
+    max-height: 90vh !important;
+    margin: 10px auto !important;
+    overflow-y: auto !important;
+    resize: none !important; /* Disable resizing on mobile to prevent scaling issues */
+  }
+}

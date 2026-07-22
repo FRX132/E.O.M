@@ -68,20 +68,18 @@ export default function MovieList() {
 
       <div className="notion-block" style={{ minHeight: '60vh' }}>
         <div className="notion-tabs">
-          <div className="tab-group">
-            {['All', 'Watching', 'Watched', 'Watchlist'].map(tab => (
-              <button
-                key={tab}
-                className={`tab-item ${activeTab === tab ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab)}
-              >
-                {tab}
-              </button>
-            ))}
-            <button style={{ marginLeft: 'auto', background: 'var(--blue-bg)', color: 'var(--blue-text)', padding: '4px 12px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600 }} onClick={openAddModal}>
-              New Movie +
+          {['All', 'Watching', 'Watched', 'Watchlist'].map(tab => (
+            <button
+              key={tab}
+              className={`notion-tab ${activeTab === tab ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
             </button>
-          </div>
+          ))}
+          <button style={{ marginLeft: 'auto', background: 'var(--blue-bg)', color: 'var(--blue-text)', padding: '4px 12px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, border: 'none', cursor: 'pointer', alignSelf: 'center', marginBottom: '8px' }} onClick={openAddModal}>
+            New Movie +
+          </button>
         </div>
 
         <div className="card-content" style={{ padding: '0 20px 40px' }}>
