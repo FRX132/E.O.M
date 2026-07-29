@@ -695,3 +695,100 @@
 .mac-switch-checkbox:checked + .mac-switch-slider:before {
   transform: translateX(20px);
 }
+
+/* --- macOS Confirm Dialog --- */
+.mac-confirm-dialog {
+  max-width: 340px !important;
+}
+
+.mac-confirm-title {
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+:root[data-theme="light"] .mac-confirm-title {
+  color: #000000;
+}
+
+.mac-confirm-text {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 20px;
+  line-height: 1.45;
+}
+
+:root[data-theme="light"] .mac-confirm-text {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.mac-btn-confirm-choice {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mac-btn-confirm-choice.primary {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.mac-btn-confirm-choice.primary:hover {
+  filter: brightness(1.15);
+}
+
+.mac-btn-confirm-choice.danger {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.mac-btn-confirm-choice.danger:hover {
+  background: #dc2626;
+}
+
+.mac-btn-confirm-choice.secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.mac-btn-confirm-choice.secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme="light"] .mac-btn-confirm-choice.secondary {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #333333;
+}
+
+:root[data-theme="light"] .mac-btn-confirm-choice.secondary:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.mac-btn-confirm-choice.text {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.mac-btn-confirm-choice.text:hover {
+  color: #ffffff;
+}
+
+:root[data-theme="light"] .mac-btn-confirm-choice.text {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="light"] .mac-btn-confirm-choice.text:hover {
+  color: #000000;
+}

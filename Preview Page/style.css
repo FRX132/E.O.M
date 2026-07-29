@@ -899,3 +899,20 @@ footer {
     box-shadow: 0 0 25px var(--primary);
     transform: translateY(-2px);
 }
+
+/* Waitlist / Contact Form Styles */
+.waitlist-card input:focus, .waitlist-card textarea:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 10px var(--primary-glow);
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.waitlist-card button:hover {
+    box-shadow: 0 0 15px var(--primary-glow);
+    transform: translateY(-2px);
+}
+
+.waitlist-card button:active {
+    transform: translateY(0);
+}
+

@@ -259,8 +259,8 @@ function openDownloadModal(platform) {
         title.innerText = 'Download E.O.M for iOS (iPhone)';
         content.innerHTML = `
             <p style="margin-bottom: 15px;">Get the prebuilt <strong>E.O.M.ipa</strong> bundle to install directly on your device.</p>
-            <a href="https://github.com/FRX132/E.O.M/releases/download/v1.6.6/E.O.M.ipa" class="modal-download-btn" download>
-                📥 Download E.O.M.ipa (V1.6.6)
+            <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M.ipa" class="modal-download-btn" download>
+                📥 Download E.O.M.ipa (V2.0.0)
             </a>
             <div style="text-align: left; font-size: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
                 <strong style="color: #fff; display: block; margin-bottom: 5px;">Installation Instructions:</strong>
@@ -273,8 +273,8 @@ function openDownloadModal(platform) {
         title.innerText = 'Download E.O.M for Android';
         content.innerHTML = `
             <p style="margin-bottom: 15px;">Get the prebuilt <strong>E.O.M.apk</strong> bundle to install on Android devices or Emulators.</p>
-            <a href="https://github.com/FRX132/E.O.M/releases/download/v1.6.6/E.O.M.apk" class="modal-download-btn" download>
-                📥 Download E.O.M.apk (V1.6.6)
+            <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M.apk" class="modal-download-btn" download>
+                📥 Download E.O.M.apk (V2.0.0)
             </a>
             <div style="text-align: left; font-size: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
                 <strong style="color: #fff; display: block; margin-bottom: 5px;">Installation Instructions:</strong>
@@ -302,3 +302,159 @@ window.addEventListener('click', (event) => {
         closeDownloadModal();
     }
 });
+
+// --- 8. Waitlist Form Handler (AJAX & Validation) ---
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('waitlist-form');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Elements
+        const statusDiv = document.getElementById('form-status');
+        const nameInput = document.getElementById('agent-name');
+        const emailInput = document.getElementById('agent-email');
+        const reasonInput = document.getElementById('agent-reason');
+
+        const errName = document.getElementById('error-name');
+        const errEmail = document.getElementById('error-email');
+        const errReason = document.getElementById('error-reason');
+
+        // Reset display
+        statusDiv.style.display = 'none';
+        statusDiv.className = '';
+        statusDiv.innerText = '';
+        
+        [errName, errEmail, errReason].forEach(el => {
+            if (el) {
+                el.style.display = 'none';
+                el.innerText = '';
+            }
+        });
+        [nameInput, emailInput, reasonInput].forEach(el => {
+            if (el) {
+                el.style.borderColor = 'var(--border-color)';
+            }
+        });
+
+        // Client-side validation
+        let clientErrors = false;
+
+        const nameVal = nameInput ? nameInput.value.trim() : '';
+        if (nameVal === '') {
+            if (errName) {
+                errName.innerText = 'Agent codename is required.';
+                errName.style.display = 'block';
+            }
+            if (nameInput) nameInput.style.borderColor = 'var(--accent)';
+            clientErrors = true;
+        } else if (nameVal.length < 2) {
+            if (errName) {
+                errName.innerText = 'Agent codename must be at least 2 characters.';
+                errName.style.display = 'block';
+            }
+            if (nameInput) nameInput.style.borderColor = 'var(--accent)';
+            clientErrors = true;
+        }
+
+        const emailVal = emailInput ? emailInput.value.trim() : '';
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailVal === '') {
+            if (errEmail) {
+                errEmail.innerText = 'Email address is required.';
+                errEmail.style.display = 'block';
+            }
+            if (emailInput) emailInput.style.borderColor = 'var(--accent)';
+            clientErrors = true;
+        } else if (!emailRegex.test(emailVal)) {
+            if (errEmail) {
+                errEmail.innerText = 'Please enter a valid secure email address.';
+                errEmail.style.display = 'block';
+            }
+            if (emailInput) emailInput.style.borderColor = 'var(--accent)';
+            clientErrors = true;
+        }
+
+        const reasonVal = reasonInput ? reasonInput.value.trim() : '';
+        if (reasonVal.length > 1000) {
+            if (errReason) {
+                errReason.innerText = 'Motivation message must not exceed 1000 characters.';
+                errReason.style.display = 'block';
+            }
+            if (reasonInput) reasonInput.style.borderColor = 'var(--accent)';
+            clientErrors = true;
+        }
+
+        if (clientErrors) {
+            if (statusDiv) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = 'rgba(255, 107, 107, 0.1)';
+                statusDiv.style.border = '1px solid var(--accent)';
+                statusDiv.style.color = 'var(--accent)';
+                statusDiv.innerText = 'System override rejected. Please fix errors below.';
+            }
+            return;
+        }
+
+        // AJAX submit
+        try {
+            const formData = new FormData(form);
+            const response = await fetch('validate.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.status === 'success') {
+                // Success
+                if (statusDiv) {
+                    statusDiv.style.display = 'block';
+                    statusDiv.style.background = 'rgba(0, 255, 102, 0.1)';
+                    statusDiv.style.border = '1px solid var(--primary)';
+                    statusDiv.style.color = 'var(--primary)';
+                    statusDiv.innerText = result.message;
+                }
+                form.reset();
+            } else {
+                // Server-side validation errors
+                if (statusDiv) {
+                    statusDiv.style.display = 'block';
+                    statusDiv.style.background = 'rgba(255, 107, 107, 0.1)';
+                    statusDiv.style.border = '1px solid var(--accent)';
+                    statusDiv.style.color = 'var(--accent)';
+                    statusDiv.innerText = result.message || 'System override rejected. Please fix errors below.';
+                }
+
+                if (result.errors) {
+                    if (result.errors.name && errName) {
+                        errName.innerText = result.errors.name;
+                        errName.style.display = 'block';
+                        if (nameInput) nameInput.style.borderColor = 'var(--accent)';
+                    }
+                    if (result.errors.email && errEmail) {
+                        errEmail.innerText = result.errors.email;
+                        errEmail.style.display = 'block';
+                        if (emailInput) emailInput.style.borderColor = 'var(--accent)';
+                    }
+                    if (result.errors.reason && errReason) {
+                        errReason.innerText = result.errors.reason;
+                        errReason.style.display = 'block';
+                        if (reasonInput) reasonInput.style.borderColor = 'var(--accent)';
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
+            if (statusDiv) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = 'rgba(255, 107, 107, 0.1)';
+                statusDiv.style.border = '1px solid var(--accent)';
+                statusDiv.style.color = 'var(--accent)';
+                statusDiv.innerText = 'Network connection failed. Secure link could not be established.';
+            }
+        }
+    });
+});
+

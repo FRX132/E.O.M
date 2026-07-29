@@ -97,6 +97,8 @@ export default function Timetable() {
   const [habitId, setHabitId] = useState('');
   const [isRecurring, setIsRecurring] = useState(false);
   const [selectedDays, setSelectedDays] = useState(['Monday']);
+  const [deleteConfirmation, setDeleteConfirmation] = useState(null);
+  const [editConfirmation, setEditConfirmation] = useState(null);
 
   // Get today's weekday name
   const todayDayName = useMemo(() => {
@@ -215,25 +217,46 @@ export default function Timetable() {
 
     if (editingBlock) {
       // Edit
-      const updated = timetableBlocks.map(b => b.id === editingBlock.id ? {
-        ...b,
-        title: finalTitle,
-        notes: notes.trim(),
-        url: url.trim(),
-        day,
-        startTime,
-        endTime,
-        color,
-        habitId: finalHabitId || null,
-        isReminder,
-        completed: b.completed || false
-      } : b);
-      setTimetableBlocks(updated);
+      if (editingBlock.recurringGroupId) {
+        setEditConfirmation({
+          block: editingBlock,
+          fields: {
+            title: finalTitle,
+            notes: notes.trim(),
+            url: url.trim(),
+            day,
+            startTime,
+            endTime,
+            color,
+            habitId: finalHabitId || null,
+            isReminder
+          }
+        });
+        setIsModalOpen(false);
+      } else {
+        const updated = timetableBlocks.map(b => b.id === editingBlock.id ? {
+          ...b,
+          title: finalTitle,
+          notes: notes.trim(),
+          url: url.trim(),
+          day,
+          startTime,
+          endTime,
+          color,
+          habitId: finalHabitId || null,
+          isReminder,
+          completed: b.completed || false
+        } : b);
+        setTimetableBlocks(updated);
+        setIsModalOpen(false);
+      }
     } else {
       // Add
       if (isRecurring && selectedDays.length > 0) {
+        const recurringGroupId = window.crypto.randomUUID ? window.crypto.randomUUID() : (Date.now().toString() + '-group-' + Math.random());
         const newBlocks = selectedDays.map(d => ({
           id: window.crypto.randomUUID ? window.crypto.randomUUID() : (Date.now().toString() + '-' + Math.random()),
+          recurringGroupId,
           title: finalTitle,
           notes: notes.trim(),
           url: url.trim(),
@@ -262,16 +285,62 @@ export default function Timetable() {
         };
         setTimetableBlocks([...timetableBlocks, newBlock]);
       }
+      setIsModalOpen(false);
     }
-    setIsModalOpen(false);
   };
 
   // Delete block
-  const handleDelete = (id, e) => {
+  const handleDelete = (block, e) => {
     e.stopPropagation();
-    if (confirm('Are you sure you want to delete this schedule block?')) {
-      setTimetableBlocks(timetableBlocks.filter(b => b.id !== id));
+    if (block.recurringGroupId) {
+      setDeleteConfirmation(block);
+    } else {
+      if (confirm('Are you sure you want to delete this schedule block?')) {
+        setTimetableBlocks(timetableBlocks.filter(b => b.id !== block.id));
+      }
     }
+  };
+
+  // Confirm handlers for recurring edit
+  const handleConfirmEditAll = () => {
+    if (!editConfirmation) return;
+    const { block, fields } = editConfirmation;
+    const updated = timetableBlocks.map(b => {
+      if (b.recurringGroupId === block.recurringGroupId) {
+        return {
+          ...b,
+          title: fields.title,
+          notes: fields.notes,
+          url: fields.url,
+          startTime: fields.startTime,
+          endTime: fields.endTime,
+          color: fields.color,
+          habitId: fields.habitId,
+          isReminder: fields.isReminder
+        };
+      }
+      return b;
+    });
+    setTimetableBlocks(updated);
+    setEditConfirmation(null);
+  };
+
+  const handleConfirmEditOnlyThis = () => {
+    if (!editConfirmation) return;
+    const { block, fields } = editConfirmation;
+    const updated = timetableBlocks.map(b => b.id === block.id ? {
+      ...b,
+      ...fields,
+      completed: b.completed || false
+    } : b);
+    setTimetableBlocks(updated);
+    setEditConfirmation(null);
+  };
+
+  const handleCancelEditConfirmation = () => {
+    if (!editConfirmation) return;
+    setEditConfirmation(null);
+    setIsModalOpen(true);
   };
 
   // Group and sort blocks by day
@@ -382,7 +451,7 @@ export default function Timetable() {
                         <button className="timetable-block-action-btn edit" onClick={(e) => handleOpenEdit(block, e)} title="Edit Block">
                           ✏️
                         </button>
-                        <button className="timetable-block-action-btn delete" onClick={(e) => handleDelete(block.id, e)} title="Delete Block">
+                        <button className="timetable-block-action-btn delete" onClick={(e) => handleDelete(block, e)} title="Delete Block">
                           🗑️
                         </button>
                       </div>
@@ -672,6 +741,90 @@ export default function Timetable() {
               </div>
 
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* macOS Confirm Delete Dialog */}
+      {deleteConfirmation && (
+        <div className="timetable-modal-backdrop" onClick={() => setDeleteConfirmation(null)}>
+          <div className="timetable-modal-content mac-confirm-dialog" onClick={e => e.stopPropagation()}>
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              <h3 className="mac-confirm-title">
+                Wiederkehrende Aufgabe löschen
+              </h3>
+              <p className="mac-confirm-text">
+                Möchtest du nur diese einzelne Aufgabe oder alle wiederkehrenden Aufgaben dieser Serie löschen?
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <button
+                  type="button"
+                  className="mac-btn-confirm-choice danger"
+                  onClick={() => {
+                    setTimetableBlocks(timetableBlocks.filter(b => b.recurringGroupId !== deleteConfirmation.recurringGroupId));
+                    setDeleteConfirmation(null);
+                  }}
+                >
+                  Alle Vorkommen löschen
+                </button>
+                <button
+                  type="button"
+                  className="mac-btn-confirm-choice secondary"
+                  onClick={() => {
+                    setTimetableBlocks(timetableBlocks.filter(b => b.id !== deleteConfirmation.id));
+                    setDeleteConfirmation(null);
+                  }}
+                >
+                  Nur dieses Vorkommen löschen
+                </button>
+                <button
+                  type="button"
+                  className="mac-btn-confirm-choice text"
+                  onClick={() => setDeleteConfirmation(null)}
+                >
+                  Abbrechen
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* macOS Confirm Edit Dialog */}
+      {editConfirmation && (
+        <div className="timetable-modal-backdrop" onClick={handleCancelEditConfirmation}>
+          <div className="timetable-modal-content mac-confirm-dialog" onClick={e => e.stopPropagation()}>
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              <h3 className="mac-confirm-title">
+                Wiederkehrende Aufgabe bearbeiten
+              </h3>
+              <p className="mac-confirm-text">
+                Möchtest du nur diese einzelne Aufgabe oder alle wiederkehrenden Aufgaben dieser Serie ändern?
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <button
+                  type="button"
+                  className="mac-btn-confirm-choice primary"
+                  onClick={handleConfirmEditAll}
+                >
+                  Alle Vorkommen ändern
+                </button>
+                <button
+                  type="button"
+                  className="mac-btn-confirm-choice secondary"
+                  onClick={handleConfirmEditOnlyThis}
+                >
+                  Nur dieses Vorkommen ändern
+                </button>
+                <button
+                  type="button"
+                  className="mac-btn-confirm-choice text"
+                  onClick={handleCancelEditConfirmation}
+                >
+                  Abbrechen
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

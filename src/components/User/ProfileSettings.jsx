@@ -9,6 +9,7 @@ const SettingsIcon = () => (
   </svg>
 );
 
+// 
 const DATA_KEYS = [
   'profile',
   'activeQuests',
@@ -55,6 +56,7 @@ export default function ProfileSettings() {
   const applyDesignPreset = useStore(state => state.applyDesignPreset);
 
   const [saveStatus, setSaveStatus] = useState('');
+  const [activeTab, setActiveTab] = useState('profile');
 
   const [syncCode, setSyncCode] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
@@ -166,7 +168,7 @@ export default function ProfileSettings() {
     try {
       const res = await fetch(`https://api.pastes.dev/${cleanCode}`);
       if (!res.ok) throw new Error('Sync fetch failed');
-      
+
       const rawText = await res.text();
       let decryptedText = rawText;
 
@@ -179,7 +181,7 @@ export default function ProfileSettings() {
             return;
           }
         }
-        
+
         try {
           decryptedText = decryptWithPassphrase(rawText, pass.trim());
         } catch (err) {
@@ -305,6 +307,34 @@ export default function ProfileSettings() {
     }
   };
 
+  const handleCopyToClipboard = () => {
+    try {
+      const state = useStore.getState();
+      const dataStr = JSON.stringify(state, null, 2);
+      navigator.clipboard.writeText(dataStr);
+      alert('Backup JSON copied to clipboard!');
+    } catch (e) {
+      alert('Failed to copy backup: ' + e.message);
+    }
+  };
+
+  const handleImportFromText = () => {
+    const backupText = prompt('Paste your backup JSON text here:');
+    if (!backupText) return;
+    try {
+      const data = JSON.parse(backupText);
+      if (data && data.profile) {
+        useStore.setState(data);
+        alert('Data imported successfully!');
+        window.location.reload();
+      } else {
+        alert('Invalid backup structure. The backup must contain a profile object.');
+      }
+    } catch (e) {
+      alert('Failed to parse backup JSON: ' + e.message);
+    }
+  };
+
   const handleImport = async (e) => {
     if (window.electronAPI && window.electronAPI.loadBackup) {
       const dataStr = await window.electronAPI.loadBackup();
@@ -314,6 +344,7 @@ export default function ProfileSettings() {
           if (data && data.profile) {
             useStore.setState(data);
             alert('Data imported successfully!');
+            window.location.reload();
           } else {
             alert('Invalid backup file structure!');
           }
@@ -333,6 +364,7 @@ export default function ProfileSettings() {
         if (data && data.profile) {
           useStore.setState(data);
           alert('Data imported successfully!');
+          window.location.reload();
         } else {
           alert('Invalid backup file structure!');
         }
@@ -373,905 +405,1069 @@ export default function ProfileSettings() {
         <p className="premium-subtitle">Manage your personal details and overarching objectives.</p>
       </div>
 
-      <div className="premium-card" style={{ padding: '30px' }}>
+      <div className="premium-card" style={{ padding: '0', overflow: 'hidden' }}>
+        <div className="settings-container-flex">
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-
-          {/* Column 1: Personal Data */}
-          <div>
-            <h3 style={{ fontSize: '1rem', marginBottom: '20px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              👤 Authentication Cache
-            </h3>
-
-            <div className="form-group">
-              <label className="form-label">Username</label>
-              <input
-                name="username"
-                className="notion-input"
-                value={profile.username}
-                onChange={handleChange}
-                placeholder="Enter display name..."
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Education</label>
-              <select
-                name="education"
-                className="notion-input"
-                value={profile.education || ''}
-                onChange={handleChange}
-              >
-                <option value="" disabled>Select highest level...</option>
-                <option value="High School / Matura">High School / Matura</option>
-                <option value="Bachelor's Degree">Bachelor's Degree</option>
-                <option value="Master's Degree">Master's Degree</option>
-                <option value="Doctorate (PhD)">Doctorate (PhD)</option>
-                <option value="Self-Taught / Other">Self-Taught / Other</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Vault Password</label>
-              <input
-                name="password"
-                type="password"
-                className="notion-input"
-                value={profile.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-              />
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
-                Used for securing local data caches.
-              </span>
-            </div>
-
-            <div className="form-group" style={{ marginTop: '20px' }}>
-              <label className="form-label">Personalized Assets</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px' }}>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Profile Picture:</span>
-                  <label className="notion-button secondary" style={{ margin: 0, padding: '4px 12px', fontSize: '0.75rem', cursor: 'pointer' }}>
-                    Upload
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(e, 'profilePicture')}
-                      style={{ display: 'none' }}
-                    />
-                  </label>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px' }}>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Background Image:</span>
-                  <label className="notion-button secondary" style={{ margin: 0, padding: '4px 12px', fontSize: '0.75rem', cursor: 'pointer' }}>
-                    Upload
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(e, 'backgroundImage')}
-                      style={{ display: 'none' }}
-                    />
-                  </label>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px' }}>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Cover Image (Overview):</span>
-                  <label className="notion-button secondary" style={{ margin: 0, padding: '4px 12px', fontSize: '0.75rem', cursor: 'pointer' }}>
-                    Upload
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(e, 'heroImage')}
-                      style={{ display: 'none' }}
-                    />
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Column 2: Physical Metrics */}
-          <div>
-            <h3 style={{ fontSize: '1rem', marginBottom: '20px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              ⚖️ Physical Metrics & Demographics
-            </h3>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-              <div className="form-group">
-                <label className="form-label">Age</label>
-                <input
-                  name="age"
-                  type="number"
-                  className="notion-input"
-                  value={profile.age || ''}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Gender</label>
-                <select
-                  name="gender"
-                  className="notion-input"
-                  value={profile.gender || 'Other'}
-                  onChange={handleChange}
-                >
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-              <div className="form-group">
-                <label className="form-label">Height (cm)</label>
-                <input
-                  name="height"
-                  type="number"
-                  className="notion-input"
-                  value={profile.height}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Weight (kg)</label>
-                <input
-                  name="weight"
-                  type="number"
-                  step="0.1"
-                  className="notion-input"
-                  value={profile.weight}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-              <div className="form-group">
-                <label className="form-label">Target Weight (kg)</label>
-                <input
-                  name="targetWeight"
-                  type="number"
-                  step="0.1"
-                  className="notion-input"
-                  value={profile.targetWeight || ''}
-                  onChange={handleChange}
-                  placeholder="Target..."
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Body Fat (%)</label>
-                <input
-                  name="bodyFat"
-                  type="number"
-                  step="0.1"
-                  className="notion-input"
-                  value={profile.bodyFat || ''}
-                  onChange={handleChange}
-                  placeholder="e.g. 15"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Activity Level</label>
-              <select
-                name="activityLevel"
-                className="notion-input"
-                value={profile.activityLevel || 'Moderate'}
-                onChange={handleChange}
-              >
-                <option value="Sedentary">Sedentary (Office job)</option>
-                <option value="Light">Lightly Active (1-2 days/week)</option>
-                <option value="Moderate">Moderately Active (3-5 days/week)</option>
-                <option value="VeryActive">Very Active (6-7 days/week)</option>
-                <option value="Athlete">Extra Active (Professional athlete)</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Primary Fitness Goal</label>
-              <select
-                name="fitnessGoal"
-                className="notion-input"
-                value={profile.fitnessGoal || 'Maintain'}
-                onChange={handleChange}
-              >
-                <option value="Lose Weight">Weight Loss / Definition</option>
-                <option value="Maintain">Maintenance / Functional</option>
-                <option value="Build Muscle">Muscle Gain / Strength</option>
-                <option value="Endurance">Endurance / Stamina</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ borderTop: '1px solid var(--border-color)', margin: '30px 0' }}></div>
-
-        {/* Dynamic Color Customization Section */}
-        <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ fontSize: '1rem', marginBottom: '20px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            🎨 Interface Aesthetics
-          </h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px' }}>
-            <div>
-              <label className="form-label" style={{ marginBottom: '12px' }}>Accent Color Presets</label>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                {presets.map(p => (
-                  <button
-                    key={p.color}
-                    onClick={() => setAccentColor(p.color)}
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      background: p.color,
-                      border: accentColor === p.color ? '3px solid #fff' : 'none',
-                      boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-                      transition: 'transform 0.2s',
-                    }}
-                    onMouseEnter={(e) => e.target.style.transform = 'scale(1.2)'}
-                    onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                    title={p.name}
-                  />
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="form-label" style={{ marginBottom: '12px' }}>Custom Color Picker</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <input
-                  type="color"
-                  value={accentColor}
-                  onChange={(e) => setAccentColor(e.target.value)}
-                  style={{ width: '40px', height: '40px', border: 'none', background: 'transparent', cursor: 'pointer' }}
-                />
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{accentColor.toUpperCase()}</span>
-              </div>
-            </div>
-            <div>
-              <label className="form-label" style={{ marginBottom: '12px' }}>System Currency Symbol</label>
-              <select
-                name="currencySymbol"
-                value={profile.currencySymbol || '€'}
-                onChange={handleChange}
-                className="notion-input"
-                style={{ height: '40px', padding: '0 15px', borderRadius: '8px', cursor: 'pointer' }}
-              >
-                <option value="€">EUR (€)</option>
-                <option value="£">GBP (£)</option>
-                <option value="$">USD / Dollar ($)</option>
-                <option value="¥">Yen/Yuan (¥)</option>
-              </select>
-            </div>
-            <div style={{ flexBasis: '100%', marginTop: '10px' }}>
+          {/* Settings Sidebar */}
+          <div className="settings-sidebar">
+            {[
+              { id: 'profile', label: '👤 Profile & Metrics' },
+              { id: 'appearance', label: '🎨 Style & Aesthetics' },
+              { id: 'sync', label: '🔄 Backup & Sync' },
+              { id: 'system', label: '⚙️ System Actions' }
+            ].map(tab => (
               <button
-                className={`notion-button ${useStore.getState().designSettings.enabled ? '' : 'secondary'}`}
-                onClick={() => useStore.getState().setDesignSettings({ enabled: !useStore.getState().designSettings.enabled })}
-                style={{
-                  background: useStore.getState().designSettings.enabled ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
-                  color: useStore.getState().designSettings.enabled ? '#fff' : 'var(--text-main)',
-                  border: useStore.getState().designSettings.enabled ? 'none' : '1px solid var(--border-color)',
-                  padding: '10px 20px',
-                  borderRadius: '8px',
-                  fontSize: '0.9rem',
-                  fontWeight: 700,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px'
-                }}
+                key={tab.id}
+                type="button"
+                className={`settings-tab-btn ${activeTab === tab.id ? 'active' : ''}`}
+                onClick={() => setActiveTab(tab.id)}
               >
-                {useStore.getState().designSettings.enabled ? '✨ Design Mode: ON' : '🛠️ Enable Design Mode'}
+                {tab.label}
               </button>
-            </div>
+            ))}
           </div>
 
-          {/* Advanced Design System Panel */}
-          {useStore.getState().designSettings.enabled && (
-            <div className="design-mode-panel" style={{
-              marginTop: '25px',
-              padding: '25px',
-              background: 'rgba(255,255,255,0.03)',
-              borderRadius: '12px',
-              border: '1px solid var(--primary)',
-              animation: 'fadeIn 0.4s ease-out'
-            }}>
-              <h4 style={{ fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '20px' }}>
-                Advanced Design System
-              </h4>
+          {/* Settings Active Panel */}
+          <div className="settings-panel">
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-                <div className="design-setting-group">
-                  <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    Glassmorphism Blur <span>{useStore.getState().designSettings.blur}px</span>
-                  </label>
-                  <input
-                    type="range" min="0" max="25"
-                    value={useStore.getState().designSettings.blur}
-                    onChange={(e) => useStore.getState().setDesignSettings({ blur: parseInt(e.target.value) })}
-                    style={{ width: '100%', accentColor: 'var(--primary)' }}
-                  />
-                </div>
-                <div className="design-setting-group">
-                  <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    Corner Roundness <span>{useStore.getState().designSettings.radius}px</span>
-                  </label>
-                  <input
-                    type="range" min="0" max="30"
-                    value={useStore.getState().designSettings.radius}
-                    onChange={(e) => useStore.getState().setDesignSettings({ radius: parseInt(e.target.value) })}
-                    style={{ width: '100%', accentColor: 'var(--primary)' }}
-                  />
-                </div>
+            {activeTab === 'profile' && (
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }} className="settings-responsive-grid">
+                  {/* Column 1: Personal Data */}
+                  <div>
+                    <h3 style={{ fontSize: '1rem', marginBottom: '20px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      👤 Authentication Cache
+                    </h3>
 
-                <div className="design-setting-group" style={{ gridColumn: 'span 2' }}>
-                  <label className="form-label">Interface Style Template</label>
-                  <select
-                    className="notion-input"
-                    value={useStore.getState().designSettings.template || 'default'}
-                    onChange={(e) => useStore.getState().setDesignSettings({ template: e.target.value })}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <option value="default">Default OS Theme</option>
-                    <option value="cyberpunk">Cyberpunk Neon</option>
-                    <option value="glassmorphism">Glassmorphism (Aero Glass)</option>
-                    <option value="neo-brutalism">Neo-Brutalism</option>
-                    <option value="retro-terminal">Retro Terminal (Fallout CRT)</option>
-                    <option value="nordic-minimalist">Nordic Minimalist (Nord)</option>
-                    <option value="obsidian-gold">Obsidian Gold</option>
-                    <option value="claymorphism">Claymorphism Soft 3D</option>
-                    <option value="neumorphism">Neumorphism Soft UI</option>
-                    <option value="aurora-ui">Aurora Glow UI</option>
-                  </select>
-                </div>
+                    <div className="form-group">
+                      <label className="form-label">Username</label>
+                      <input
+                        name="username"
+                        className="notion-input"
+                        value={profile.username}
+                        onChange={handleChange}
+                        placeholder="Enter display name..."
+                      />
+                    </div>
 
-                <div className="design-setting-group" style={{ gridColumn: 'span 2' }}>
-                  <label className="form-label">Active Typography</label>
-                  <select
-                    className="notion-input"
-                    value={useStore.getState().designSettings.font}
-                    onChange={(e) => useStore.getState().setDesignSettings({ font: e.target.value })}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <option value="Inter">Inter (Classic)</option>
-                    <option value="Outfit">Outfit (Modern)</option>
-                    <option value="JetBrains Mono">JetBrains Mono (Technical)</option>
-                    <option value="Roboto">Roboto (Clean)</option>
-                  </select>
-                </div>
+                    <div className="form-group">
+                      <label className="form-label">Education</label>
+                      <select
+                        name="education"
+                        className="notion-input"
+                        value={profile.education || ''}
+                        onChange={handleChange}
+                      >
+                        <option value="" disabled>Select highest level...</option>
+                        <option value="High School / Matura">High School / Matura</option>
+                        <option value="Bachelor's Degree">Bachelor's Degree</option>
+                        <option value="Master's Degree">Master's Degree</option>
+                        <option value="Doctorate (PhD)">Doctorate (PhD)</option>
+                        <option value="Self-Taught / Other">Self-Taught / Other</option>
+                      </select>
+                    </div>
 
-                <div className="design-setting-group" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <input
-                    type="checkbox"
-                    id="neon-toggle"
-                    checked={useStore.getState().designSettings.isNeon}
-                    onChange={(e) => useStore.getState().setDesignSettings({ isNeon: e.target.checked })}
-                    style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--primary)' }}
-                  />
-                  <label htmlFor="neon-toggle" className="form-label" style={{ margin: 0, cursor: 'pointer' }}>Neon Glow Effects</label>
-                </div>
-                <div className="design-setting-group" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <input
-                    type="checkbox"
-                    id="compact-toggle"
-                    checked={useStore.getState().designSettings.isCompact}
-                    onChange={(e) => useStore.getState().setDesignSettings({ isCompact: e.target.checked })}
-                    style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--primary)' }}
-                  />
-                  <label htmlFor="compact-toggle" className="form-label" style={{ margin: 0, cursor: 'pointer' }}>Compact Mode Spacing</label>
-                </div>
+                    <div className="form-group">
+                      <label className="form-label">Vault Password</label>
+                      <input
+                        name="password"
+                        type="password"
+                        className="notion-input"
+                        value={profile.password}
+                        onChange={handleChange}
+                        placeholder="••••••••"
+                      />
+                    </div>
 
-                <div className="design-setting-group" style={{ gridColumn: 'span 2', marginTop: '10px' }}>
-                  <label className="form-label" style={{ marginBottom: '15px' }}>Quick Design Presets</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                    <button
-                      className="notion-button secondary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ template: 'cyberpunk', blur: 15, radius: 0, isNeon: true, isCompact: false, accent: '#ef4444', font: 'JetBrains Mono' })}
-                    >
-                      🚀 Cyberpunk
-                    </button>
-                    <button
-                      className="notion-button secondary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ template: 'default', blur: 0, radius: 4, isNeon: false, isCompact: true, accent: '#737373', font: 'Inter' })}
-                    >
-                      🔳 Minimalist
-                    </button>
-                    <button
-                      className="notion-button secondary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ template: 'glassmorphism', blur: 25, radius: 25, isNeon: false, isCompact: false, accent: '#8b5cf6', font: 'Outfit' })}
-                    >
-                      💎 Ultra Glass
-                    </button>
-                    <button
-                      className="notion-button secondary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ template: 'default', blur: 10, radius: 12, isNeon: false, isCompact: false, accent: '#3b82f6', font: 'Roboto' })}
-                    >
-                      🖥️ Modern OS
-                    </button>
-                    <button
-                      className="notion-button secondary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ template: 'default', blur: 12, radius: 8, isNeon: true, isCompact: false, accent: '#10b981', font: 'JetBrains Mono' })}
-                    >
-                      🌿 Emerald Night
-                    </button>
-                    <button
-                      className="notion-button secondary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ template: 'default', blur: 5, radius: 20, isNeon: false, isCompact: false, accent: '#f59e0b', font: 'Roboto' })}
-                    >
-                      ☀️ Solarized
-                    </button>
-                    <button
-                      className="notion-button secondary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ template: 'default', blur: 20, radius: 4, isNeon: true, isCompact: false, accent: '#0ea5e9', font: 'Outfit' })}
-                    >
-                      🌌 Deep Space
-                    </button>
-                    <button
-                      className="notion-button secondary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ template: 'default', blur: 0, radius: 0, isNeon: false, isCompact: true, accent: '#ffffff', font: 'Inter' })}
-                    >
-                      🌑 Noir
-                    </button>
-                    <button
-                      className="notion-button secondary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ template: 'default', blur: 15, radius: 30, isNeon: true, isCompact: false, accent: '#f43f5e', font: 'Outfit' })}
-                    >
-                      🌸 Sakura
-                    </button>
-                    <button
-                      className="notion-button secondary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ template: 'claymorphism', blur: 0, radius: 24, isNeon: false, isCompact: false, accent: '#6366f1', font: 'Outfit' })}
-                    >
-                      🏺 Claymorphism
-                    </button>
-                    <button
-                      className="notion-button secondary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ template: 'neumorphism', blur: 0, radius: 20, isNeon: false, isCompact: false, accent: '#4f8a8b', font: 'Inter' })}
-                    >
-                      ☁️ Neumorphism
-                    </button>
-                    <button
-                      className="notion-button secondary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => applyDesignPreset({ template: 'aurora-ui', blur: 25, radius: 20, isNeon: true, isCompact: false, accent: '#ec4899', font: 'Outfit' })}
-                    >
-                      ✨ Aurora UI
-                    </button>
-                    <button
-                      className="notion-button secondary"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem', background: 'rgba(var(--primary-rgb), 0.1)', border: '1px solid var(--primary)' }}
-                      onClick={() => {
-                        const fonts = ['Inter', 'Outfit', 'JetBrains Mono', 'Roboto'];
-                        const colors = ['#ef4444', '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#0ea5e9', '#f43f5e'];
-                        const templates = ['default', 'cyberpunk', 'glassmorphism', 'neo-brutalism', 'retro-terminal', 'nordic-minimalist', 'obsidian-gold', 'claymorphism', 'neumorphism', 'aurora-ui'];
-                        applyDesignPreset({
-                          blur: Math.floor(Math.random() * 25),
-                          radius: Math.floor(Math.random() * 30),
-                          isNeon: Math.random() > 0.5,
-                          isCompact: Math.random() > 0.7,
-                          accent: colors[Math.floor(Math.random() * colors.length)],
-                          font: fonts[Math.floor(Math.random() * fonts.length)],
-                          template: templates[Math.floor(Math.random() * templates.length)]
-                        });
-                      }}
-                    >
-                      🎲 Randomize
-                    </button>
+                    <div className="form-group">
+                      <label className="form-label">Profile & Cover Media</label>
+                      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                        <div>
+                          <label className="form-label" style={{ fontSize: '0.75rem', marginBottom: '6px' }}>Avatar Image</label>
+                          <label className="image-upload-trigger" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '60px',
+                            height: '60px',
+                            borderRadius: '50%',
+                            background: profile.profilePicture ? `url(${profile.profilePicture}) center/cover no-repeat` : 'rgba(255,255,255,0.05)',
+                            border: '1px dashed var(--border-color)',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem'
+                          }}>
+                            {!profile.profilePicture && '📁'}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleImageUpload(e, 'profilePicture')}
+                              style={{ display: 'none' }}
+                            />
+                          </label>
+                        </div>
+                        <div>
+                          <label className="form-label" style={{ fontSize: '0.75rem', marginBottom: '6px' }}>Dashboard Banner</label>
+                          <label className="image-upload-trigger" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '120px',
+                            height: '60px',
+                            borderRadius: '8px',
+                            background: profile.backgroundImage ? `url(${profile.backgroundImage}) center/cover no-repeat` : 'rgba(255,255,255,0.05)',
+                            border: '1px dashed var(--border-color)',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem'
+                          }}>
+                            {!profile.backgroundImage && '📁 Banner'}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleImageUpload(e, 'backgroundImage')}
+                              style={{ display: 'none' }}
+                            />
+                          </label>
+                        </div>
+                        <div>
+                          <label className="form-label" style={{ fontSize: '0.75rem', marginBottom: '6px' }}>Cover Header Image</label>
+                          <label className="image-upload-trigger" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '120px',
+                            height: '60px',
+                            borderRadius: '8px',
+                            background: profile.heroImage ? `url(${profile.heroImage}) center/cover no-repeat` : 'rgba(255,255,255,0.05)',
+                            border: '1px dashed var(--border-color)',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem'
+                          }}>
+                            {!profile.heroImage && '📁 Cover'}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleImageUpload(e, 'heroImage')}
+                              style={{ display: 'none' }}
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Column 2: Physical Metrics */}
+                  <div>
+                    <h3 style={{ fontSize: '1rem', marginBottom: '20px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      ⚖️ Physical Metrics & Demographics
+                    </h3>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                      <div className="form-group">
+                        <label className="form-label">Age</label>
+                        <input
+                          name="age"
+                          type="number"
+                          className="notion-input"
+                          value={profile.age || ''}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Gender</label>
+                        <select
+                          name="gender"
+                          className="notion-input"
+                          value={profile.gender || 'Other'}
+                          onChange={handleChange}
+                        >
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                      <div className="form-group">
+                        <label className="form-label">Height (cm)</label>
+                        <input
+                          name="height"
+                          type="number"
+                          className="notion-input"
+                          value={profile.height}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Weight (kg)</label>
+                        <input
+                          name="weight"
+                          type="number"
+                          step="0.1"
+                          className="notion-input"
+                          value={profile.weight}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                      <div className="form-group">
+                        <label className="form-label">Target Weight (kg)</label>
+                        <input
+                          name="targetWeight"
+                          type="number"
+                          step="0.1"
+                          className="notion-input"
+                          value={profile.targetWeight || ''}
+                          onChange={handleChange}
+                          placeholder="Target..."
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Body Fat (%)</label>
+                        <input
+                          name="bodyFat"
+                          type="number"
+                          step="0.1"
+                          className="notion-input"
+                          value={profile.bodyFat || ''}
+                          onChange={handleChange}
+                          placeholder="e.g. 15"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Activity Level</label>
+                      <select
+                        name="activityLevel"
+                        className="notion-input"
+                        value={profile.activityLevel || 'Moderate'}
+                        onChange={handleChange}
+                      >
+                        <option value="Sedentary">Sedentary (Office job)</option>
+                        <option value="Light">Lightly Active (1-2 days/week)</option>
+                        <option value="Moderate">Moderately Active (3-5 days/week)</option>
+                        <option value="VeryActive">Very Active (6-7 days/week)</option>
+                        <option value="Athlete">Extra Active (Professional athlete)</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Primary Fitness Goal</label>
+                      <select
+                        name="fitnessGoal"
+                        className="notion-input"
+                        value={profile.fitnessGoal || 'Maintain'}
+                        onChange={handleChange}
+                      >
+                        <option value="Lose Weight">Weight Loss / Definition</option>
+                        <option value="Maintain">Maintenance / Functional</option>
+                        <option value="Build Muscle">Muscle Gain / Strength</option>
+                        <option value="Endurance">Endurance / Stamina</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          )}
-        </div>
 
-        <div style={{ borderTop: '1px solid var(--border-color)', margin: '30px 0' }}></div>
+                <div style={{ borderTop: '1px solid var(--border-color)', margin: '20px 0' }}></div>
 
-        {/* Full width: Goals */}
-        <div>
-          <h3 style={{ fontSize: '1rem', marginBottom: '20px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            🏔️ Life Objectives
-          </h3>
+                {/* Goals */}
+                <div>
+                  <h3 style={{ fontSize: '1rem', marginBottom: '20px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    🏔️ Life Objectives
+                  </h3>
 
-          <div className="form-group">
-            <label className="form-label">Overarching Goals (Context for Goal Planner)</label>
-            <textarea
-              name="goals"
-              className="notion-textarea"
-              value={profile.goals}
-              onChange={handleChange}
-              placeholder="List your ultimate goals here..."
-              style={{ minHeight: '120px' }}
-            />
-          </div>
-        </div>
+                  <div className="form-group">
+                    <label className="form-label">Overarching Goals (Context for Goal Planner)</label>
+                    <textarea
+                      name="goals"
+                      className="notion-textarea"
+                      value={profile.goals}
+                      onChange={handleChange}
+                      placeholder="List your ultimate goals here..."
+                      style={{ minHeight: '120px' }}
+                    />
+                  </div>
+                </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '30px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <button className="notion-button" onClick={handleSave}>
-              Save Configuration
-            </button>
-            {saveStatus && <span style={{ color: 'var(--green-text)', fontSize: '0.85rem', fontWeight: 600 }}>✓ {saveStatus}</span>}
-          </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              onClick={toggleTheme}
-              style={{
-                background: 'rgba(255,255,255,0.1)',
-                color: 'var(--text-main)',
-                border: '1px solid var(--border-color)',
-                padding: '8px 16px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: 600,
-                fontSize: '0.8rem'
-              }}>
-              Switch to {theme === 'dark' ? 'Light' : 'Dark'} Mode
-            </button>
-            <button
-              onClick={logout}
-              style={{
-                background: 'rgba(255,255,255,0.1)',
-                color: 'var(--text-main)',
-                border: '1px solid var(--border-color)',
-                padding: '8px 16px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: 600,
-                fontSize: '0.8rem'
-              }}>
-              Log Out
-            </button>
-            <button
-              onClick={() => {
-                const confirmed = window.confirm("This will clear your local temporary cache to fix any display typos from old versions. Your main database will remain. Continue?");
-                if (confirmed) {
-                  localStorage.clear();
-                  window.location.reload();
-                }
-              }}
-              style={{
-                background: 'rgba(50,150,255,0.1)',
-                color: 'var(--blue-text)',
-                border: '1px solid var(--blue-text)',
-                padding: '8px 16px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: 600,
-                fontSize: '0.8rem'
-              }}>
-              Clear UI Cache
-            </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginTop: '20px' }}>
+                  <button type="button" className="notion-button" onClick={handleSave}>
+                    Save Configuration
+                  </button>
+                  {saveStatus && <span style={{ color: 'var(--green-text)', fontSize: '0.85rem', fontWeight: 600 }}>✓ {saveStatus}</span>}
+                </div>
+              </>
+            )}
 
-            <button
-              onClick={handleReset}
-
-              style={{
-                background: 'rgba(255,50,50,0.1)',
-                color: 'var(--red-text)',
-                border: '1px solid var(--red-text)',
-                padding: '8px 16px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: 600,
-                fontSize: '0.8rem'
-              }}>
-              Factory Reset
-            </button>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: '15px', gap: '10px' }}>
-          <button
-            onClick={handleExport}
-            style={{
-              background: 'rgba(50,200,100,0.1)',
-              color: 'var(--green-text, #22c55e)',
-              border: '1px solid var(--green-text, #22c55e)',
-              padding: '8px 16px',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontWeight: 600,
-              fontSize: '0.8rem'
-            }}>
-            📥 Export Backup
-          </button>
-          {window.electronAPI ? (
-            <button
-              onClick={handleImport}
-              style={{
-                background: 'rgba(50,200,100,0.1)',
-                color: 'var(--green-text, #22c55e)',
-                border: '1px solid var(--green-text, #22c55e)',
-                padding: '8px 16px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: 600,
-                fontSize: '0.8rem',
-                margin: 0
-              }}>
-              📤 Import Backup
-            </button>
-          ) : (
-            <label
-              style={{
-                background: 'rgba(50,200,100,0.1)',
-                color: 'var(--green-text, #22c55e)',
-                border: '1px solid var(--green-text, #22c55e)',
-                padding: '8px 16px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: 600,
-                fontSize: '0.8rem',
-                margin: 0
-              }}>
-              📤 Import Backup
-              <input
-                type="file"
-                accept=".json"
-                onChange={handleImport}
-                style={{ display: 'none' }}
-              />
-            </label>
-          )}
-        </div>
-
-        {/* Cloud Sync Section */}
-        <div style={{ marginTop: '20px', padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-          <h3 style={{ fontSize: '0.95rem', margin: '0 0 10px 0', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            📲 Mobile & Web Cloud Sync
-          </h3>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px', lineHeight: '1.4' }}>
-            Synchronize your statistics and data between this device and your iPhone 11.
-            Generate a sync key, or scan the QR code with your phone's camera.
-          </p>
-
-          <div className="form-group" style={{ maxWidth: '400px', marginBottom: '20px' }}>
-            <label className="form-label">Public Web App URL</label>
-            <input
-              type="text"
-              className="notion-input"
-              value={profile.webAppUrl || ''}
-              onChange={(e) => setProfile({ webAppUrl: e.target.value })}
-              placeholder="https://frx132.github.io/E.O.M/"
-            />
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
-              Used to construct the sync QR code for the public web version.
-            </span>
-          </div>
-
-          <div className="form-group" style={{ maxWidth: '400px', marginBottom: '20px' }}>
-            <label className="form-label">Sync Passphrase / Passwort (E2EE)</label>
-            <input
-              type="password"
-              className="notion-input"
-              value={syncPassphrase}
-              onChange={(e) => setSyncPassphrase(e.target.value)}
-              placeholder="Choose a passphrase (Optional)..."
-            />
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
-              Your data will be encrypted client-side using this passphrase before being uploaded.
-            </span>
-          </div>
-
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'stretch', marginBottom: '20px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <button
-                onClick={handleCreateSync}
-                className="notion-button"
-                disabled={isSyncing}
-                style={{ background: 'var(--primary)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}
-              >
-                {isSyncing ? 'Uploading...' : '☁️ Generate Sync Code & QR'}
-              </button>
-            </div>
-
-            {syncCode && (
-              <div style={{ display: 'flex', gap: '20px', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', flex: 1, minWidth: '320px', flexWrap: 'wrap' }}>
-                <div style={{ flex: 1, minWidth: '200px' }}>
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <button
-                      onClick={() => setQrType('local')}
-                      className={`notion-button ${qrType === 'local' ? '' : 'secondary'}`}
-                      style={{ padding: '4px 10px', fontSize: '0.75rem', margin: 0, border: qrType === 'local' ? '1px solid var(--primary)' : '1px solid var(--border-color)' }}
-                    >
-                      Local Network
-                    </button>
-                    <button
-                      onClick={() => setQrType('web')}
-                      className={`notion-button ${qrType === 'web' ? '' : 'secondary'}`}
-                      style={{ padding: '4px 10px', fontSize: '0.75rem', margin: 0, border: qrType === 'web' ? '1px solid var(--primary)' : '1px solid var(--border-color)' }}
-                    >
-                      Public Web
-                    </button>
-
-                    {qrType === 'local' && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto' }}>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>IP:</span>
-                        {isEditingIp ? (
-                          <input
-                            type="text"
-                            value={localIp}
-                            onChange={(e) => setLocalIp(e.target.value)}
-                            onBlur={() => setIsEditingIp(false)}
-                            onKeyDown={(e) => { if (e.key === 'Enter') setIsEditingIp(false); }}
+            {activeTab === 'appearance' && (
+              <>
+                {/* Dynamic Color Customization Section */}
+                <div>
+                  <h3 style={{ fontSize: '1rem', marginBottom: '20px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    🎨 Interface Aesthetics
+                  </h3>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', marginBottom: '20px' }}>
+                    <div>
+                      <label className="form-label" style={{ marginBottom: '12px' }}>Accent Color Presets</label>
+                      <div style={{ display: 'flex', gap: '12px' }}>
+                        {presets.map(p => (
+                          <button
+                            key={p.color}
+                            type="button"
+                            onClick={() => setAccentColor(p.color)}
                             style={{
-                              background: 'var(--bg-input)',
-                              border: '1px solid var(--border-color)',
-                              color: 'var(--text-main)',
-                              padding: '2px 6px',
-                              borderRadius: '4px',
-                              fontSize: '0.7rem',
-                              width: '110px',
-                              outline: 'none'
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              background: p.color,
+                              border: accentColor === p.color ? '3px solid #fff' : 'none',
+                              boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                              transition: 'transform 0.2s',
+                              cursor: 'pointer'
                             }}
-                            autoFocus
+                            onMouseEnter={(e) => e.target.style.transform = 'scale(1.2)'}
+                            onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                            title={p.name}
                           />
-                        ) : (
-                          <span 
-                            onClick={() => setIsEditingIp(true)} 
-                            style={{ fontSize: '0.7rem', color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline', fontWeight: 600 }}
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="form-label" style={{ marginBottom: '12px' }}>Custom Color Picker</label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <input
+                          type="color"
+                          value={accentColor}
+                          onChange={(e) => setAccentColor(e.target.value)}
+                          style={{ width: '40px', height: '40px', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                        />
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{accentColor.toUpperCase()}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="form-label" style={{ marginBottom: '12px' }}>System Currency Symbol</label>
+                      <select
+                        name="currencySymbol"
+                        value={profile.currencySymbol || '€'}
+                        onChange={handleChange}
+                        className="notion-input"
+                        style={{ height: '40px', padding: '0 15px', borderRadius: '8px', cursor: 'pointer' }}
+                      >
+                        <option value="€">EUR (€)</option>
+                        <option value="£">GBP (£)</option>
+                        <option value="$">USD / Dollar ($)</option>
+                        <option value="¥">Yen/Yuan (¥)</option>
+                      </select>
+                    </div>
+                    <div style={{ flexBasis: '100%', marginTop: '10px' }}>
+                      <button
+                        type="button"
+                        className={`notion-button ${useStore.getState().designSettings.enabled ? '' : 'secondary'}`}
+                        onClick={() => useStore.getState().setDesignSettings({ enabled: !useStore.getState().designSettings.enabled })}
+                        style={{
+                          background: useStore.getState().designSettings.enabled ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
+                          color: useStore.getState().designSettings.enabled ? '#fff' : 'var(--text-main)',
+                          border: useStore.getState().designSettings.enabled ? 'none' : '1px solid var(--border-color)',
+                          padding: '10px 20px',
+                          borderRadius: '8px',
+                          fontSize: '0.9rem',
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px'
+                        }}
+                      >
+                        {useStore.getState().designSettings.enabled ? '✨ Design Mode: ON' : '🛠️ Enable Design Mode'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Advanced Design System Panel */}
+                  {useStore.getState().designSettings.enabled && (
+                    <div className="design-mode-panel" style={{
+                      padding: '25px',
+                      background: 'rgba(255,255,255,0.03)',
+                      borderRadius: '12px',
+                      border: '1px solid var(--primary)',
+                      animation: 'fadeIn 0.4s ease-out',
+                      marginBottom: '20px'
+                    }}>
+                      <h4 style={{ fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '20px' }}>
+                        Advanced Design System
+                      </h4>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }} className="settings-responsive-grid">
+                        <div className="design-setting-group">
+                          <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            Glassmorphism Blur <span>{useStore.getState().designSettings.blur}px</span>
+                          </label>
+                          <input
+                            type="range" min="0" max="25"
+                            value={useStore.getState().designSettings.blur}
+                            onChange={(e) => useStore.getState().setDesignSettings({ blur: parseInt(e.target.value) })}
+                            style={{ width: '100%', accentColor: 'var(--primary)' }}
+                          />
+                        </div>
+                        <div className="design-setting-group">
+                          <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            Corner Roundness <span>{useStore.getState().designSettings.radius}px</span>
+                          </label>
+                          <input
+                            type="range" min="0" max="30"
+                            value={useStore.getState().designSettings.radius}
+                            onChange={(e) => useStore.getState().setDesignSettings({ radius: parseInt(e.target.value) })}
+                            style={{ width: '100%', accentColor: 'var(--primary)' }}
+                          />
+                        </div>
+
+                        <div className="design-setting-group" style={{ gridColumn: 'span 2' }}>
+                          <label className="form-label">Interface Style Template</label>
+                          <select
+                            className="notion-input"
+                            value={useStore.getState().designSettings.template || 'default'}
+                            onChange={(e) => useStore.getState().setDesignSettings({ template: e.target.value })}
+                            style={{ cursor: 'pointer' }}
                           >
-                            {localIp} ✏️
-                          </span>
-                        )}
+                            <option value="default">Default OS Theme</option>
+                            <option value="cyberpunk">Cyberpunk Neon</option>
+                            <option value="glassmorphism">Glassmorphism (Aero Glass)</option>
+                            <option value="neo-brutalism">Neo-Brutalism</option>
+                            <option value="retro-terminal">Retro Terminal (Fallout CRT)</option>
+                            <option value="nordic-minimalist">Nordic Minimalist (Nord)</option>
+                            <option value="obsidian-gold">Obsidian Gold</option>
+                            <option value="claymorphism">Claymorphism Soft 3D</option>
+                            <option value="neumorphism">Neumorphism Soft UI</option>
+                            <option value="aurora-ui">Aurora Glow UI</option>
+                          </select>
+                        </div>
+
+                        <div className="design-setting-group" style={{ gridColumn: 'span 2' }}>
+                          <label className="form-label">Active Typography</label>
+                          <select
+                            className="notion-input"
+                            value={useStore.getState().designSettings.font}
+                            onChange={(e) => useStore.getState().setDesignSettings({ font: e.target.value })}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <option value="Inter">Inter (Classic)</option>
+                            <option value="Outfit">Outfit (Modern)</option>
+                            <option value="JetBrains Mono">JetBrains Mono (Technical)</option>
+                            <option value="Roboto">Roboto (Clean)</option>
+                          </select>
+                        </div>
+
+                        <div className="design-setting-group" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <input
+                            type="checkbox"
+                            id="neon-toggle"
+                            checked={useStore.getState().designSettings.isNeon}
+                            onChange={(e) => useStore.getState().setDesignSettings({ isNeon: e.target.checked })}
+                            style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--primary)' }}
+                          />
+                          <label htmlFor="neon-toggle" className="form-label" style={{ margin: 0, cursor: 'pointer' }}>Neon Glow Effects</label>
+                        </div>
+                        <div className="design-setting-group" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <input
+                            type="checkbox"
+                            id="compact-toggle"
+                            checked={useStore.getState().designSettings.isCompact}
+                            onChange={(e) => useStore.getState().setDesignSettings({ isCompact: e.target.checked })}
+                            style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--primary)' }}
+                          />
+                          <label htmlFor="compact-toggle" className="form-label" style={{ margin: 0, cursor: 'pointer' }}>Compact Mode Spacing</label>
+                        </div>
+
+                        <div className="design-setting-group" style={{ gridColumn: 'span 2', marginTop: '10px' }}>
+                          <label className="form-label" style={{ marginBottom: '15px' }}>Quick Design Presets</label>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                              onClick={() => applyDesignPreset({ template: 'cyberpunk', blur: 15, radius: 0, isNeon: true, isCompact: false, accent: '#ef4444', font: 'JetBrains Mono' })}
+                            >
+                              🚀 Cyberpunk
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                              onClick={() => applyDesignPreset({ template: 'default', blur: 0, radius: 4, isNeon: false, isCompact: true, accent: '#737373', font: 'Inter' })}
+                            >
+                              🔳 Minimalist
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                              onClick={() => applyDesignPreset({ template: 'glassmorphism', blur: 25, radius: 25, isNeon: false, isCompact: false, accent: '#8b5cf6', font: 'Outfit' })}
+                            >
+                              💎 Ultra Glass
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                              onClick={() => applyDesignPreset({ template: 'default', blur: 10, radius: 12, isNeon: false, isCompact: false, accent: '#3b82f6', font: 'Roboto' })}
+                            >
+                              🖥️ Modern OS
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                              onClick={() => applyDesignPreset({ template: 'default', blur: 12, radius: 8, isNeon: true, isCompact: false, accent: '#10b981', font: 'JetBrains Mono' })}
+                            >
+                              🌿 Emerald Night
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                              onClick={() => applyDesignPreset({ template: 'default', blur: 5, radius: 20, isNeon: false, isCompact: false, accent: '#f59e0b', font: 'Roboto' })}
+                            >
+                              ☀️ Solarized
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                              onClick={() => applyDesignPreset({ template: 'default', blur: 20, radius: 4, isNeon: true, isCompact: false, accent: '#0ea5e9', font: 'Outfit' })}
+                            >
+                              🌌 Deep Space
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                              onClick={() => applyDesignPreset({ template: 'default', blur: 0, radius: 0, isNeon: false, isCompact: true, accent: '#ffffff', font: 'Inter' })}
+                            >
+                              🌑 Noir
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                              onClick={() => applyDesignPreset({ template: 'default', blur: 15, radius: 30, isNeon: true, isCompact: false, accent: '#f43f5e', font: 'Outfit' })}
+                            >
+                              🌸 Sakura
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                              onClick={() => applyDesignPreset({ template: 'claymorphism', blur: 0, radius: 24, isNeon: false, isCompact: false, accent: '#6366f1', font: 'Outfit' })}
+                            >
+                              🏺 Claymorphism
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                              onClick={() => applyDesignPreset({ template: 'neumorphism', blur: 0, radius: 20, isNeon: false, isCompact: false, accent: '#4f8a8b', font: 'Inter' })}
+                            >
+                              ☁️ Neumorphism
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                              onClick={() => applyDesignPreset({ template: 'aurora-ui', blur: 25, radius: 20, isNeon: true, isCompact: false, accent: '#ec4899', font: 'Outfit' })}
+                            >
+                              ✨ Aurora UI
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem', background: 'rgba(var(--primary-rgb), 0.1)', border: '1px solid var(--primary)' }}
+                              onClick={() => {
+                                const fonts = ['Inter', 'Outfit', 'JetBrains Mono', 'Roboto'];
+                                const colors = ['#ef4444', '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#0ea5e9', '#f43f5e'];
+                                const templates = ['default', 'cyberpunk', 'glassmorphism', 'neo-brutalism', 'retro-terminal', 'nordic-minimalist', 'obsidian-gold', 'claymorphism', 'neumorphism', 'aurora-ui'];
+                                applyDesignPreset({
+                                  blur: Math.floor(Math.random() * 25),
+                                  radius: Math.floor(Math.random() * 30),
+                                  isNeon: Math.random() > 0.5,
+                                  isCompact: Math.random() > 0.7,
+                                  accent: colors[Math.floor(Math.random() * colors.length)],
+                                  font: fonts[Math.floor(Math.random() * fonts.length)],
+                                  template: templates[Math.floor(Math.random() * templates.length)]
+                                });
+                              }}
+                            >
+                              🎲 Randomize
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px' }}>
+                  <button
+                    type="button"
+                    onClick={toggleTheme}
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      color: 'var(--text-main)',
+                      border: '1px solid var(--border-color)',
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: 600,
+                      fontSize: '0.8rem'
+                    }}>
+                    Switch to {theme === 'dark' ? 'Light' : 'Dark'} Theme Mode
+                  </button>
+                  <button type="button" className="notion-button" onClick={handleSave}>
+                    Save Configuration
+                  </button>
+                  {saveStatus && <span style={{ color: 'var(--green-text)', fontSize: '0.85rem', fontWeight: 600 }}>✓ {saveStatus}</span>}
+                </div>
+              </>
+            )}
+
+            {activeTab === 'sync' && (
+              <>
+                <h3 style={{ fontSize: '1rem', marginBottom: '10px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  💾 Database Backups
+                </h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px', lineHeight: '1.4' }}>
+                  Save your E.O.M. database offline, copy it to another device, or load an existing backup file.
+                </p>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '30px' }}>
+                  {!window.electronAPI && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleCopyToClipboard}
+                        style={{
+                          background: 'rgba(255,255,255,0.05)',
+                          color: 'var(--text-main)',
+                          border: '1px solid var(--border-color)',
+                          padding: '8px 16px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: '0.8rem'
+                        }}>
+                        📋 Copy Backup Text
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleImportFromText}
+                        style={{
+                          background: 'rgba(255,255,255,0.05)',
+                          color: 'var(--text-main)',
+                          border: '1px solid var(--border-color)',
+                          padding: '8px 16px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontSize: '0.8rem'
+                        }}>
+                        📥 Import Backup Text
+                      </button>
+                    </>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleExport}
+                    style={{
+                      background: 'rgba(50,200,100,0.1)',
+                      color: 'var(--green-text, #22c55e)',
+                      border: '1px solid var(--green-text, #22c55e)',
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: 600,
+                      fontSize: '0.8rem'
+                    }}>
+                    📥 Export Backup
+                  </button>
+                  {window.electronAPI ? (
+                    <button
+                      type="button"
+                      onClick={handleImport}
+                      style={{
+                        background: 'rgba(50,200,100,0.1)',
+                        color: 'var(--green-text, #22c55e)',
+                        border: '1px solid var(--green-text, #22c55e)',
+                        padding: '8px 16px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        fontSize: '0.8rem',
+                        margin: 0
+                      }}>
+                      📤 Import Backup
+                    </button>
+                  ) : (
+                    <label
+                      style={{
+                        background: 'rgba(50,200,100,0.1)',
+                        color: 'var(--green-text, #22c55e)',
+                        border: '1px solid var(--green-text, #22c55e)',
+                        padding: '8px 16px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        fontSize: '0.8rem',
+                        margin: 0
+                      }}>
+                      📤 Import Backup
+                      <input
+                        type="file"
+                        accept=".json"
+                        onChange={handleImport}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                  )}
+                </div>
+
+                {/* Cloud Sync Section */}
+                <div style={{ padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border-color)', marginBottom: '30px' }}>
+                  <h3 style={{ fontSize: '0.95rem', margin: '0 0 10px 0', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    📲 Mobile & Web Cloud Sync
+                  </h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px', lineHeight: '1.4' }}>
+                    Synchronize your statistics and data between this device and your phone.
+                    Generate a sync key, or scan the QR code with your phone's camera.
+                  </p>
+
+                  <div className="form-group" style={{ maxWidth: '400px', marginBottom: '20px' }}>
+                    <label className="form-label">Public Web App URL</label>
+                    <input
+                      type="text"
+                      className="notion-input"
+                      value={profile.webAppUrl || ''}
+                      onChange={(e) => setProfile({ webAppUrl: e.target.value })}
+                      placeholder="https://frx132.github.io/E.O.M/"
+                    />
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+                      Used to construct the sync QR code for the public web version.
+                    </span>
+                  </div>
+
+                  <div className="form-group" style={{ maxWidth: '400px', marginBottom: '20px' }}>
+                    <label className="form-label">Sync Passphrase / Passwort (E2EE)</label>
+                    <input
+                      type="password"
+                      className="notion-input"
+                      value={syncPassphrase}
+                      onChange={(e) => setSyncPassphrase(e.target.value)}
+                      placeholder="Choose a passphrase (Optional)..."
+                    />
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+                      Your data will be encrypted client-side using this passphrase before being uploaded.
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'stretch', marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                      <button
+                        type="button"
+                        onClick={handleCreateSync}
+                        className="notion-button"
+                        disabled={isSyncing}
+                        style={{ background: 'var(--primary)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}
+                      >
+                        {isSyncing ? 'Uploading...' : '☁️ Generate Sync Code & QR'}
+                      </button>
+                    </div>
+
+                    {syncCode && (
+                      <div style={{ display: 'flex', gap: '20px', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', flex: 1, minWidth: '320px', flexWrap: 'wrap' }}>
+                        <div style={{ flex: 1, minWidth: '200px' }}>
+                          <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <button
+                              type="button"
+                              onClick={() => setQrType('local')}
+                              className={`notion-button ${qrType === 'local' ? '' : 'secondary'}`}
+                              style={{ padding: '4px 10px', fontSize: '0.75rem', margin: 0, border: qrType === 'local' ? '1px solid var(--primary)' : '1px solid var(--border-color)' }}
+                            >
+                              Local Network
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setQrType('web')}
+                              className={`notion-button ${qrType === 'web' ? '' : 'secondary'}`}
+                              style={{ padding: '4px 10px', fontSize: '0.75rem', margin: 0, border: qrType === 'web' ? '1px solid var(--primary)' : '1px solid var(--border-color)' }}
+                            >
+                              Public Web
+                            </button>
+
+                            {qrType === 'local' && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto' }}>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>IP:</span>
+                                {isEditingIp ? (
+                                  <input
+                                    type="text"
+                                    value={localIp}
+                                    onChange={(e) => setLocalIp(e.target.value)}
+                                    onBlur={() => setIsEditingIp(false)}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') setIsEditingIp(false); }}
+                                    style={{
+                                      background: 'var(--bg-input)',
+                                      border: '1px solid var(--border-color)',
+                                      color: 'var(--text-main)',
+                                      padding: '2px 6px',
+                                      borderRadius: '4px',
+                                      fontSize: '0.7rem',
+                                      width: '110px',
+                                      outline: 'none'
+                                    }}
+                                    autoFocus
+                                  />
+                                ) : (
+                                  <span
+                                    onClick={() => setIsEditingIp(true)}
+                                    style={{ fontSize: '0.7rem', color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline', fontWeight: 600 }}
+                                  >
+                                    {localIp} ✏️
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          <label className="form-label" style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your Sync Code</label>
+                          <div style={{ fontSize: '1.2rem', fontWeight: 700, letterSpacing: '1px', color: 'var(--primary)', margin: '4px 0 8px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            {syncCode}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(syncCode);
+                                alert('Sync Code copied!');
+                              }}
+                              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '4px', fontSize: '0.7rem', padding: '2px 8px', color: 'var(--text-main)', cursor: 'pointer' }}
+                            >
+                              Copy Code
+                            </button>
+                          </div>
+
+                          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0 0 10px 0' }}>
+                            {qrType === 'local'
+                              ? `WiFi Sync URL: http://${localIp}:5173/?sync=${syncCode}`
+                              : `Web Sync URL: ${(profile.webAppUrl || 'https://frx132.github.io/E.O.M/').replace(/\/$/, '')}/?sync=${syncCode}`
+                            }
+                          </p>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const fullUrl = qrType === 'local'
+                                ? `http://${localIp}:5173/?sync=${syncCode}`
+                                : `${profile.webAppUrl || 'https://frx132.github.io/E.O.M/'}?sync=${syncCode}`;
+                              navigator.clipboard.writeText(fullUrl);
+                              alert('Sync Link copied!');
+                            }}
+                            className="notion-button secondary"
+                            style={{ padding: '4px 10px', fontSize: '0.75rem', margin: 0 }}
+                          >
+                            🔗 Copy Sync Link
+                          </button>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
+                          <img
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(
+                              qrType === 'local'
+                                ? `http://${localIp}:5173/?sync=${syncCode}`
+                                : `${profile.webAppUrl || 'https://frx132.github.io/E.O.M/'}?sync=${syncCode}`
+                            )}`}
+                            alt="Sync QR Code"
+                            style={{ borderRadius: '6px', background: '#fff', padding: '4px', width: '100px', height: '100px', display: 'block' }}
+                          />
+                          <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Scan with phone</span>
+                        </div>
                       </div>
                     )}
                   </div>
 
-                  <label className="form-label" style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your Sync Code</label>
-                  <div style={{ fontSize: '1.2rem', fontWeight: 700, letterSpacing: '1px', color: 'var(--primary)', margin: '4px 0 8px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    {syncCode}
+                  <div style={{ borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '0.85rem', color: 'var(--text-main)' }}>Enter Sync Code from Another Device</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '400px' }}>
+                      <input
+                        type="text"
+                        placeholder="Enter Sync Code or Link (e.g. a1b2c3d4)"
+                        value={inputSyncCode}
+                        onChange={(e) => setInputSyncCode(e.target.value)}
+                        style={{
+                          width: '100%',
+                          background: 'var(--bg-input)',
+                          border: '1px solid var(--border-color)',
+                          color: 'var(--text-main)',
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          outline: 'none',
+                          fontSize: '0.85rem',
+                          boxSizing: 'border-box'
+                        }}
+                      />
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        <input
+                          type="password"
+                          placeholder="Sync Passphrase (If encrypted)"
+                          value={syncPassphrase}
+                          onChange={(e) => setSyncPassphrase(e.target.value)}
+                          style={{
+                            flex: 1,
+                            background: 'var(--bg-input)',
+                            border: '1px solid var(--border-color)',
+                            color: 'var(--text-main)',
+                            padding: '8px 12px',
+                            borderRadius: '6px',
+                            outline: 'none',
+                            fontSize: '0.85rem'
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleRestoreSync}
+                          className="notion-button secondary"
+                          disabled={isRestoring}
+                          style={{ padding: '8px 16px', fontSize: '0.8rem', whiteSpace: 'nowrap', margin: 0 }}
+                        >
+                          {isRestoring ? 'Downloading...' : 'Link & Restore'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Auto-Backup Directory Section */}
+                <div style={{ padding: '15px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-main)' }}>🔄 Live Auto-Backup Directory</h4>
+                    <span style={{ fontSize: '0.75rem', color: autoBackupPath ? 'var(--green-text)' : 'var(--text-muted)' }}>
+                      {autoBackupPath ? 'Active' : 'Disabled'}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px', lineHeight: '1.4' }}>
+                    Choose a folder (e.g., Desktop or Dropbox) where the app will continuously write a live backup file (`EOM_AutoBackup.json`) whenever you make changes.
+                  </p>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                     <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(syncCode);
-                        alert('Sync Code copied!');
-                      }}
-                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '4px', fontSize: '0.7rem', padding: '2px 8px', color: 'var(--text-main)', cursor: 'pointer' }}
+                      type="button"
+                      onClick={handleSelectAutoBackupFolder}
+                      className="notion-button secondary"
+                      style={{ padding: '6px 14px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}
                     >
-                      Copy Code
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31zM2.19 4a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4H2.19zm4.69-1.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707z" /></svg>
+                      Choose Folder
+                    </button>
+
+                    {autoBackupPath && (
+                      <>
+                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '6px 10px', borderRadius: '4px', fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--text-main)', border: '1px solid rgba(255,255,255,0.05)', wordBreak: 'break-all', flex: 1, minWidth: '200px' }}>
+                          {autoBackupPath}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleDisableAutoBackup}
+                          className="notion-button secondary"
+                          style={{ padding: '6px 12px', fontSize: '0.8rem', color: 'var(--red-text)', borderColor: 'var(--red-text)', background: 'transparent' }}
+                        >
+                          Disable
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === 'system' && (
+              <>
+                <h3 style={{ fontSize: '1rem', marginBottom: '10px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  ⚙️ System Management
+                </h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '20px', lineHeight: '1.4' }}>
+                  Perform administrative actions on your local device account, temporary system cache, or delete databases.
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '300px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Session Account</span>
+                    <button
+                      type="button"
+                      onClick={logout}
+                      style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        color: 'var(--text-main)',
+                        border: '1px solid var(--border-color)',
+                        padding: '10px 16px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                        textAlign: 'center'
+                      }}>
+                      🚪 Log Out
                     </button>
                   </div>
 
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0 0 10px 0' }}>
-                    {qrType === 'local'
-                      ? `WiFi Sync URL: http://${localIp}:5173/?sync=${syncCode}`
-                      : `Web Sync URL: ${(profile.webAppUrl || 'https://frx132.github.io/E.O.M/').replace(/\/$/, '')}/?sync=${syncCode}`
-                    }
-                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Troubleshooting</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const confirmed = window.confirm("This will clear your local temporary cache to fix any display typos from old versions. Your main database will remain. Continue?");
+                        if (confirmed) {
+                          localStorage.clear();
+                          window.location.reload();
+                        }
+                      }}
+                      style={{
+                        background: 'rgba(50,150,255,0.1)',
+                        color: 'var(--blue-text)',
+                        border: '1px solid var(--blue-text)',
+                        padding: '10px 16px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                        textAlign: 'center'
+                      }}>
+                      🧹 Clear UI Cache
+                    </button>
+                  </div>
 
-                  <button
-                    onClick={() => {
-                      const fullUrl = qrType === 'local'
-                        ? `http://${localIp}:5173/?sync=${syncCode}`
-                        : `${profile.webAppUrl || 'https://frx132.github.io/E.O.M/'}?sync=${syncCode}`;
-                      navigator.clipboard.writeText(fullUrl);
-                      alert('Sync Link copied!');
-                    }}
-                    className="notion-button secondary"
-                    style={{ padding: '4px 10px', fontSize: '0.75rem', margin: 0 }}
-                  >
-                    🔗 Copy Sync Link
-                  </button>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Factory Operations</span>
+                    <button
+                      type="button"
+                      onClick={handleReset}
+                      style={{
+                        background: 'rgba(255,50,50,0.1)',
+                        color: 'var(--red-text)',
+                        border: '1px solid var(--red-text)',
+                        padding: '10px 16px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                        textAlign: 'center'
+                      }}>
+                      ⚠️ Factory Reset
+                    </button>
+                  </div>
                 </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(
-                      qrType === 'local'
-                        ? `http://${localIp}:5173/?sync=${syncCode}`
-                        : `${profile.webAppUrl || 'https://frx132.github.io/E.O.M/'}?sync=${syncCode}`
-                    )}`}
-                    alt="Sync QR Code"
-                    style={{ borderRadius: '6px', background: '#fff', padding: '4px', width: '100px', height: '100px', display: 'block' }}
-                  />
-                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Scan with phone</span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div style={{ borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '15px' }}>
-            <h4 style={{ margin: '0 0 10px 0', fontSize: '0.85rem', color: 'var(--text-main)' }}>Enter Sync Code from Another Device</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '400px' }}>
-              <input
-                type="text"
-                placeholder="Enter Sync Code or Link (e.g. a1b2c3d4)"
-                value={inputSyncCode}
-                onChange={(e) => setInputSyncCode(e.target.value)}
-                style={{
-                  width: '100%',
-                  background: 'var(--bg-input)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-main)',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  outline: 'none',
-                  fontSize: '0.85rem',
-                  boxSizing: 'border-box'
-                }}
-              />
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <input
-                  type="password"
-                  placeholder="Sync Passphrase (If encrypted)"
-                  value={syncPassphrase}
-                  onChange={(e) => setSyncPassphrase(e.target.value)}
-                  style={{
-                    flex: 1,
-                    background: 'var(--bg-input)',
-                    border: '1px solid var(--border-color)',
-                    color: 'var(--text-main)',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    outline: 'none',
-                    fontSize: '0.85rem'
-                  }}
-                />
-                <button
-                  onClick={handleRestoreSync}
-                  className="notion-button secondary"
-                  disabled={isRestoring}
-                  style={{ padding: '8px 16px', fontSize: '0.8rem', whiteSpace: 'nowrap', margin: 0 }}
-                >
-                  {isRestoring ? 'Downloading...' : 'Link & Restore'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Auto-Backup Directory Section */}
-        <div style={{ marginTop: '20px', padding: '15px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-            <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-main)' }}>🔄 Live Auto-Backup Directory</h4>
-            <span style={{ fontSize: '0.75rem', color: autoBackupPath ? 'var(--green-text)' : 'var(--text-muted)' }}>
-              {autoBackupPath ? 'Active' : 'Disabled'}
-            </span>
-          </div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px', lineHeight: '1.4' }}>
-            Choose a folder (e.g., Desktop or Dropbox) where the app will continuously write a live backup file (`EOM_AutoBackup.json`) whenever you make changes.
-          </p>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            <button
-              onClick={handleSelectAutoBackupFolder}
-              className="notion-button secondary"
-              style={{ padding: '6px 14px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31zM2.19 4a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4H2.19zm4.69-1.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707z" /></svg>
-              Choose Folder
-            </button>
-
-            {autoBackupPath && (
-              <>
-                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '6px 10px', borderRadius: '4px', fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--text-main)', border: '1px solid rgba(255,255,255,0.05)', wordBreak: 'break-all', flex: 1, minWidth: '200px' }}>
-                  {autoBackupPath}
-                </div>
-                <button
-                  onClick={handleDisableAutoBackup}
-                  className="notion-button secondary"
-                  style={{ padding: '6px 12px', fontSize: '0.8rem', color: 'var(--red-text)', borderColor: 'var(--red-text)', background: 'transparent' }}
-                >
-                  Disable
-                </button>
               </>
             )}
+
           </div>
         </div>
-
       </div>
     </div>
   );

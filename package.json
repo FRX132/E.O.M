@@ -1,7 +1,7 @@
 {
   "name": "eom",
   "private": true,
-  "version": "1.6.7",
+  "version": "2.0.0",
   "description": "E.O.M",
   "author": "Freakzy",
   "type": "module",
