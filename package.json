@@ -13,13 +13,15 @@
     "electron:build:mac": "vite build && electron-builder --mac",
     "electron:build:win": "vite build && electron-builder --win --x64",
     "build": "vite build",
-    "cap:build": "vite build && cap sync ios",
-    "cap:sync": "cap sync ios",
-    "cap:open": "cap open ios",
+    "cap:build": "vite build && cap sync",
+    "cap:sync": "cap sync",
+    "cap:open:ios": "cap open ios",
+    "cap:open:android": "cap open android",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.2",
     "@capacitor/cli": "^8.4.0",
     "@capacitor/core": "^8.4.0",
     "@capacitor/ios": "^8.4.0",

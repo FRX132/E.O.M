@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EOM</string>
+    <string name="title_activity_main">EOM</string>
+    <string name="package_name">com.freakzy.lifeplanneros</string>
+    <string name="custom_url_scheme">com.freakzy.lifeplanneros</string>
+</resources>

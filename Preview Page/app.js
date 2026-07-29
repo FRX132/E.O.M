@@ -255,7 +255,35 @@ function openDownloadModal(platform) {
     
     if (!modal || !title || !content) return;
     
-    if (platform === 'ios') {
+    if (platform === 'win') {
+        title.innerText = 'Download E.O.M for Windows';
+        content.innerHTML = `
+            <p style="margin-bottom: 15px;">Get the prebuilt desktop installer for <strong>Windows (x64)</strong>.</p>
+            <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M-Setup-2.0.0.exe" class="modal-download-btn" download>
+                📥 Download E.O.M Setup 2.0.0.exe
+            </a>
+            <div style="text-align: left; font-size: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
+                <strong style="color: #fff; display: block; margin-bottom: 5px;">Installation Instructions:</strong>
+                1. Download the <code>.EXE</code> installer above.<br>
+                2. Run the installer to set up E.O.M on your PC.<br>
+                3. Follow instructions on screen. Open via the desktop shortcut.
+            </div>
+        `;
+    } else if (platform === 'mac') {
+        title.innerText = 'Download E.O.M for macOS';
+        content.innerHTML = `
+            <p style="margin-bottom: 15px;">Get the prebuilt desktop disk image for <strong>macOS</strong>.</p>
+            <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M-2.0.0.dmg" class="modal-download-btn" download>
+                📥 Download E.O.M-2.0.0.dmg
+            </a>
+            <div style="text-align: left; font-size: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
+                <strong style="color: #fff; display: block; margin-bottom: 5px;">Installation Instructions:</strong>
+                1. Download the <code>.DMG</code> file above.<br>
+                2. Double-click the file to open it.<br>
+                3. Drag the E.O.M app icon to your Applications folder.
+            </div>
+        `;
+    } else if (platform === 'ios') {
         title.innerText = 'Download E.O.M for iOS (iPhone)';
         content.innerHTML = `
             <p style="margin-bottom: 15px;">Get the prebuilt <strong>E.O.M.ipa</strong> bundle to install directly on your device.</p>
