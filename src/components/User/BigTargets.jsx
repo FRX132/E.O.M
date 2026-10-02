@@ -51,7 +51,12 @@ export default function BigTargets() {
 
   const filteredProjects = activeTab === 'All'
     ? projects
-    : projects.filter(p => activeTab === 'Active' ? p.status === 'In progress' : p.status === 'Not started');
+    : projects.filter(p => {
+        if (activeTab === 'In progress') return p.status === 'In progress';
+        if (activeTab === 'Not started') return p.status === 'Not started';
+        if (activeTab === 'Completed') return p.status === 'Completed';
+        return true;
+      });
 
   return (
     <div className="premium-container">
@@ -70,7 +75,7 @@ export default function BigTargets() {
         </div>
 
         <div className="notion-tabs">
-          {['All', 'Active', 'On hold'].map(tab => (
+          {['All', 'In progress', 'Not started', 'Completed'].map(tab => (
             <button
               key={tab}
               className={`notion-tab ${activeTab === tab ? 'active' : ''}`}

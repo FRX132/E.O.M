@@ -4,6 +4,7 @@ import '../Styles/NewsHub.css';
 import {
   fetchAllNewsArticles,
   NEWS_CATEGORIES,
+  SOURCE_TIERS,
   DEFAULT_NEWS_FEEDS,
   generateLocalSummary,
   speakArticleText,
@@ -59,7 +60,12 @@ function NewsCard({ item, isSaved, onToggleBookmark, onRead, onTts }) {
       <div className="news-card-img" style={{ backgroundImage: `url(${item.imageUrl})` }}>
         <div className="news-card-img-overlay" />
         <div className="news-card-top-badges">
-          <span className="news-source-tag">{item.source}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span className="news-source-tag">{item.source}</span>
+            {item.country && (
+              <span className="news-country-badge">{item.country.includes('/') ? item.country.split('/')[0].trim() : item.country}</span>
+            )}
+          </div>
           <button
             className={`news-bookmark-btn ${isSaved ? 'saved' : ''}`}
             onClick={(e) => onToggleBookmark(item, e)}
@@ -80,6 +86,12 @@ function NewsCard({ item, isSaved, onToggleBookmark, onRead, onTts }) {
               <>
                 <span>•</span>
                 <span style={{ color: 'var(--primary)' }}>{item.category}</span>
+              </>
+            )}
+            {item.tierLabel && (
+              <>
+                <span>•</span>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>{item.tierLabel}</span>
               </>
             )}
           </div>
@@ -132,6 +144,7 @@ export default function NewsHub() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedTier, setSelectedTier] = useState('all'); // 'all', 'agencies', 'giants', 'geopolitics', 'national', 'tech'
   const [selectedLanguage, setSelectedLanguage] = useState('all'); // 'all', 'de', 'en'
   const [layoutMode, setLayoutMode] = useState('grid'); // 'grid', 'magazine', 'compact'
   const [activeReaderArticle, setActiveReaderArticle] = useState(null);
@@ -208,6 +221,20 @@ export default function NewsHub() {
       list = list.filter((a) => a.category?.toLowerCase() === selectedCategory.toLowerCase());
     }
 
+    // Filter by Media Tier
+    if (selectedTier !== 'all') {
+      list = list.filter((a) => {
+        if (a.tier === selectedTier) return true;
+        const src = (a.source || '').toLowerCase();
+        if (selectedTier === 'agencies' && (src.includes('reuters') || src.includes('ap') || src.includes('associated press') || src.includes('afp'))) return true;
+        if (selectedTier === 'giants' && (src.includes('bbc') || src.includes('new york times') || src.includes('nyt') || src.includes('cnn') || src.includes('guardian'))) return true;
+        if (selectedTier === 'geopolitics' && (src.includes('bloomberg') || src.includes('financial times') || src.includes('ft') || src.includes('al jazeera'))) return true;
+        if (selectedTier === 'national' && (src.includes('tagesschau') || src.includes('spiegel'))) return true;
+        if (selectedTier === 'tech' && (src.includes('heise') || src.includes('verge') || src.includes('wired') || src.includes('techcrunch') || src.includes('ars') || src.includes('hacker') || src.includes('dev'))) return true;
+        return false;
+      });
+    }
+
     // Filter by Language
     if (selectedLanguage !== 'all') {
       list = list.filter((a) => a.language === selectedLanguage);
@@ -226,7 +253,7 @@ export default function NewsHub() {
     }
 
     return list;
-  }, [articles, newsBookmarks, selectedCategory, selectedLanguage, searchQuery]);
+  }, [articles, newsBookmarks, selectedCategory, selectedTier, selectedLanguage, searchQuery]);
 
   // Breaking headlines for ticker
   const breakingNewsItems = useMemo(() => {
@@ -299,6 +326,10 @@ export default function NewsHub() {
       url: newFeedUrl.trim(),
       category: newFeedCategory,
       language: 'de',
+      tier: 'custom',
+      tierLabel: 'Benutzerdefiniert',
+      country: 'Custom',
+      description: 'Benutzerdefinierter RSS Feed',
       enabled: true,
       icon: '📡'
     };
@@ -379,7 +410,7 @@ export default function NewsHub() {
               <h1>
                 News Hub <span style={{ fontSize: '1rem', color: 'var(--primary)', fontWeight: 600 }}>LIVE</span>
               </h1>
-              <p>Echtzeit-Nachrichten aus Technologie, Wirtschaft, KI, Wissenschaft und Weltgeschehen.</p>
+              <p>Echtzeit-Nachrichten aus den 10 führenden globalen Medienhäusern, Technologie, Finanzen und Geopolitik.</p>
             </div>
           </div>
 
@@ -420,7 +451,7 @@ export default function NewsHub() {
             </svg>
             <input
               type="text"
-              placeholder="Thema, Quelle oder Schlagwort suchen..."
+              placeholder="Thema, Quelle oder Schlagwort suchen (z.B. Reuters, BBC, Bloomberg, KI)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -508,6 +539,24 @@ export default function NewsHub() {
                 <span>{cat.icon}</span>
                 <span>{cat.deLabel}</span>
                 <span className="news-count-badge">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 4b. Source Tier Filter Pills (Fakten-Agenturen, Globale Giganten, Geopolitik) */}
+        <div className="news-tiers-bar">
+          {SOURCE_TIERS.map((tier) => {
+            const isActive = selectedTier === tier.id;
+            return (
+              <button
+                key={tier.id}
+                className={`news-tier-pill ${isActive ? 'active' : ''}`}
+                onClick={() => setSelectedTier(tier.id)}
+                title={tier.description || tier.deLabel}
+              >
+                <span>{tier.icon}</span>
+                <span>{tier.deLabel}</span>
               </button>
             );
           })}
@@ -668,8 +717,16 @@ export default function NewsHub() {
           <div className="news-reader-modal" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className="news-modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span className="news-source-tag">{activeReaderArticle.source}</span>
+                {activeReaderArticle.country && (
+                  <span className="news-country-badge">{activeReaderArticle.country}</span>
+                )}
+                {activeReaderArticle.tierLabel && (
+                  <span style={{ fontSize: '0.75rem', color: 'var(--primary)', background: 'rgba(var(--primary-rgb), 0.1)', padding: '2px 8px', borderRadius: '6px', fontWeight: 600 }}>
+                    {activeReaderArticle.tierLabel}
+                  </span>
+                )}
                 <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                   {new Date(activeReaderArticle.pubDate).toLocaleString()}
                 </span>
@@ -931,22 +988,42 @@ export default function NewsHub() {
               </form>
 
               {/* Feed List */}
-              <h4 style={{ margin: '10px 0 0 0', fontSize: '1rem', color: 'var(--text-main)' }}>Verfügbare Feeds</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
+                <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-main)' }}>Verfügbare Globale Feeds ({customFeeds.length})</h4>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Top 10 Leitmedien & Fakten-Standards</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '420px', overflowY: 'auto', paddingRight: '4px' }}>
                 {customFeeds.map((feed) => (
-                  <div key={feed.id} className="news-feed-item-row">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ fontSize: '1.2rem' }}>{feed.icon || '📰'}</span>
-                      <div>
-                        <div style={{ fontWeight: 600, fontSize: '0.92rem', color: 'var(--text-main)' }}>{feed.name}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{feed.category} • {feed.language?.toUpperCase() || 'DE'}</div>
+                  <div key={feed.id} className="news-feed-item-row" style={{ padding: '12px 14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flex: 1 }}>
+                      <span style={{ fontSize: '1.4rem', marginTop: '2px' }}>{feed.icon || '📰'}</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)' }}>{feed.name}</span>
+                          {feed.country && (
+                            <span className="news-country-badge">{feed.country}</span>
+                          )}
+                          {feed.tierLabel && (
+                            <span style={{ fontSize: '0.72rem', color: 'var(--primary)', background: 'rgba(var(--primary-rgb), 0.1)', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
+                              {feed.tierLabel}
+                            </span>
+                          )}
+                        </div>
+                        {feed.description && (
+                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: '3px 0' }}>
+                            {feed.description}
+                          </div>
+                        )}
+                        <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)', opacity: 0.8 }}>
+                          Kategorie: {feed.category} • Sprache: {feed.language?.toUpperCase() || 'DE'}
+                        </div>
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: '10px' }}>
                       <button
                         className={`news-btn ${feed.enabled !== false ? 'active' : ''}`}
-                        style={{ padding: '4px 10px', fontSize: '0.78rem' }}
+                        style={{ padding: '6px 12px', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
                         onClick={() => handleToggleFeed(feed.id)}
                       >
                         {feed.enabled !== false ? 'Aktiviert ✓' : 'Pausiert'}

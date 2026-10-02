@@ -785,10 +785,29 @@
   color: #ffffff;
 }
 
-:root[data-theme="light"] .mac-btn-confirm-choice.text {
-  color: rgba(0, 0, 0, 0.5);
-}
-
 :root[data-theme="light"] .mac-btn-confirm-choice.text:hover {
   color: #000000;
+}
+
+@media (max-width: 768px) {
+  .timetable-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .timetable-column {
+    min-height: auto;
+    padding: 14px;
+    border-radius: 14px;
+  }
+  .timetable-column-header {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+  }
+  .timetable-blocks-list {
+    gap: 8px;
+  }
+  .timetable-block-card {
+    padding: 12px;
+  }
 }

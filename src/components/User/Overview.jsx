@@ -117,7 +117,7 @@ export default function Overview({ navigate }) {
   const netWorth = totalWealth - monthlyTotal; // Simplified net worth logic
 
   // Progress metrics for the 5 databases
-  const goalProg = goals.week.length > 0 ? Math.round((goals.week.filter(g => g.done).length / goals.week.length) * 100) : 0;
+  const goalProg = (goals?.week && goals.week.length > 0) ? Math.round((goals.week.filter(g => g.done).length / goals.week.length) * 100) : 0;
   const fridgeProg = fridge.length > 0 ? Math.round((fridge.filter(f => f.status !== 'Not in stock').length / fridge.length) * 100) : 0;
   const expenseProg = totalWealth > 0 ? Math.max(0, Math.round(100 - (monthlyTotal / totalWealth) * 100)) : 100;
   const targetProg = targets.length > 0 ? Math.round((targets.filter(t => t.status === 'Completed').length / targets.length) * 100) : 0;

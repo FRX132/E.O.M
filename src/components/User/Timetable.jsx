@@ -66,7 +66,10 @@ function getLocalDateOfWeekday(dayName) {
   
   const targetDate = new Date(today);
   targetDate.setDate(today.getDate() + diff);
-  return targetDate.toISOString().split('T')[0];
+  const ye = targetDate.getFullYear();
+  const mo = String(targetDate.getMonth() + 1).padStart(2, '0');
+  const da = String(targetDate.getDate()).padStart(2, '0');
+  return `${ye}-${mo}-${da}`;
 }
 
 export default function Timetable() {

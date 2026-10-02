@@ -106,11 +106,13 @@ export default function TripMode() {
   const visitedLocations = useMemo(() => trips.map(t => (t.resolvedCountry || t.location).toLowerCase()), [trips]);
 
   const isVisited = (d) => {
-    return visitedLocations.some(loc =>
-      loc.includes(d.properties.NAME.toLowerCase()) ||
-      loc.includes(d.properties.SOV_A3.toLowerCase()) ||
-      d.properties.NAME.toLowerCase().includes(loc)
-    );
+    if (!d || !d.properties) return false;
+    const name = (d.properties.NAME || d.properties.name || d.properties.ADMIN || d.properties.admin || '').toLowerCase();
+    const sov = (d.properties.SOV_A3 || d.properties.sov_a3 || d.properties.ISO_A3 || d.properties.iso_a3 || '').toLowerCase();
+    return visitedLocations.some(loc => {
+      if (!loc) return false;
+      return (name && (loc.includes(name) || name.includes(loc))) || (sov && loc.includes(sov));
+    });
   };
 
   const handleAddTrip = async (e) => {
@@ -210,7 +212,7 @@ export default function TripMode() {
             polygonStrokeColor={() => '#ffffff'}
             polygonLabel={({ properties: d }) => `
               <div style="background: rgba(0,0,0,0.8); padding: 5px 10px; border-radius: 4px; color: white; border: 1px solid rgba(255,140,0,0.5);">
-                <b>${d.ADMIN}</b>
+                <b>${d?.ADMIN || d?.NAME || d?.name || 'Destination'}</b>
               </div>
             `}
             polygonsTransitionDuration={300}

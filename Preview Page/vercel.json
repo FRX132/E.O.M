@@ -1,17 +1,8 @@
 {
-  "functions": {
-    "*.php": {
-      "runtime": "vercel-php@0.7.3"
-    }
-  },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/validate.php",
-      "dest": "/validate.php"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/validate.php",
+      "destination": "/api/validate"
     }
   ]
 }

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { DEFAULT_NEWS_FEEDS } from './services/newsService';
 
 // Migration Logic: Safely fetch legacy data if it exists.
 const migrateLegacyData = (key, defaultVal) => {
@@ -12,6 +13,18 @@ const migrateLegacyData = (key, defaultVal) => {
     console.error(`Failed to parse legacy ${key}`, e);
   }
   return defaultVal;
+};
+
+// Merge legacy feeds with any newly introduced default global outlets
+const migrateFeeds = (key, defaultFeeds) => {
+  const loaded = migrateLegacyData(key, defaultFeeds);
+  if (!Array.isArray(loaded) || loaded.length === 0) return defaultFeeds;
+  const existingIds = new Set(loaded.map(f => f.id));
+  const missingDefaults = defaultFeeds.filter(f => !existingIds.has(f.id));
+  if (missingDefaults.length > 0) {
+    return [...loaded, ...missingDefaults];
+  }
+  return loaded;
 };
 
 // Zustand Persist IndexedDB Custom Engine
@@ -158,18 +171,7 @@ const EMPTY_STATE = {
   passwordsVault: [],
   masterPasswordHash: "",
   newsBookmarks: [],
-  customNewsFeeds: [
-    { id: 'tagesschau', name: 'Tagesschau', url: 'https://www.tagesschau.de/xml/rss2/', category: 'World', language: 'de', enabled: true, icon: '🌐' },
-    { id: 'heise', name: 'Heise Online', url: 'https://www.heise.de/rss/heise-atom.xml', category: 'Tech', language: 'de', enabled: true, icon: '💻' },
-    { id: 'spiegel', name: 'Spiegel Schlagzeilen', url: 'https://www.spiegel.de/schlagzeilen/index.rss', category: 'World', language: 'de', enabled: true, icon: '📰' },
-    { id: 'golem', name: 'Golem.de', url: 'https://rss.golem.de/rss.php?feed=RSS2.0', category: 'Tech', language: 'de', enabled: true, icon: '⚡' },
-    { id: 'btc_echo', name: 'BTC-ECHO Crypto', url: 'https://www.btc-echo.de/feed/', category: 'Finance', language: 'de', enabled: true, icon: '₿' },
-    { id: 'verge', name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml', category: 'Tech', language: 'en', enabled: true, icon: '⚡' },
-    { id: 'bbc', name: 'BBC World News', url: 'https://feeds.bbci.co.uk/news/world/rss.xml', category: 'World', language: 'en', enabled: true, icon: '🌍' },
-    { id: 'wired', name: 'Wired News', url: 'https://www.wired.com/feed/rss', category: 'Tech', language: 'en', enabled: true, icon: '🔌' },
-    { id: 'techcrunch', name: 'TechCrunch', url: 'https://techcrunch.com/feed/', category: 'Tech', language: 'en', enabled: true, icon: '🚀' },
-    { id: 'nasa', name: 'NASA Breaking News', url: 'https://www.nasa.gov/rss/dyn/breaking_news.rss', category: 'Science', language: 'en', enabled: true, icon: '🚀' }
-  ],
+  customNewsFeeds: DEFAULT_NEWS_FEEDS,
   newsSettings: {
     defaultCategory: 'all',
     defaultLanguage: 'all',
@@ -267,7 +269,7 @@ const initialState = {
   passwordsVault: migrateLegacyData('os_passwords_vault', EMPTY_STATE.passwordsVault),
   masterPasswordHash: migrateLegacyData('os_master_password_hash', EMPTY_STATE.masterPasswordHash),
   newsBookmarks: migrateLegacyData('os_news_bookmarks', EMPTY_STATE.newsBookmarks),
-  customNewsFeeds: migrateLegacyData('os_custom_news_feeds', EMPTY_STATE.customNewsFeeds),
+  customNewsFeeds: migrateFeeds('os_custom_news_feeds', DEFAULT_NEWS_FEEDS),
   newsSettings: migrateLegacyData('os_news_settings', EMPTY_STATE.newsSettings),
   newsHistory: migrateLegacyData('os_news_history', EMPTY_STATE.newsHistory),
   journal: migrateLegacyData('os_journal', EMPTY_STATE.journal),
