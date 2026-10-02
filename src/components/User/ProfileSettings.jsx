@@ -843,6 +843,13 @@ export default function ProfileSettings() {
                             <option value="claymorphism">Claymorphism Soft 3D</option>
                             <option value="neumorphism">Neumorphism Soft UI</option>
                             <option value="aurora-ui">Aurora Glow UI</option>
+                            <option value="retro-70s-disco">🕺 70s Disco Groove & Vinyl</option>
+                            <option value="retro-80s-arcade">🕹️ 80s Synthwave & Arcade Neon</option>
+                            <option value="retro-y2k-pixel">📟 Y2K & Nokia 3310 Dot-Matrix</option>
+                            <option value="retro-vintage-editorial">📜 Vintage Editorial & Parchment</option>
+                            <option value="retro-90s-web">🌐 90s Web 1.0 & Windows 95</option>
+                            <option value="retro-art-deco">🍸 1920s Art Deco Luxury</option>
+                            <option value="retro-50s-diner">🍦 50s Diner & Pin-Up Pastel</option>
                           </select>
                         </div>
 
@@ -854,10 +861,14 @@ export default function ProfileSettings() {
                             onChange={(e) => useStore.getState().setDesignSettings({ font: e.target.value })}
                             style={{ cursor: 'pointer' }}
                           >
-                            <option value="Inter">Inter (Classic)</option>
-                            <option value="Outfit">Outfit (Modern)</option>
-                            <option value="JetBrains Mono">JetBrains Mono (Technical)</option>
-                            <option value="Roboto">Roboto (Clean)</option>
+                            <option value="Inter">Inter (Classic Modern)</option>
+                            <option value="Outfit">Outfit (Clean Geometric)</option>
+                            <option value="JetBrains Mono">JetBrains Mono (Technical / Code)</option>
+                            <option value="Roboto">Roboto (Clean Sans)</option>
+                            <option value="Playfair Display">Playfair Display (Vintage Serif / 70s Editorial)</option>
+                            <option value="Cinzel">Cinzel (1920s Art Deco Luxury)</option>
+                            <option value="VT323">VT323 (80s Arcade & Pixel CRT)</option>
+                            <option value="Share Tech Mono">Share Tech Mono (Y2K Cyber)</option>
                           </select>
                         </div>
 
@@ -937,30 +948,6 @@ export default function ProfileSettings() {
                               type="button"
                               className="notion-button secondary"
                               style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                              onClick={() => applyDesignPreset({ template: 'default', blur: 20, radius: 4, isNeon: true, isCompact: false, accent: '#0ea5e9', font: 'Outfit' })}
-                            >
-                              🌌 Deep Space
-                            </button>
-                            <button
-                              type="button"
-                              className="notion-button secondary"
-                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                              onClick={() => applyDesignPreset({ template: 'default', blur: 0, radius: 0, isNeon: false, isCompact: true, accent: '#ffffff', font: 'Inter' })}
-                            >
-                              🌑 Noir
-                            </button>
-                            <button
-                              type="button"
-                              className="notion-button secondary"
-                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                              onClick={() => applyDesignPreset({ template: 'default', blur: 15, radius: 30, isNeon: true, isCompact: false, accent: '#f43f5e', font: 'Outfit' })}
-                            >
-                              🌸 Sakura
-                            </button>
-                            <button
-                              type="button"
-                              className="notion-button secondary"
-                              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
                               onClick={() => applyDesignPreset({ template: 'claymorphism', blur: 0, radius: 24, isNeon: false, isCompact: false, accent: '#6366f1', font: 'Outfit' })}
                             >
                               🏺 Claymorphism
@@ -981,14 +968,73 @@ export default function ProfileSettings() {
                             >
                               ✨ Aurora UI
                             </button>
+                            
+                            {/* Retro ReallyGoodDesigns Presets */}
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem', borderColor: '#f59e0b' }}
+                              onClick={() => applyDesignPreset({ template: 'retro-70s-disco', blur: 0, radius: 20, isNeon: true, isCompact: false, accent: '#f59e0b', font: 'Playfair Display' })}
+                            >
+                              🕺 70s Disco Groove
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem', borderColor: '#ff007f' }}
+                              onClick={() => applyDesignPreset({ template: 'retro-80s-arcade', blur: 0, radius: 0, isNeon: true, isCompact: false, accent: '#00f0ff', font: 'VT323' })}
+                            >
+                              🕹️ 80s Synth Arcade
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem', borderColor: '#8bac0f' }}
+                              onClick={() => applyDesignPreset({ template: 'retro-y2k-pixel', blur: 0, radius: 0, isNeon: false, isCompact: true, accent: '#8bac0f', font: 'Share Tech Mono' })}
+                            >
+                              📟 Y2K Nokia 3310
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem', borderColor: '#b89868' }}
+                              onClick={() => applyDesignPreset({ template: 'retro-vintage-editorial', blur: 0, radius: 2, isNeon: false, isCompact: false, accent: '#8b2500', font: 'Playfair Display' })}
+                            >
+                              📜 Vintage Editorial
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem', borderColor: '#00ffff' }}
+                              onClick={() => applyDesignPreset({ template: 'retro-90s-web', blur: 0, radius: 0, isNeon: false, isCompact: true, accent: '#000080', font: 'Share Tech Mono' })}
+                            >
+                              🌐 90s Windows 95
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem', borderColor: '#d4af37' }}
+                              onClick={() => applyDesignPreset({ template: 'retro-art-deco', blur: 0, radius: 0, isNeon: true, isCompact: false, accent: '#e5c158', font: 'Cinzel' })}
+                            >
+                              🍸 1920s Art Deco
+                            </button>
+                            <button
+                              type="button"
+                              className="notion-button secondary"
+                              style={{ padding: '6px 14px', fontSize: '0.8rem', borderColor: '#fb7185' }}
+                              onClick={() => applyDesignPreset({ template: 'retro-50s-diner', blur: 0, radius: 20, isNeon: true, isCompact: false, accent: '#fb7185', font: 'Outfit' })}
+                            >
+                              🍦 50s Pastel Diner
+                            </button>
+                            
                             <button
                               type="button"
                               className="notion-button secondary"
                               style={{ padding: '6px 14px', fontSize: '0.8rem', background: 'rgba(var(--primary-rgb), 0.1)', border: '1px solid var(--primary)' }}
                               onClick={() => {
-                                const fonts = ['Inter', 'Outfit', 'JetBrains Mono', 'Roboto'];
-                                const colors = ['#ef4444', '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#0ea5e9', '#f43f5e'];
-                                const templates = ['default', 'cyberpunk', 'glassmorphism', 'neo-brutalism', 'retro-terminal', 'nordic-minimalist', 'obsidian-gold', 'claymorphism', 'neumorphism', 'aurora-ui'];
+                                const fonts = ['Inter', 'Outfit', 'JetBrains Mono', 'Roboto', 'Playfair Display', 'Cinzel', 'VT323', 'Share Tech Mono'];
+                                const colors = ['#ef4444', '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#0ea5e9', '#f43f5e', '#ff007f', '#00f0ff', '#8bac0f', '#d4af37', '#ea580c', '#fb7185'];
+                                const templates = ['default', 'cyberpunk', 'glassmorphism', 'neo-brutalism', 'retro-terminal', 'nordic-minimalist', 'obsidian-gold', 'claymorphism', 'neumorphism', 'aurora-ui', 'retro-70s-disco', 'retro-80s-arcade', 'retro-y2k-pixel', 'retro-vintage-editorial', 'retro-90s-web', 'retro-art-deco', 'retro-50s-diner'];
                                 applyDesignPreset({
                                   blur: Math.floor(Math.random() * 25),
                                   radius: Math.floor(Math.random() * 30),

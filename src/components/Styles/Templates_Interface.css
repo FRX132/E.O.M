@@ -687,3 +687,487 @@
   background: rgba(0, 0, 0, 0.06) !important;
   box-shadow: 0 0 12px rgba(219, 39, 119, 0.2) !important;
 }
+
+/* ==========================================================================
+   10. RETRO 70s DISCO & VINYL GROOVE TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="retro-70s-disco"],
+:root[data-theme="dark"][data-interface-template="retro-70s-disco"] {
+  --bg-main: #140b07;
+  --bg-card: #22120b;
+  --bg-header: #2d180e;
+  --border-color: #d97706;
+  --border-light: rgba(217, 119, 6, 0.25);
+  --bg-card-alt: rgba(245, 158, 11, 0.06);
+  --bg-input: #1a0e08;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(34, 18, 11, 0.94);
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(217, 119, 6, 0.15);
+  --text-main: #fef3c7;
+  --text-muted: #d97706;
+  --primary: #f59e0b;
+  --font-main: 'Playfair Display', Georgia, serif;
+  --neon-glow: 0 0 15px rgba(245, 158, 11, 0.4);
+  --border-neon: 1px solid #f59e0b;
+}
+
+:root[data-theme="light"][data-interface-template="retro-70s-disco"] {
+  --bg-main: #fdf8eb;
+  --bg-card: #f9eed4;
+  --bg-header: #f3e1b7;
+  --border-color: #c2410c;
+  --border-light: rgba(194, 65, 12, 0.2);
+  --bg-card-alt: rgba(194, 65, 12, 0.04);
+  --bg-input: #ffffff;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(249, 238, 212, 0.95);
+  --card-shadow: 0 8px 24px rgba(194, 65, 12, 0.1);
+  --text-main: #431407;
+  --text-muted: #9a3412;
+  --primary: #ea580c;
+  --neon-glow: 0 0 10px rgba(234, 88, 12, 0.25);
+  --border-neon: 1.5px solid #ea580c;
+}
+
+:root[data-interface-template="retro-70s-disco"] body {
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.05) 0%, transparent 60%),
+    repeating-radial-gradient(circle at 100% 100%, rgba(217, 119, 6, 0.03) 0, rgba(217, 119, 6, 0.03) 2px, transparent 3px, transparent 40px);
+}
+
+:root[data-interface-template="retro-70s-disco"] .notion-block,
+:root[data-interface-template="retro-70s-disco"] .overview-card,
+:root[data-interface-template="retro-70s-disco"] .premium-card {
+  border: 1.5px solid var(--border-color) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--card-shadow) !important;
+  background: var(--bg-card) !important;
+  color: var(--text-main) !important;
+}
+
+:root[data-interface-template="retro-70s-disco"] h1,
+:root[data-interface-template="retro-70s-disco"] h2,
+:root[data-interface-template="retro-70s-disco"] h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+:root[data-interface-template="retro-70s-disco"] button,
+:root[data-interface-template="retro-70s-disco"] .pill {
+  border-radius: 24px !important;
+  border: 1px solid var(--border-color) !important;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   11. RETRO 80s ARCADE & SYNTHWAVE TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="retro-80s-arcade"],
+:root[data-theme="dark"][data-interface-template="retro-80s-arcade"] {
+  --bg-main: #0a051d;
+  --bg-card: #130a33;
+  --bg-header: #1c0e48;
+  --border-color: #ff007f;
+  --border-light: rgba(0, 240, 255, 0.35);
+  --bg-card-alt: rgba(255, 0, 127, 0.08);
+  --bg-input: #11082d;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(19, 10, 51, 0.92);
+  --card-shadow: 0 0 20px rgba(255, 0, 127, 0.35), 0 0 35px rgba(0, 240, 255, 0.15);
+  --text-main: #e0f2fe;
+  --text-muted: #c084fc;
+  --primary: #00f0ff;
+  --font-main: 'VT323', 'JetBrains Mono', monospace;
+  --neon-glow: 0 0 14px rgba(0, 240, 255, 0.7);
+  --border-neon: 2px solid #ff007f;
+}
+
+:root[data-theme="light"][data-interface-template="retro-80s-arcade"] {
+  --bg-main: #faf5ff;
+  --bg-card: #ffffff;
+  --bg-header: #f3e8ff;
+  --border-color: #d946ef;
+  --border-light: rgba(217, 70, 239, 0.25);
+  --bg-card-alt: rgba(217, 70, 239, 0.05);
+  --bg-input: #faf5ff;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --card-shadow: 0 8px 25px rgba(217, 70, 239, 0.18);
+  --text-main: #3b0764;
+  --text-muted: #86198f;
+  --primary: #c026d3;
+  --neon-glow: 0 0 10px rgba(217, 70, 239, 0.35);
+  --border-neon: 2px solid #c026d3;
+}
+
+:root[data-interface-template="retro-80s-arcade"] body {
+  background-image: 
+    linear-gradient(rgba(255, 0, 127, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+:root[data-interface-template="retro-80s-arcade"] .notion-block,
+:root[data-interface-template="retro-80s-arcade"] .overview-card,
+:root[data-interface-template="retro-80s-arcade"] .premium-card {
+  border: 2px solid var(--border-color) !important;
+  box-shadow: 0 0 15px rgba(255, 0, 127, 0.25), inset 0 0 15px rgba(0, 240, 255, 0.1) !important;
+  clip-path: polygon(0 8px, 8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px));
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+}
+
+:root[data-interface-template="retro-80s-arcade"] h1,
+:root[data-interface-template="retro-80s-arcade"] h2,
+:root[data-interface-template="retro-80s-arcade"] h3 {
+  font-family: 'VT323', 'JetBrains Mono', monospace;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0px rgba(255, 0, 127, 0.6);
+}
+
+:root[data-interface-template="retro-80s-arcade"] button,
+:root[data-interface-template="retro-80s-arcade"] .pill {
+  font-family: 'VT323', 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  letter-spacing: 1px;
+  border: 2px solid var(--primary) !important;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.3) !important;
+}
+
+/* ==========================================================================
+   12. RETRO Y2K & NOKIA 3310 LCD TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="retro-y2k-pixel"],
+:root[data-theme="dark"][data-interface-template="retro-y2k-pixel"] {
+  --bg-main: #091508;
+  --bg-card: #10260e;
+  --bg-header: #173614;
+  --border-color: #8bac0f;
+  --border-light: rgba(139, 172, 15, 0.35);
+  --bg-card-alt: rgba(139, 172, 15, 0.08);
+  --bg-input: #0c1c0a;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(16, 38, 14, 0.95);
+  --card-shadow: 4px 4px 0px #8bac0f;
+  --text-main: #9bbc0f;
+  --text-muted: #62810a;
+  --primary: #9bbc0f;
+  --font-main: 'Share Tech Mono', 'VT323', monospace;
+  --neon-glow: 0 0 8px rgba(155, 188, 15, 0.5);
+  --border-neon: 2px solid #8bac0f;
+}
+
+:root[data-theme="light"][data-interface-template="retro-y2k-pixel"] {
+  --bg-main: #8bac0f;
+  --bg-card: #9bbc0f;
+  --bg-header: #81a20d;
+  --border-color: #0f380f;
+  --border-light: rgba(15, 56, 15, 0.35);
+  --bg-card-alt: rgba(15, 56, 15, 0.08);
+  --bg-input: #9bbc0f;
+  --card-bg: var(--bg-card);
+  --glass-bg: #9bbc0f;
+  --card-shadow: 4px 4px 0px #0f380f;
+  --text-main: #0f380f;
+  --text-muted: #306230;
+  --primary: #0f380f;
+  --neon-glow: none;
+  --border-neon: 2px solid #0f380f;
+}
+
+:root[data-interface-template="retro-y2k-pixel"] body {
+  background-image: radial-gradient(rgba(139, 172, 15, 0.15) 1px, transparent 0);
+  background-size: 8px 8px;
+}
+:root[data-theme="light"][data-interface-template="retro-y2k-pixel"] body {
+  background-image: radial-gradient(rgba(15, 56, 15, 0.12) 1px, transparent 0);
+}
+
+:root[data-interface-template="retro-y2k-pixel"] .notion-block,
+:root[data-interface-template="retro-y2k-pixel"] .overview-card,
+:root[data-interface-template="retro-y2k-pixel"] .premium-card {
+  border: 2px solid var(--border-color) !important;
+  border-radius: 0px !important;
+  box-shadow: 4px 4px 0px var(--border-color) !important;
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+}
+
+:root[data-interface-template="retro-y2k-pixel"] button,
+:root[data-interface-template="retro-y2k-pixel"] .pill {
+  border: 2px solid var(--border-color) !important;
+  border-radius: 0px !important;
+  box-shadow: 3px 3px 0px var(--border-color) !important;
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  font-family: 'Share Tech Mono', monospace;
+  font-weight: 700;
+}
+
+:root[data-interface-template="retro-y2k-pixel"] button:active,
+:root[data-interface-template="retro-y2k-pixel"] .pill:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px var(--border-color) !important;
+}
+
+/* ==========================================================================
+   13. RETRO VINTAGE EDITORIAL & PARCHMENT TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="retro-vintage-editorial"],
+:root[data-theme="dark"][data-interface-template="retro-vintage-editorial"] {
+  --bg-main: #17130f;
+  --bg-card: #221c15;
+  --bg-header: #2e261e;
+  --border-color: #b89868;
+  --border-light: rgba(184, 152, 104, 0.2);
+  --bg-card-alt: rgba(184, 152, 104, 0.05);
+  --bg-input: #1a1510;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(34, 28, 21, 0.95);
+  --card-shadow: 0 6px 25px rgba(0, 0, 0, 0.6);
+  --text-main: #ede2cd;
+  --text-muted: #a69480;
+  --primary: #d4af37;
+  --font-main: 'Playfair Display', Georgia, serif;
+}
+
+:root[data-theme="light"][data-interface-template="retro-vintage-editorial"] {
+  --bg-main: #f6efe1;
+  --bg-card: #ede3ce;
+  --bg-header: #e3d5bb;
+  --border-color: #63472d;
+  --border-light: rgba(99, 71, 45, 0.2);
+  --bg-card-alt: rgba(99, 71, 45, 0.04);
+  --bg-input: #faf5eb;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(237, 227, 206, 0.95);
+  --card-shadow: 0 4px 15px rgba(99, 71, 45, 0.1);
+  --text-main: #24170d;
+  --text-muted: #73573e;
+  --primary: #8b2500;
+}
+
+:root[data-interface-template="retro-vintage-editorial"] .notion-block,
+:root[data-interface-template="retro-vintage-editorial"] .overview-card,
+:root[data-interface-template="retro-vintage-editorial"] .premium-card {
+  border: 1px solid var(--border-color) !important;
+  outline: 1px solid var(--border-color) !important;
+  outline-offset: -5px;
+  border-radius: 2px !important;
+  box-shadow: var(--card-shadow) !important;
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+}
+
+:root[data-interface-template="retro-vintage-editorial"] h1,
+:root[data-interface-template="retro-vintage-editorial"] h2,
+:root[data-interface-template="retro-vintage-editorial"] h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+}
+
+:root[data-interface-template="retro-vintage-editorial"] button,
+:root[data-interface-template="retro-vintage-editorial"] .pill {
+  border: 1px solid var(--border-color) !important;
+  border-radius: 3px !important;
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* ==========================================================================
+   14. RETRO 90s WEB 1.0 & WINDOWS 95 TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="retro-90s-web"],
+:root[data-theme="dark"][data-interface-template="retro-90s-web"] {
+  --bg-main: #000033;
+  --bg-card: #0a1138;
+  --bg-header: #000080;
+  --border-color: #00ffff;
+  --border-light: #0055aa;
+  --bg-card-alt: rgba(0, 255, 255, 0.05);
+  --bg-input: #000022;
+  --card-bg: var(--bg-card);
+  --glass-bg: #0a1138;
+  --card-shadow: 4px 4px 0px #00ffff;
+  --text-main: #ffffff;
+  --text-muted: #7fe5ff;
+  --primary: #ffff00;
+  --font-main: 'Share Tech Mono', monospace;
+}
+
+:root[data-theme="light"][data-interface-template="retro-90s-web"] {
+  --bg-main: #008080; /* Win95 Teal Desktop */
+  --bg-card: #c0c0c0; /* Win95 Classic Grey */
+  --bg-header: #000080; /* Win95 Titlebar Navy */
+  --border-color: #808080;
+  --border-light: #dfdfdf;
+  --bg-card-alt: #d4d0c8;
+  --bg-input: #ffffff;
+  --card-bg: var(--bg-card);
+  --glass-bg: #c0c0c0;
+  --card-shadow: 3px 3px 0px #404040;
+  --text-main: #000000;
+  --text-muted: #333333;
+  --primary: #000080;
+}
+
+:root[data-interface-template="retro-90s-web"] .notion-block,
+:root[data-interface-template="retro-90s-web"] .overview-card,
+:root[data-interface-template="retro-90s-web"] .premium-card {
+  border-top: 2px solid #ffffff !important;
+  border-left: 2px solid #ffffff !important;
+  border-right: 2px solid #404040 !important;
+  border-bottom: 2px solid #404040 !important;
+  border-radius: 0px !important;
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+}
+
+:root[data-interface-template="retro-90s-web"] button,
+:root[data-interface-template="retro-90s-web"] .pill {
+  border-top: 2px solid #ffffff !important;
+  border-left: 2px solid #ffffff !important;
+  border-right: 2px solid #404040 !important;
+  border-bottom: 2px solid #404040 !important;
+  border-radius: 0px !important;
+  background: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  font-family: 'Share Tech Mono', monospace;
+  font-weight: 700;
+}
+
+:root[data-interface-template="retro-90s-web"] button:active,
+:root[data-interface-template="retro-90s-web"] .pill:active {
+  border-top: 2px solid #404040 !important;
+  border-left: 2px solid #404040 !important;
+  border-right: 2px solid #ffffff !important;
+  border-bottom: 2px solid #ffffff !important;
+}
+
+/* ==========================================================================
+   15. RETRO 1920s ART DECO LUXURY TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="retro-art-deco"],
+:root[data-theme="dark"][data-interface-template="retro-art-deco"] {
+  --bg-main: #08080a;
+  --bg-card: #121217;
+  --bg-header: #191922;
+  --border-color: #d4af37;
+  --border-light: rgba(212, 175, 55, 0.25);
+  --bg-card-alt: rgba(212, 175, 55, 0.03);
+  --bg-input: #0d0d10;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(18, 18, 23, 0.95);
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(212, 175, 55, 0.15);
+  --text-main: #faf6eb;
+  --text-muted: #b5a47e;
+  --primary: #e5c158;
+  --font-main: 'Cinzel', Georgia, serif;
+  --neon-glow: 0 0 12px rgba(229, 193, 88, 0.4);
+  --border-neon: 1px solid #d4af37;
+}
+
+:root[data-theme="light"][data-interface-template="retro-art-deco"] {
+  --bg-main: #faf7f2;
+  --bg-card: #f3ede2;
+  --bg-header: #e7decb;
+  --border-color: #947528;
+  --border-light: rgba(148, 117, 40, 0.2);
+  --bg-card-alt: rgba(148, 117, 40, 0.03);
+  --bg-input: #ffffff;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(243, 237, 226, 0.95);
+  --card-shadow: 0 8px 25px rgba(148, 117, 40, 0.12);
+  --text-main: #1c170d;
+  --text-muted: #6b572a;
+  --primary: #8a6a1c;
+  --neon-glow: 0 0 8px rgba(148, 117, 40, 0.2);
+  --border-neon: 1px solid #947528;
+}
+
+:root[data-interface-template="retro-art-deco"] .notion-block,
+:root[data-interface-template="retro-art-deco"] .overview-card,
+:root[data-interface-template="retro-art-deco"] .premium-card {
+  border: 1px solid var(--border-color) !important;
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+  box-shadow: var(--card-shadow) !important;
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+}
+
+:root[data-interface-template="retro-art-deco"] h1,
+:root[data-interface-template="retro-art-deco"] h2,
+:root[data-interface-template="retro-art-deco"] h3 {
+  font-family: 'Cinzel', Georgia, serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+:root[data-interface-template="retro-art-deco"] button,
+:root[data-interface-template="retro-art-deco"] .pill {
+  border: 1px solid var(--border-color) !important;
+  border-radius: 4px !important;
+  font-family: 'Cinzel', Georgia, serif;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   16. RETRO 50s AMERICAN DINER & PIN-UP TEMPLATE
+   ========================================================================== */
+:root[data-interface-template="retro-50s-diner"],
+:root[data-theme="dark"][data-interface-template="retro-50s-diner"] {
+  --bg-main: #0c1718;
+  --bg-card: #132628;
+  --bg-header: #1b3538;
+  --border-color: #2dd4bf;
+  --border-light: rgba(45, 212, 191, 0.25);
+  --bg-card-alt: rgba(251, 113, 133, 0.06);
+  --bg-input: #0f1f20;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(19, 38, 40, 0.92);
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(45, 212, 191, 0.2);
+  --text-main: #f0fdfa;
+  --text-muted: #5eead4;
+  --primary: #fb7185;
+  --font-main: 'Outfit', sans-serif;
+  --neon-glow: 0 0 12px rgba(251, 113, 133, 0.5);
+  --border-neon: 2px solid #fb7185;
+}
+
+:root[data-theme="light"][data-interface-template="retro-50s-diner"] {
+  --bg-main: #f0fdf9;
+  --bg-card: #ffffff;
+  --bg-header: #ccfbf1;
+  --border-color: #fb7185;
+  --border-light: rgba(251, 113, 133, 0.25);
+  --bg-card-alt: rgba(251, 113, 133, 0.04);
+  --bg-input: #f0fdf9;
+  --card-bg: var(--bg-card);
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --card-shadow: 0 8px 25px rgba(251, 113, 133, 0.15);
+  --text-main: #134e4a;
+  --text-muted: #0f766e;
+  --primary: #e11d48;
+  --neon-glow: 0 0 10px rgba(225, 29, 72, 0.25);
+  --border-neon: 2px solid #e11d48;
+}
+
+:root[data-interface-template="retro-50s-diner"] .notion-block,
+:root[data-interface-template="retro-50s-diner"] .overview-card,
+:root[data-interface-template="retro-50s-diner"] .premium-card {
+  border: 2px solid var(--border-color) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--card-shadow) !important;
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+}
+
+:root[data-interface-template="retro-50s-diner"] button,
+:root[data-interface-template="retro-50s-diner"] .pill {
+  border-radius: 20px !important;
+  border: 2px solid var(--border-color) !important;
+  font-weight: 700;
+}
+

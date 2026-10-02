@@ -92,11 +92,15 @@
                 A premium, minimalist local-first operating system designed to gamify and organize every facet of your life. Earn XP, track capital, map fitness, and code goals.
             </p>
             <div class="btn-group">
-                <a href="#demo" class="btn btn-primary">
-                    Interactive Preview
+                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; box-shadow: 0 0 20px rgba(212, 143, 72, 0.4);">
+                    🚀 Launch Web App (PWA)
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                        <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                        <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
                     </svg>
+                </a>
+                <a href="#demo" class="btn btn-secondary">
+                    Interactive Preview
                 </a>
                 <a href="https://github.com/FRX132/E.O.M" target="_blank" class="btn btn-secondary">
                     View on GitHub
@@ -104,17 +108,20 @@
             </div>
 
             <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px; margin-top: -30px;">
+                <button class="btn btn-secondary" onclick="openDownloadModal('pwa')" style="font-size: 0.9rem; border-color: var(--primary); color: #fff; cursor: pointer; background: rgba(212, 143, 72, 0.15);">
+                    📲 PWA / Mobile Instant Install
+                </button>
                 <button class="btn btn-secondary" onclick="openDownloadModal('win')" style="font-size: 0.9rem; border-color: var(--primary); color: #fff; cursor: pointer;">
-                    🪟 Download Windows App
+                    🪟 Windows (.exe)
                 </button>
                 <button class="btn btn-secondary" onclick="openDownloadModal('mac')" style="font-size: 0.9rem; border-color: var(--secondary); color: #fff; cursor: pointer;">
-                    🍏 Download macOS App
+                    🍏 macOS (.dmg)
                 </button>
                 <button class="btn btn-secondary" onclick="openDownloadModal('ios')" style="font-size: 0.9rem; border-color: var(--text-muted); color: #fff; cursor: pointer;">
-                     iOS Bundle
+                     iOS (PWA / IPA)
                 </button>
                 <button class="btn btn-secondary" onclick="openDownloadModal('android')" style="font-size: 0.9rem; border-color: var(--text-muted); color: #fff; cursor: pointer;">
-                    🤖 Android APK
+                    🤖 Android (PWA / APK)
                 </button>
             </div>
 

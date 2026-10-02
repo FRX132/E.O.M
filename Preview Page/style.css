@@ -912,6 +912,68 @@ footer {
     transform: translateY(-2px);
 }
 
+.modal-option-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+    text-align: left;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.modal-option-box:hover {
+    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-option-box.highlight {
+    border-color: var(--primary);
+    background: rgba(212, 143, 72, 0.08);
+}
+
+.modal-option-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.modal-option-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: var(--primary);
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+}
+
+.modal-secondary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 16px;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-secondary-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+    color: #fff;
+}
+
 /* Waitlist / Contact Form Styles */
 .waitlist-card input:focus, .waitlist-card textarea:focus {
     border-color: var(--primary) !important;

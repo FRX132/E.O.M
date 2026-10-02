@@ -247,6 +247,10 @@ function App() {
       if (designSettings.font === 'Outfit') fontValue = 'var(--font-outfit)';
       else if (designSettings.font === 'JetBrains Mono') fontValue = 'var(--font-mono)';
       else if (designSettings.font === 'Roboto') fontValue = 'var(--font-roboto)';
+      else if (designSettings.font === 'Playfair Display') fontValue = 'var(--font-playfair)';
+      else if (designSettings.font === 'Cinzel') fontValue = 'var(--font-cinzel)';
+      else if (designSettings.font === 'VT323') fontValue = 'var(--font-arcade)';
+      else if (designSettings.font === 'Share Tech Mono') fontValue = 'var(--font-tech)';
     }
     root.style.setProperty('--font-main', fontValue);
 

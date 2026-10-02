@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700&family=JetBrains+Mono:wght@400;700&family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Outfit:wght@400;600;700&family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,400&family=Roboto:wght@400;500;700&family=Share+Tech+Mono&family=VT323&display=swap');
 
 :root {
   --bg-main: #111111;
@@ -41,6 +41,10 @@
   --font-outfit: 'Outfit', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --font-roboto: 'Roboto', sans-serif;
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-cinzel: 'Cinzel', Georgia, serif;
+  --font-arcade: 'VT323', 'JetBrains Mono', monospace;
+  --font-tech: 'Share Tech Mono', monospace;
   --transition-fast: 0.15s ease;
 
   /* Bootstrap Overrides */

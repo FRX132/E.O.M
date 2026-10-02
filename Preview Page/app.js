@@ -255,60 +255,146 @@ function openDownloadModal(platform) {
     
     if (!modal || !title || !content) return;
     
-    if (platform === 'win') {
+    if (platform === 'pwa') {
+        title.innerText = 'Launch & Install E.O.M (PWA)';
+        content.innerHTML = `
+            <div class="modal-option-box highlight">
+                <div class="modal-option-header">
+                    <strong style="color: #fff; font-size: 1.05rem;">🚀 Instant Web App</strong>
+                    <span class="modal-option-badge">Recommended</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+                    Runs directly in your browser with offline support, local IndexedDB persistence, and zero setup required.
+                </p>
+                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-download-btn" style="margin-top: 5px;">
+                    Launch E.O.M Web App ➔
+                </a>
+            </div>
+
+            <div class="modal-option-box">
+                <strong style="color: #fff; display: block; margin-bottom: 8px;">📲 How to install as an App:</strong>
+                <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
+                    • <strong>iPhone / iPad (Safari):</strong> Open link, tap Share <span style="font-size: 1rem;">📤</span>, select <strong>„Add to Home Screen“</strong> (➕).<br>
+                    • <strong>Android (Chrome):</strong> Open link, tap Menu (⋮), select <strong>„Install App“</strong>.<br>
+                    • <strong>Desktop (Chrome / Edge):</strong> Click the <strong>Install icon (⊕)</strong> in your browser address bar.
+                </div>
+            </div>
+        `;
+    } else if (platform === 'ios') {
+        title.innerText = 'E.O.M for iOS (iPhone & iPad)';
+        content.innerHTML = `
+            <!-- Option 1: PWA (Recommended) -->
+            <div class="modal-option-box highlight">
+                <div class="modal-option-header">
+                    <strong style="color: #fff; font-size: 1rem;">⚡ Option 1: Instant PWA Install</strong>
+                    <span class="modal-option-badge">No Xcode Needed</span>
+                </div>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
+                    Install directly to your iPhone Home Screen without developer accounts or sideloading tools.
+                </p>
+                <div style="font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 12px; line-height: 1.5;">
+                    1. Open in <strong>Safari</strong>: <a href="https://frx132.github.io/E.O.M/" target="_blank" style="color: var(--primary);">frx132.github.io/E.O.M</a><br>
+                    2. Tap the <strong>Share button</strong> (📤) at the bottom.<br>
+                    3. Tap <strong>„Add to Home Screen“</strong> (➕) and confirm.
+                </div>
+                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-download-btn" style="padding: 10px; font-size: 0.9rem;">
+                    Open Web App on iPhone ➔
+                </a>
+            </div>
+
+            <!-- Option 2: Native IPA Bundle -->
+            <div class="modal-option-box">
+                <div class="modal-option-header">
+                    <strong style="color: #fff; font-size: 0.95rem;">📦 Option 2: Sideload IPA Bundle</strong>
+                    <span style="font-size: 0.72rem; color: var(--text-muted);">For AltStore / Xcode</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+                    Download the prebuilt <code>.IPA</code> binary for manual sideloading.
+                </p>
+                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M.ipa" class="modal-secondary-btn" download>
+                    📥 Download E.O.M.ipa (V2.0.0)
+                </a>
+            </div>
+        `;
+    } else if (platform === 'android') {
+        title.innerText = 'E.O.M for Android';
+        content.innerHTML = `
+            <!-- Option 1: PWA (Recommended) -->
+            <div class="modal-option-box highlight">
+                <div class="modal-option-header">
+                    <strong style="color: #fff; font-size: 1rem;">⚡ Option 1: 1-Click PWA App</strong>
+                    <span class="modal-option-badge">Instant</span>
+                </div>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
+                    Open in Chrome and install directly with full offline and standalone capabilities.
+                </p>
+                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-download-btn" style="padding: 10px; font-size: 0.9rem;">
+                    Open Web App on Android ➔
+                </a>
+            </div>
+
+            <!-- Option 2: Direct APK -->
+            <div class="modal-option-box">
+                <div class="modal-option-header">
+                    <strong style="color: #fff; font-size: 0.95rem;">📦 Option 2: Direct APK Installer</strong>
+                    <span style="font-size: 0.72rem; color: var(--text-muted);">Sideload APK</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+                    Install the standalone Android application package.
+                </p>
+                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M.apk" class="modal-secondary-btn" download>
+                    📥 Download E.O.M.apk (V2.0.0)
+                </a>
+            </div>
+        `;
+    } else if (platform === 'win') {
         title.innerText = 'Download E.O.M for Windows';
         content.innerHTML = `
-            <p style="margin-bottom: 15px;">Get the prebuilt desktop installer for <strong>Windows (x64)</strong>.</p>
-            <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M-Setup-2.0.0.exe" class="modal-download-btn" download>
-                📥 Download E.O.M Setup 2.0.0.exe
-            </a>
-            <div style="text-align: left; font-size: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
-                <strong style="color: #fff; display: block; margin-bottom: 5px;">Installation Instructions:</strong>
-                1. Download the <code>.EXE</code> installer above.<br>
-                2. Run the installer to set up E.O.M on your PC.<br>
-                3. Follow instructions on screen. Open via the desktop shortcut.
+            <div class="modal-option-box highlight">
+                <div class="modal-option-header">
+                    <strong style="color: #fff; font-size: 1rem;">🪟 Windows Desktop Installer</strong>
+                    <span class="modal-option-badge">x64 Installer</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+                    Download the prebuilt native desktop application for <strong>Windows 10 / 11</strong>.
+                </p>
+                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M-Setup-2.0.0.exe" class="modal-download-btn" download>
+                    📥 Download E.O.M Setup 2.0.0.exe
+                </a>
+            </div>
+
+            <div class="modal-option-box">
+                <div class="modal-option-header">
+                    <strong style="color: #fff; font-size: 0.95rem;">🌐 Web App / Browser Version</strong>
+                </div>
+                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-secondary-btn">
+                    Launch in Browser ➔
+                </a>
             </div>
         `;
     } else if (platform === 'mac') {
         title.innerText = 'Download E.O.M for macOS';
         content.innerHTML = `
-            <p style="margin-bottom: 15px;">Get the prebuilt desktop disk image for <strong>macOS</strong>.</p>
-            <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M-2.0.0.dmg" class="modal-download-btn" download>
-                📥 Download E.O.M-2.0.0.dmg
-            </a>
-            <div style="text-align: left; font-size: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
-                <strong style="color: #fff; display: block; margin-bottom: 5px;">Installation Instructions:</strong>
-                1. Download the <code>.DMG</code> file above.<br>
-                2. Double-click the file to open it.<br>
-                3. Drag the E.O.M app icon to your Applications folder.
+            <div class="modal-option-box highlight">
+                <div class="modal-option-header">
+                    <strong style="color: #fff; font-size: 1rem;">🍏 macOS Disk Image (.dmg)</strong>
+                    <span class="modal-option-badge">Universal DMG</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+                    Download the native desktop disk image for <strong>Apple Silicon & Intel Macs</strong>.
+                </p>
+                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M-2.0.0.dmg" class="modal-download-btn" download>
+                    📥 Download E.O.M-2.0.0.dmg
+                </a>
             </div>
-        `;
-    } else if (platform === 'ios') {
-        title.innerText = 'Download E.O.M for iOS (iPhone)';
-        content.innerHTML = `
-            <p style="margin-bottom: 15px;">Get the prebuilt <strong>E.O.M.ipa</strong> bundle to install directly on your device.</p>
-            <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M.ipa" class="modal-download-btn" download>
-                📥 Download E.O.M.ipa (V2.0.0)
-            </a>
-            <div style="text-align: left; font-size: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
-                <strong style="color: #fff; display: block; margin-bottom: 5px;">Installation Instructions:</strong>
-                1. Download the <code>.IPA</code> bundle above.<br>
-                2. Sideload it on your iPhone using tools like <strong>AltStore</strong>, <strong>Sideloadly</strong>, or <strong>Xcode Developer Tool</strong>.<br>
-                3. Trust the developer profile in iOS settings: <em>Settings > General > VPN & Device Management</em>.
-            </div>
-        `;
-    } else if (platform === 'android') {
-        title.innerText = 'Download E.O.M for Android';
-        content.innerHTML = `
-            <p style="margin-bottom: 15px;">Get the prebuilt <strong>E.O.M.apk</strong> bundle to install on Android devices or Emulators.</p>
-            <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M.apk" class="modal-download-btn" download>
-                📥 Download E.O.M.apk (V2.0.0)
-            </a>
-            <div style="text-align: left; font-size: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
-                <strong style="color: #fff; display: block; margin-bottom: 5px;">Installation Instructions:</strong>
-                1. Download the <code>.APK</code> file to your device.<br>
-                2. Tap the downloaded file in your File Manager to start installation.<br>
-                3. Make sure to allow "Install from Unknown Sources" if prompted by Android.
+
+            <div class="modal-option-box">
+                <div class="modal-option-header">
+                    <strong style="color: #fff; font-size: 0.95rem;">🌐 Web App / Browser Version</strong>
+                </div>
+                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-secondary-btn">
+                    Launch in Browser ➔
+                </a>
             </div>
         `;
     }
