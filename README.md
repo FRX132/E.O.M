@@ -1,6 +1,6 @@
 # E.O.M — Life Planner OS 🧠
 
-**E.O.M** (End of Month / Each One Matters) is a premium, high-performance personal operating system designed to gamify, optimize, and organize every facet of your life. Built with a "local-first" privacy philosophy, it combines productivity with RPG-inspired progression mechanics on Desktop, Web, and Mobile (PWA & iOS).
+**E.O.M** (End of Month / Escape of Matrix / Each One Matters) is a premium, high-performance personal operating system designed to gamify, optimize, and organize every facet of your life. Built with a "local-first" privacy philosophy, it combines productivity with RPG-inspired progression mechanics on Desktop, Web, and Mobile (PWA & iOS).
 
 ![E.O.M Dashboard](https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=400&fit=crop&q=80)
 
