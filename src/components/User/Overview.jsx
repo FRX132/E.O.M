@@ -4,6 +4,7 @@ import { useStore } from '../../store';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { calculateRank, SKILL_DEF } from '../../constants';
 import { LIFE_RULES } from '../../data/lifeRules';
+import { fetchAllNewsArticles } from '../../services/newsService';
 
 export default function Overview({ navigate }) {
   const [isMounted, setIsMounted] = useState(false);
@@ -32,10 +33,17 @@ export default function Overview({ navigate }) {
   const setHabitsDays = useStore(state => state.setHabits);
   const addXP = useStore(state => state.addXP);
   const [newReminderTitle, setNewReminderTitle] = useState('');
+  const [overviewNews, setOverviewNews] = useState([]);
+
+  useEffect(() => {
+    fetchAllNewsArticles().then(items => {
+      if (items && items.length > 0) setOverviewNews(items.slice(0, 4));
+    }).catch(() => {});
+  }, []);
 
   const settings = overviewSettings || {
-    visibleWidgets: { clock: true, calendar: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true, reminders: true },
-    widgetTitles: { clock: "Clock", calendar: "Calendar", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats", reminders: "Daily Reminders" },
+    visibleWidgets: { clock: true, calendar: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true, reminders: true, news: true },
+    widgetTitles: { clock: "Clock", calendar: "Calendar", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats", reminders: "Daily Reminders", news: "Breaking News" },
     visibleStatsBars: { expenses: true, goals: true, habits: true, fridge: true, targets: true, library: true, cinema: true, quests: true }
   };
 
@@ -768,6 +776,51 @@ export default function Overview({ navigate }) {
           </div>
         )}
 
+        {settings.visibleWidgets?.news !== false && (
+          <div className="overview-card news-card">
+            <div className="card-header">
+              <span className="card-icon" style={{ color: 'var(--primary)' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.528c0 .3-.05.654-.238.972h.738a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 1 1 0v9a1.5 1.5 0 0 1-1.5 1.5H1.497A1.497 1.497 0 0 1 0 13.5zM12 14c.37 0 .654-.211.855-.455L13 13.316V2.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5v11c0 .278.223.5.497.5z"/>
+                  <path d="M2 3h10v2H2zm0 3h4v3H2zm0 4h4v1H2zm0 2h4v1H2zm5-6h5v1H7zm0 2h5v1H7zm0 2h5v1H7zm0 2h5v1H7z"/>
+                </svg>
+              </span>
+              <h3>{settings.widgetTitles?.news || "Breaking News"}</h3>
+            </div>
+            <div className="card-content">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {overviewNews.slice(0, 3).map((item, idx) => (
+                  <div
+                    key={`overview-news-${item.id || idx}`}
+                    onClick={() => navigate('/news')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      padding: '8px 10px',
+                      borderRadius: '8px',
+                      border: '1px solid var(--border-light)',
+                      cursor: 'pointer',
+                      transition: 'border-color 0.2s, background 0.2s'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(var(--primary-rgb), 0.08)'; e.currentTarget.style.borderColor = 'var(--primary)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)'; e.currentTarget.style.borderColor = 'var(--border-light)'; }}
+                  >
+                    <span style={{ fontSize: '0.7rem', background: 'rgba(var(--primary-rgb), 0.15)', color: 'var(--primary)', padding: '2px 6px', borderRadius: '4px', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                      {item.source || 'News'}
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-main)', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 500 }}>
+                      {item.title}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button className="card-action" onClick={() => navigate('/news')}>Zum News Hub ➔</button>
+          </div>
+        )}
+
         {upcomingBills.length > 0 && (
           <div className="overview-card bill-alert-card scale-in" style={{ border: '1px solid rgba(var(--primary-rgb), 0.3)', background: 'rgba(var(--primary-rgb), 0.05)' }}>
             <div className="card-header">
@@ -866,7 +919,8 @@ export default function Overview({ navigate }) {
                   { key: 'fridge', label: 'Fridge Status Card', defaultTitle: 'Fridge Status' },
                   { key: 'objective', label: 'Primary Objective Card', defaultTitle: 'Primary Objective' },
                   { key: 'rule', label: 'Daily Rule Card', defaultTitle: 'Daily Rule' },
-                  { key: 'reminders', label: 'Daily Reminders Card', defaultTitle: 'Daily Reminders' }
+                  { key: 'reminders', label: 'Daily Reminders Card', defaultTitle: 'Daily Reminders' },
+                  { key: 'news', label: 'Breaking News Card', defaultTitle: 'Breaking News' }
                 ].map(widget => (
                   <div key={widget.key} style={{ display: 'flex', alignItems: 'center', gap: '15px', background: 'var(--bg-card-alt)', padding: '10px 15px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                     <label className="mac-switch" style={{ position: 'relative', display: 'inline-block', width: '40px', height: '22px', flexShrink: 0 }}>
