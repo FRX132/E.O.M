@@ -8,7 +8,8 @@ const ASSETS_TO_CACHE = [
   "/script.js",
   "/Documentary.html",
   "/apple-touch-icon.png",
-  "/favicon.svg",
+  "/icon.png",
+  "/favicon.png",
   "/manifest.json"
 ];
 
