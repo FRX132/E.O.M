@@ -311,7 +311,7 @@ function openDownloadModal(platform) {
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
                     Runs locally in any modern browser with full offline persistence and zero latency.
                 </p>
-                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-download-btn">
+                <a href="https://eom-app-eta.vercel.app" target="_blank" class="modal-download-btn">
                     Launch Web App Instantly ➔
                 </a>
             </div>
@@ -325,19 +325,25 @@ function openDownloadModal(platform) {
             </div>
         `;
     } else if (platform === 'ios') {
-        title.innerText = 'E.O.M for Apple iOS';
+        title.innerText = 'E.O.M für Apple iOS (iPhone & iPad)';
         content.innerHTML = `
             <!-- Option 1: PWA (Recommended) -->
             <div class="modal-option-box highlight">
                 <div class="modal-option-header">
-                    <strong style="color: #fff; font-size: 1.05rem;">⚡ Option 1: Instant iOS Web App (Recommended)</strong>
-                    <span class="modal-option-badge">1-Tap Install</span>
+                    <strong style="color: #fff; font-size: 1.05rem;">⚡ Option 1: Als App auf dem Homescreen (Empfohlen)</strong>
+                    <span class="modal-option-badge">1-Klick Install</span>
                 </div>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
-                    Open in Safari, tap <strong>Share ➔ Add to Home Screen</strong> for a full native fullscreen experience.
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                    Auf dem iPhone wird E.O.M als vollwertige Offline-App ohne App Store installiert:
                 </p>
-                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-download-btn">
-                    Open Web App on iPhone ➔
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; font-size: 0.82rem; color: var(--text-main); margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px;">
+                    <div>1. Öffne die Web-App unten im <strong>Safari-Browser</strong>.</div>
+                    <div>2. Tippe unten auf das <strong>Teilen-Symbol</strong> (📤 Quadrat mit Pfeil nach oben).</div>
+                    <div>3. Scrolle etwas runter und tippe auf <strong>„Zum Home-Bildschirm“</strong>.</div>
+                    <div>4. Tippe oben rechts auf <strong>„Hinzufügen“</strong>. Fertig! 🎉</div>
+                </div>
+                <a href="https://eom-app-eta.vercel.app" target="_blank" class="modal-download-btn">
+                    🚀 Web App jetzt im Safari öffnen ➔
                 </a>
             </div>
 
@@ -345,10 +351,10 @@ function openDownloadModal(platform) {
             <div class="modal-option-box">
                 <div class="modal-option-header">
                     <strong style="color: #fff; font-size: 0.95rem;">📦 Option 2: Sideload IPA Bundle</strong>
-                    <span style="font-size: 0.72rem; color: var(--text-muted);">For AltStore / Xcode</span>
+                    <span style="font-size: 0.72rem; color: var(--text-muted);">AltStore / Xcode</span>
                 </div>
                 <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px;">
-                    Download the prebuilt <code>.IPA</code> binary for manual sideloading.
+                    Prebuilt <code>.IPA</code> Binary für manuelles Sideloading (z. B. via AltStore / TrollStore).
                 </p>
                 <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.1/E.O.M.ipa" class="modal-secondary-btn" download>
                     📥 Download E.O.M.ipa (V2.0.1)
@@ -367,7 +373,7 @@ function openDownloadModal(platform) {
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
                     Open in Chrome and install directly with full offline and standalone capabilities.
                 </p>
-                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-download-btn">
+                <a href="https://eom-app-eta.vercel.app" target="_blank" class="modal-download-btn">
                     Open Web App on Android ➔
                 </a>
             </div>
@@ -406,7 +412,7 @@ function openDownloadModal(platform) {
                 <div class="modal-option-header">
                     <strong style="color: #fff; font-size: 0.95rem;">🌐 Web App / Browser Version</strong>
                 </div>
-                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-secondary-btn">
+                <a href="https://eom-app-eta.vercel.app" target="_blank" class="modal-secondary-btn">
                     Launch in Browser ➔
                 </a>
             </div>
@@ -431,7 +437,7 @@ function openDownloadModal(platform) {
                 <div class="modal-option-header">
                     <strong style="color: #fff; font-size: 0.95rem;">🌐 Web App / Browser Version</strong>
                 </div>
-                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-secondary-btn">
+                <a href="https://eom-app-eta.vercel.app" target="_blank" class="modal-secondary-btn">
                     Launch in Browser ➔
                 </a>
             </div>
