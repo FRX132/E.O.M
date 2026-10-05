@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escape Of Matrix (E.O.M) — Gamified Life Planner OS</title>
+    
     <!-- SEO Meta Tags -->
     <meta name="description" content="E.O.M (Escape Of Matrix) is a premium, local-first gamified Life Planner OS that turns your real life habits, finances, workouts, and goals into an RPG-style progression system.">
-    <meta name="keywords" content="Life Planner, Gamification, Personal Development, Finance Tracker, Workout Tracker, Escape the Matrix, RPG Life, Local First">
+    <meta name="keywords" content="Life Planner, Gamification, Personal Development, Finance Tracker, Workout Tracker, Escape the Matrix, RPG Life, Local First, Obsidian Gold, Cyberpunk OS">
 
     <!-- PWA Settings -->
     <link rel="manifest" href="manifest.json">
@@ -15,19 +16,19 @@
     <meta name="apple-mobile-web-app-title" content="E.O.M OS">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <meta name="theme-color" content="#cca43b">
+    <meta name="theme-color" content="#d48f48">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Escape Of Matrix (E.O.M) — Gamified Life Planner OS">
-    <meta property="og:description" content="E.O.M (Escape Of Matrix) is a premium, local-first gamified Life Planner OS that turns your real life habits, finances, workouts, and goals into an RPG-style progression system.">
+    <meta property="og:description" content="A sovereign, local-first gamified OS that converts your daily habits, net worth, and fitness routines into an RPG progression system.">
     <meta property="og:image" content="/apple-touch-icon.png">
     <meta property="og:site_name" content="E.O.M OS">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Escape Of Matrix (E.O.M) — Gamified Life Planner OS">
-    <meta name="twitter:description" content="E.O.M (Escape Of Matrix) is a premium, local-first gamified Life Planner OS that turns your real life habits, finances, workouts, and goals into an RPG-style progression system.">
+    <meta name="twitter:description" content="A sovereign, local-first gamified OS that converts your daily habits, net worth, and fitness routines into an RPG progression system.">
     <meta name="twitter:image" content="/apple-touch-icon.png">
 
     <!-- Structured Data (JSON-LD) -->
@@ -36,7 +37,7 @@
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "Escape Of Matrix (E.O.M) OS",
-      "operatingSystem": "Windows, macOS, iOS, Android",
+      "operatingSystem": "Windows, macOS, iOS, Android, Web",
       "applicationCategory": "ProductivityApplication",
       "offers": {
         "@type": "Offer",
@@ -44,7 +45,7 @@
         "priceCurrency": "USD"
       },
       "description": "A premium, local-first gamified Life Planner OS that turns your real life habits, finances, workouts, and goals into an RPG-style progression system.",
-      "softwareVersion": "2.0.0",
+      "softwareVersion": "2.0.1",
       "author": {
         "@type": "Person",
         "name": "Chetan Kaushal"
@@ -55,290 +56,371 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
     <!-- External Stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-eom">
 
-    <!-- Matrix Glowing Particles Backdrop -->
+    <!-- Matrix Glowing Rain Canvas Backdrop -->
     <canvas id="matrix-canvas"></canvas>
 
+    <!-- Ambient Glow FX -->
+    <div class="ambient-glow-top"></div>
+    <div class="ambient-glow-mid"></div>
+
     <div class="wrapper">
-        <!-- Header -->
+        <!-- Header / Navigation -->
         <header>
             <div class="nav-container">
                 <a href="#" class="logo">
+                    <div class="logo-symbol">⚡</div>
                     <span>E.O.M</span> OS
                 </a>
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <button class="btn btn-secondary" onclick="toggleTheme()" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 20px; font-family: var(--font-display); cursor: pointer;">
-                        🌓 Style: <span id="theme-name" style="color: var(--primary); font-weight: bold; margin-left: 4px;">E.O.M Obsidian Gold</span>
+
+                <nav class="nav-links">
+                    <a href="#demo" class="nav-link">Simulator</a>
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#comparison" class="nav-link">Architecture</a>
+                    <a href="Documentary.html" class="nav-link">Documentation</a>
+                </nav>
+
+                <div class="nav-actions">
+                    <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle visual aesthetic">
+                        🌓 <span id="theme-name" style="color: var(--primary);">Obsidian Gold</span>
                     </button>
-                    <a href="Documentary.html" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 20px; font-family: var(--font-display); text-decoration: none; color: #fff;">
-                        📖 Docs
+                    <span class="badge-mono" style="display: none; @media(min-width: 768px){display: inline-flex;}">
+                        <span class="badge-dot"></span> Local First
+                    </span>
+                    <span class="badge-mono" style="border-color: var(--secondary); color: var(--secondary);">V2.0.1</span>
+                    <a href="https://frx132.github.io/E.O.M/" target="_blank" class="btn btn-primary" style="padding: 7px 16px; font-size: 0.85rem;">
+                        Launch App ↗
                     </a>
-                    <span class="badge-mono">Local First</span>
-                    <span class="badge-mono" style="border-color: var(--secondary); color: var(--secondary);">V2.0.0</span>
                 </div>
             </div>
         </header>
 
         <!-- Hero Section -->
         <section class="hero">
+            <div class="hero-pill">
+                <span class="badge-dot"></span>
+                <span>SYSTEM V2.0.1 ACTIVE</span>
+                <span style="color: var(--border-color);">•</span>
+                <span class="pill-highlight">THE SOVEREIGN LIFE ENGINE</span>
+            </div>
+
             <h1 class="hero-glitch-title">ESCAPE OF MATRIX</h1>
+            
             <p class="hero-subtitle">
-                A premium, minimalist local-first operating system designed to gamify and organize every facet of your life. Earn XP, track capital, map fitness, and code goals.
+                A hyper-fast, <strong>local-first operating system</strong> designed to gamify, optimize, and master every dimension of your life. Earn RPG XP, automate budgets, map biomechanics, and route AI actions with zero latency.
             </p>
+
             <div class="btn-group">
-                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; box-shadow: 0 0 20px rgba(212, 143, 72, 0.4);">
-                    🚀 Launch Web App (PWA)
+                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="btn btn-primary">
+                    ⚡ Launch Web App (PWA)
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
                         <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
                     </svg>
                 </a>
                 <a href="#demo" class="btn btn-secondary">
-                    Interactive Preview
+                    🎮 Test Live Simulator
                 </a>
                 <a href="https://github.com/FRX132/E.O.M" target="_blank" class="btn btn-secondary">
-                    View on GitHub
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+                    </svg>
+                    GitHub (Open Source)
                 </a>
             </div>
 
-            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px; margin-top: -30px;">
-                <button class="btn btn-secondary" onclick="openDownloadModal('pwa')" style="font-size: 0.9rem; border-color: var(--primary); color: #fff; cursor: pointer; background: rgba(212, 143, 72, 0.15);">
-                    📲 PWA / Mobile Instant Install
+            <!-- Platform Launcher Deck -->
+            <div class="platform-launch-bar" id="platform-launch-bar">
+                <button class="platform-btn" id="btn-plat-pwa" onclick="openDownloadModal('pwa')">
+                    📲 PWA Mobile
                 </button>
-                <button class="btn btn-secondary" onclick="openDownloadModal('win')" style="font-size: 0.9rem; border-color: var(--primary); color: #fff; cursor: pointer;">
+                <button class="platform-btn" id="btn-plat-win" onclick="openDownloadModal('win')">
                     🪟 Windows (.exe)
                 </button>
-                <button class="btn btn-secondary" onclick="openDownloadModal('mac')" style="font-size: 0.9rem; border-color: var(--secondary); color: #fff; cursor: pointer;">
+                <button class="platform-btn" id="btn-plat-mac" onclick="openDownloadModal('mac')">
                     🍏 macOS (.dmg)
                 </button>
-                <button class="btn btn-secondary" onclick="openDownloadModal('ios')" style="font-size: 0.9rem; border-color: var(--text-muted); color: #fff; cursor: pointer;">
-                     iOS (PWA / IPA)
+                <button class="platform-btn" id="btn-plat-ios" onclick="openDownloadModal('ios')">
+                     iOS (IPA / PWA)
                 </button>
-                <button class="btn btn-secondary" onclick="openDownloadModal('android')" style="font-size: 0.9rem; border-color: var(--text-muted); color: #fff; cursor: pointer;">
-                    🤖 Android (PWA / APK)
+                <button class="platform-btn" id="btn-plat-android" onclick="openDownloadModal('android')">
+                    🤖 Android (APK / PWA)
                 </button>
             </div>
 
-            <!-- Live XP Status Banner -->
+            <!-- Live XP Status HUD -->
             <div class="stats-bar-banner">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <span style="font-size: 1.5rem;">🛡️</span>
-                    <div>
-                        <div style="font-weight: bold; font-family: var(--font-display);">Your Level Progression</div>
-                        <div style="font-size: 0.75rem; color: var(--text-muted);">Check habits or log workouts below to earn XP!</div>
+                <div class="agent-profile-badge">
+                    <div class="agent-avatar-ring">🛡️</div>
+                    <div style="text-align: left;">
+                        <div class="agent-meta-title">
+                            AGENT SOVEREIGN
+                            <span class="rank-tag-badge" id="rank-tag">RANK Z</span>
+                        </div>
+                        <div class="agent-meta-sub">Complete daily tasks below to gain live XP and rank up</div>
                     </div>
                 </div>
+
                 <div class="progress-container-live">
                     <div class="progress-header">
-                        <span>Rank: <strong id="rank-tag">Z</strong></span>
-                        <span id="progress-percent">35%</span>
+                        <span style="color: var(--text-muted);">PROGRESSION TO TIER UP</span>
+                        <span id="progress-percent" style="color: var(--primary); font-weight: bold;">35%</span>
                     </div>
                     <div class="progress-track">
                         <div class="progress-fill" id="xp-fill-bar"></div>
                     </div>
                 </div>
+
                 <div class="live-xp-counter">
                     <span id="xp-current">7,000</span> / <span id="xp-max">20,000</span> XP
                 </div>
             </div>
         </section>
 
-        <!-- Live Demo Mockup Widget -->
-        <section id="demo" style="padding: 20px 0;">
-            <div style="text-align: center; margin-bottom: 40px;">
-                <h2 style="font-family: var(--font-display); font-size: 2rem; font-weight: 800; margin-bottom: 10px;">Workspace Simulator</h2>
-                <p style="color: var(--text-muted);">Click sidebar items and interact with the modules directly inside the live showcase!</p>
+        <!-- Live Demo Mockup Widget (Simulator) -->
+        <section id="demo" class="simulator-section">
+            <div class="section-header-center">
+                <h2>Interactive Workspace Simulator</h2>
+                <p>Interact directly with the live OS modules below. Check habits, modify ledger rows, tap muscle zones, and send AI routing prompts.</p>
             </div>
 
             <div class="mockup-window">
-                <!-- Sidebar -->
-                <div class="mockup-sidebar">
-                    <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary); opacity: 0.8; letter-spacing: 1px;">
-                        SYSTEM NAVIGATION
+                <!-- Mac/Terminal Window Chrome Bar -->
+                <div class="mockup-window-bar">
+                    <div class="window-dots">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
                     </div>
-                    <div class="mockup-nav">
-                        <button class="mockup-nav-item active" onclick="switchMockupTab('overview')">
-                            📊 Overview
-                        </button>
-                        <button class="mockup-nav-item" onclick="switchMockupTab('finance')">
-                            💸 Finance Hub
-                        </button>
-                        <button class="mockup-nav-item" onclick="switchMockupTab('workout')">
-                            🏋️‍♂️ Workout Map
-                        </button>
-                        <button class="mockup-nav-item" onclick="switchMockupTab('ai')">
-                            🤖 AI Assistant
-                        </button>
+                    <div class="window-title-bar">
+                        <span>⚡ eom://agent/workspace-v2.sqlite</span>
                     </div>
-                    <div style="margin-top: auto; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">
-                        ⚡ CLIENT: ONLINE
+                    <div class="window-status-pill">
+                        ● 0.4ms LOCAL STATE
                     </div>
                 </div>
 
-                <!-- Content Area -->
-                <div class="mockup-content">
-                    <!-- 1. OVERVIEW VIEW -->
-                    <div class="mockup-view active" id="view-overview">
-                        <div class="mockup-content-header">
-                            <h2 class="mockup-content-title">Welcome Back, Agent</h2>
-                            <span class="badge-mono" style="background: rgba(0, 240, 255, 0.05); color: var(--secondary); border-color: var(--secondary);">Overview</span>
-                        </div>
-                        <div class="overview-grid">
-                            <!-- Habits Card -->
-                            <div class="mockup-card">
-                                <span class="card-header-icon">🛡️</span>
-                                <div class="card-label">Daily Habits</div>
-                                <div class="card-value" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 15px;">Complete & Earn XP</div>
-                                <div class="habit-list-interactive">
-                                    <div class="habit-item-interactive" onclick="toggleHabitLive(this, 150)">
-                                        <input type="checkbox" id="h-1">
-                                        <span>10m Mindful Meditation (+150 XP)</span>
-                                    </div>
-                                    <div class="habit-item-interactive" onclick="toggleHabitLive(this, 200)">
-                                        <input type="checkbox" id="h-2">
-                                        <span>Read 10 Pages of Non-Fiction (+200 XP)</span>
-                                    </div>
-                                    <div class="habit-item-interactive" onclick="toggleHabitLive(this, 100)">
-                                        <input type="checkbox" id="h-3">
-                                        <span>Drink 2 Litres of Water (+100 XP)</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Finance summary card -->
-                            <div class="mockup-card">
-                                <span class="card-header-icon">💰</span>
-                                <div class="card-label">Total Balance</div>
-                                <div class="card-value" id="overview-balance-val">€14,250.00</div>
-                                <div style="margin-top: 25px;">
-                                    <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px;">Active Weekly Goal</div>
-                                    <div style="font-size: 0.85rem; font-weight: 600; border-left: 2px solid var(--primary); padding-left: 10px; margin-bottom: 10px;" id="overview-goal-text">
-                                        Diversify cash assets in Bank accounts
-                                    </div>
-                                    <span class="badge-mono" style="font-size: 0.65rem;">Priority: Medium</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. FINANCE HUB VIEW -->
-                    <div class="mockup-view" id="view-finance">
-                        <div class="mockup-content-header">
-                            <h2 class="mockup-content-title">Finance Hub & Assets</h2>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <span style="font-size: 0.85rem; color: var(--text-muted);">Cash:</span>
-                                <span class="badge-mono" style="border-color: var(--primary); color: #fff;" id="finance-net-worth">€14,250.00</span>
-                            </div>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 20px;">
-                            <div style="font-size: 0.85rem; color: var(--text-muted);">
-                                Add transactions or adjust items. Changes are computed instantly with zero latency.
-                            </div>
-                            <div class="finance-ledger-preview" id="ledger-box">
-                                <!-- Row 1 -->
-                                <div class="ledger-row">
-                                    <input type="text" value="Grocery Store (Healthy Meals)" onchange="recalculateFinanceMockup()">
-                                    <div>
-                                        <span class="currency">€</span>
-                                        <input type="number" value="78.50" style="width: 60px; font-weight: bold; color: var(--accent);" onchange="recalculateFinanceMockup()" class="finance-amount">
-                                    </div>
-                                    <select>
-                                        <option>Food</option>
-                                        <option>Utilities</option>
-                                        <option>Home</option>
-                                    </select>
-                                    <button class="ledger-delete-btn" onclick="deleteLedgerRow(this)">×</button>
-                                </div>
-                                <!-- Row 2 -->
-                                <div class="ledger-row">
-                                    <input type="text" value="Subscription Cloud Storage" onchange="recalculateFinanceMockup()">
-                                    <div>
-                                        <span class="currency">€</span>
-                                        <input type="number" value="9.99" style="width: 60px; font-weight: bold; color: var(--accent);" onchange="recalculateFinanceMockup()" class="finance-amount">
-                                    </div>
-                                    <select>
-                                        <option>Utilities</option>
-                                        <option>Food</option>
-                                        <option>Entertainment</option>
-                                    </select>
-                                    <button class="ledger-delete-btn" onclick="deleteLedgerRow(this)">×</button>
-                                </div>
-                            </div>
-                            <button class="btn btn-secondary" onclick="addLedgerRow()" style="padding: 10px 20px; align-self: flex-start; font-size: 0.85rem;">
-                                + Add Transaction
+                <!-- Window Body -->
+                <div class="mockup-body">
+                    <!-- Sidebar -->
+                    <div class="mockup-sidebar">
+                        <div class="sidebar-category-label">SYSTEM HUBS</div>
+                        <div class="mockup-nav">
+                            <button class="mockup-nav-item active" onclick="switchMockupTab('overview')">
+                                <span class="nav-icon">📊</span> Overview & Quests
+                            </button>
+                            <button class="mockup-nav-item" onclick="switchMockupTab('finance')">
+                                <span class="nav-icon">💸</span> Finance Hub
+                            </button>
+                            <button class="mockup-nav-item" onclick="switchMockupTab('workout')">
+                                <span class="nav-icon">🏋️‍♂️</span> Biomechanical Map
+                            </button>
+                            <button class="mockup-nav-item" onclick="switchMockupTab('ai')">
+                                <span class="nav-icon">🤖</span> AI Neural Router
                             </button>
                         </div>
+                        <div class="sidebar-footer">
+                            <span class="badge-dot"></span> ENGINES: OPTIMAL
+                        </div>
                     </div>
 
-                    <!-- 3. WORKOUT MAP VIEW -->
-                    <div class="mockup-view" id="view-workout">
-                        <div class="mockup-content-header">
-                            <h2 class="mockup-content-title">Interactive Muscle Map</h2>
-                            <span class="badge-mono" style="border-color: var(--secondary); color: var(--secondary);">Workout Hub</span>
-                        </div>
-                        <div class="muscle-map-preview">
-                            <!-- Mini Body Silhouette SVG -->
-                            <div class="muscle-svg-container">
-                                <svg class="muscle-svg" viewBox="0 0 100 200">
-                                    <!-- Head -->
-                                    <circle cx="50" cy="20" r="12" class="muscle-path" onclick="clickMuscle('Traps / Neck')" />
-                                    <!-- Chest -->
-                                    <path d="M35 38 C 35 38, 50 45, 65 38 L 60 62 L 40 62 Z" class="muscle-path" onclick="clickMuscle('Chest')" id="muscle-chest" />
-                                    <!-- Abs / Core -->
-                                    <rect x="40" y="65" width="20" height="35" rx="3" class="muscle-path" onclick="clickMuscle('Core / Abs')" />
-                                    <!-- Left Arm -->
-                                    <path d="M22 38 L 32 38 L 30 75 L 20 75 Z" class="muscle-path" onclick="clickMuscle('Left Bicep/Arm')" />
-                                    <!-- Right Arm -->
-                                    <path d="M68 38 L 78 38 L 80 75 L 70 75 Z" class="muscle-path" onclick="clickMuscle('Right Bicep/Arm')" />
-                                    <!-- Legs -->
-                                    <path d="M38 105 L 48 105 L 46 175 L 34 175 Z" class="muscle-path" onclick="clickMuscle('Left Quad/Leg')" />
-                                    <path d="M52 105 L 62 105 L 66 175 L 54 175 Z" class="muscle-path" onclick="clickMuscle('Right Quad/Leg')" />
-                                </svg>
+                    <!-- Content Area -->
+                    <div class="mockup-content">
+                        <!-- 1. OVERVIEW VIEW -->
+                        <div class="mockup-view active" id="view-overview">
+                            <div class="mockup-content-header">
+                                <h2 class="mockup-content-title">Agent Command Center</h2>
+                                <span class="badge-mono" style="border-color: var(--secondary); color: var(--secondary);">Overview Hub</span>
                             </div>
+                            
+                            <div class="overview-grid">
+                                <!-- Habits Card -->
+                                <div class="mockup-card">
+                                    <span class="card-header-icon">🛡️</span>
+                                    <div class="card-label">DAILY QUESTS (HABITS)</div>
+                                    <div class="card-value" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 12px;">Complete to Earn XP</div>
+                                    <div class="habit-list-interactive">
+                                        <div class="habit-item-interactive" onclick="toggleHabitLive(this, 150)">
+                                            <input type="checkbox" id="h-1">
+                                            <span>🧘 10m Mindful Meditation (+150 XP)</span>
+                                        </div>
+                                        <div class="habit-item-interactive" onclick="toggleHabitLive(this, 200)">
+                                            <input type="checkbox" id="h-2">
+                                            <span>📚 Read 10 Pages Non-Fiction (+200 XP)</span>
+                                        </div>
+                                        <div class="habit-item-interactive" onclick="toggleHabitLive(this, 100)">
+                                            <input type="checkbox" id="h-3">
+                                            <span>💧 Hydration: 2L Clean Water (+100 XP)</span>
+                                        </div>
+                                    </div>
+                                </div>
 
-                            <div style="flex: 1;">
-                                <h3 style="font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 12px;">Active Training Log</h3>
-                                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">
-                                    Tap body zones in the interactive SVG model to select and register target workouts instantly.
-                                </p>
-                                <div class="muscle-log-list" id="muscle-logs">
-                                    <div class="muscle-log-item">
-                                        <span>💪 Chest Exercise logged (Bench Press)</span>
-                                        <span style="color: var(--secondary);">Sets: 3 reps: 8-12</span>
+                                <!-- Finance & Objective Card -->
+                                <div class="mockup-card">
+                                    <span class="card-header-icon">💰</span>
+                                    <div class="card-label">LIQUID CAPITAL</div>
+                                    <div class="card-value" id="overview-balance-val">€14,250.00</div>
+                                    
+                                    <div class="sparkline-preview-box">
+                                        <div class="sparkline-header">
+                                            <span>7-DAY CAPITAL VELOCITY</span>
+                                            <span style="color: var(--primary);">+12.4%</span>
+                                        </div>
+                                        <div class="sparkline-bar-group">
+                                            <div class="spark-bar" style="height: 40%;"></div>
+                                            <div class="spark-bar" style="height: 55%;"></div>
+                                            <div class="spark-bar" style="height: 45%;"></div>
+                                            <div class="spark-bar" style="height: 70%;"></div>
+                                            <div class="spark-bar" style="height: 60%;"></div>
+                                            <div class="spark-bar" style="height: 85%;"></div>
+                                            <div class="spark-bar" style="height: 100%; background: var(--primary);"></div>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-top: 18px;">
+                                        <div class="card-label" style="font-size: 0.72rem;">ACTIVE WEEKLY OBJECTIVE</div>
+                                        <div style="font-size: 0.88rem; font-weight: 600; border-left: 2px solid var(--primary); padding-left: 10px;" id="overview-goal-text">
+                                            Diversify cash reserves & fund index ETF
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- 4. AI ASSISTANT VIEW -->
-                    <div class="mockup-view" id="view-ai">
-                        <div class="mockup-content-header">
-                            <h2 class="mockup-content-title">Agent Chat & Intent Router</h2>
-                            <span class="badge-mono" style="border-color: var(--primary); color: var(--primary);">System MCP</span>
-                        </div>
-                        <div class="ai-chat-preview">
-                            <div class="ai-chat-history" id="chat-box-history">
-                                <div class="chat-bubble chat-bubble-ai">
-                                    Welcome back, agent. I am your system coordinator. What action can I help route today?
+                        <!-- 2. FINANCE HUB VIEW -->
+                        <div class="mockup-view" id="view-finance">
+                            <div class="mockup-content-header">
+                                <h2 class="mockup-content-title">Finance War Room & Ledger</h2>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <span style="font-size: 0.85rem; color: var(--text-muted);">Net Balance:</span>
+                                    <span class="badge-mono" style="border-color: var(--primary); color: #fff; font-size: 0.85rem; font-weight: bold;" id="finance-net-worth">€14,250.00</span>
                                 </div>
                             </div>
-                            
-                            <!-- Preset helper prompt buttons -->
-                            <div class="preset-prompts-row">
-                                <button class="preset-prompt-btn" onclick="submitAIPrompt('log workout chest for 45 minutes')">Log Workout</button>
-                                <button class="preset-prompt-btn" onclick="submitAIPrompt('complete goal read 5 books')">Complete Goal</button>
-                                <button class="preset-prompt-btn" onclick="submitAIPrompt('delete expense subscription')">Remove Expense</button>
+
+                            <div class="finance-hub-content">
+                                <div class="finance-stats-grid">
+                                    <div class="finance-mini-stat">
+                                        <div class="card-label">MONTHLY INFLOW</div>
+                                        <div class="val" style="color: var(--primary);">€4,800.00</div>
+                                    </div>
+                                    <div class="finance-mini-stat">
+                                        <div class="card-label">PROJECTED BURN</div>
+                                        <div class="val" style="color: var(--secondary);">€1,640.00</div>
+                                    </div>
+                                    <div class="finance-mini-stat">
+                                        <div class="card-label">SAVINGS RATE</div>
+                                        <div class="val" style="color: #fff;">65.8%</div>
+                                    </div>
+                                </div>
+
+                                <div class="finance-ledger-preview" id="ledger-box">
+                                    <!-- Row 1 -->
+                                    <div class="ledger-row">
+                                        <input type="text" value="Supermarket (Organic Nutrition)" onchange="recalculateFinanceMockup()">
+                                        <div>
+                                            <span class="currency">€</span>
+                                            <input type="number" value="78.50" style="width: 60px; font-weight: bold; color: var(--primary);" onchange="recalculateFinanceMockup()" class="finance-amount">
+                                        </div>
+                                        <select>
+                                            <option>Food & Nutrition</option>
+                                            <option>Hardware</option>
+                                            <option>Cloud Services</option>
+                                        </select>
+                                        <button class="ledger-delete-btn" onclick="deleteLedgerRow(this)" title="Delete Row">×</button>
+                                    </div>
+                                    <!-- Row 2 -->
+                                    <div class="ledger-row">
+                                        <input type="text" value="Encrypted Cloud Vault Backup" onchange="recalculateFinanceMockup()">
+                                        <div>
+                                            <span class="currency">€</span>
+                                            <input type="number" value="9.99" style="width: 60px; font-weight: bold; color: var(--primary);" onchange="recalculateFinanceMockup()" class="finance-amount">
+                                        </div>
+                                        <select>
+                                            <option>Cloud Services</option>
+                                            <option>Food & Nutrition</option>
+                                            <option>Hardware</option>
+                                        </select>
+                                        <button class="ledger-delete-btn" onclick="deleteLedgerRow(this)" title="Delete Row">×</button>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-secondary" onclick="addLedgerRow()" style="padding: 9px 18px; align-self: flex-start; font-size: 0.85rem;">
+                                    + Add Ledger Row
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 3. WORKOUT MAP VIEW -->
+                        <div class="mockup-view" id="view-workout">
+                            <div class="mockup-content-header">
+                                <h2 class="mockup-content-title">Biomechanical Muscle Map</h2>
+                                <span class="badge-mono" style="border-color: var(--secondary); color: var(--secondary);">Fitness Engine</span>
                             </div>
 
-                            <div class="chat-input-area">
-                                <input type="text" placeholder="Tell the agent to log, complete, or delete items..." id="chat-input" onkeydown="if(event.key === 'Enter') triggerAIChat()">
-                                <button onclick="triggerAIChat()">Send</button>
+                            <div class="muscle-map-preview">
+                                <div class="muscle-svg-container">
+                                    <svg class="muscle-svg" viewBox="0 0 100 200">
+                                        <!-- Head -->
+                                        <circle cx="50" cy="20" r="12" class="muscle-path" onclick="clickMuscle('Traps / Neck')" />
+                                        <!-- Chest -->
+                                        <path d="M35 38 C 35 38, 50 45, 65 38 L 60 62 L 40 62 Z" class="muscle-path" onclick="clickMuscle('Chest')" id="muscle-chest" />
+                                        <!-- Abs / Core -->
+                                        <rect x="40" y="65" width="20" height="35" rx="3" class="muscle-path" onclick="clickMuscle('Core / Abs')" />
+                                        <!-- Left Arm -->
+                                        <path d="M22 38 L 32 38 L 30 75 L 20 75 Z" class="muscle-path" onclick="clickMuscle('Left Bicep/Arm')" />
+                                        <!-- Right Arm -->
+                                        <path d="M68 38 L 78 38 L 80 75 L 70 75 Z" class="muscle-path" onclick="clickMuscle('Right Bicep/Arm')" />
+                                        <!-- Legs -->
+                                        <path d="M38 105 L 48 105 L 46 175 L 34 175 Z" class="muscle-path" onclick="clickMuscle('Left Quad/Leg')" />
+                                        <path d="M52 105 L 62 105 L 66 175 L 54 175 Z" class="muscle-path" onclick="clickMuscle('Right Quad/Leg')" />
+                                    </svg>
+                                </div>
+
+                                <div style="flex: 1;">
+                                    <h3 style="font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 8px; color: #fff;">Interactive Zone Selector</h3>
+                                    <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px;">
+                                        Click any anatomical sector in the vector model to trigger drills and automatically earn Physical STR XP.
+                                    </p>
+                                    <div class="muscle-log-list" id="muscle-logs">
+                                        <div class="muscle-log-item">
+                                            <span>💪 Chest Exercise Logged (Incline DB Press)</span>
+                                            <span style="color: var(--secondary); font-family: var(--font-mono);">3x 10 reps (+250 XP)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. AI ASSISTANT VIEW -->
+                        <div class="mockup-view" id="view-ai">
+                            <div class="mockup-content-header">
+                                <h2 class="mockup-content-title">System Neural MCP Router</h2>
+                                <span class="badge-mono" style="border-color: var(--primary); color: var(--primary);">Local LLM MCP</span>
+                            </div>
+
+                            <div class="ai-chat-preview">
+                                <div class="ai-chat-history" id="chat-box-history">
+                                    <div class="chat-bubble chat-bubble-ai">
+                                        Agent online. System MCP Router is initialized. Say "log workout", "complete goal", or "delete expense" to test instant state dispatching.
+                                    </div>
+                                </div>
+                                
+                                <div class="preset-prompts-row">
+                                    <button class="preset-prompt-btn" onclick="submitAIPrompt('log workout chest for 45 minutes')">🏋️ Log Workout</button>
+                                    <button class="preset-prompt-btn" onclick="submitAIPrompt('complete goal diversify cash assets')">🎯 Check Goal</button>
+                                    <button class="preset-prompt-btn" onclick="submitAIPrompt('delete expense cloud storage')">🗑️ Remove Expense</button>
+                                </div>
+
+                                <div class="chat-input-area">
+                                    <input type="text" placeholder="Type a command or query for the Agent router..." id="chat-input" onkeydown="if(event.key === 'Enter') triggerAIChat()">
+                                    <button onclick="triggerAIChat()">Send</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -346,74 +428,154 @@
             </div>
         </section>
 
-        <!-- Premium Feature Showcase -->
-        <section style="padding: 40px 0;">
-            <div style="text-align: center; margin-bottom: 60px;">
-                <h2 style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 900; margin-bottom: 12px;">Architectural Superiority</h2>
-                <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">E.O.M is designed to give you ultimate control over your metrics, data privacy, and level expansion.</p>
+        <!-- Architectural Bento Grid Showcase -->
+        <section id="features" class="features-section">
+            <div class="section-header-center">
+                <h2>Engineered for Sovereignty</h2>
+                <p>Every line of code is optimized for extreme speed, local data ownership, and uninterrupted workflow execution.</p>
             </div>
 
-            <div class="features-grid">
-                <!-- Card 1 -->
-                <div class="feature-card">
-                    <div class="feature-icon">🛡️</div>
-                    <h3 class="feature-title">Local-First Privacy</h3>
-                    <p class="feature-description">Your data never leaves your device. Fully persisted locally using Zustand store bindings with optional native local-path backups.</p>
+            <div class="bento-grid">
+                <!-- Card 1 (Span 2) -->
+                <div class="bento-card span-2">
+                    <div class="bento-icon-wrapper">🛡️</div>
+                    <h3 class="bento-title">100% Local-First Data Privacy</h3>
+                    <p class="bento-desc">
+                        No telemetry, no tracking servers, no subscriptions. Your journal entries, financial transactions, and workout logs reside purely in high-speed local persistence with automated encrypted JSON backup options.
+                    </p>
+                    <div class="bento-tags">
+                        <span class="bento-tag">Zustand State</span>
+                        <span class="bento-tag">Encrypted Local Storage</span>
+                        <span class="bento-tag">Zero Cloud Dependency</span>
+                    </div>
                 </div>
+
                 <!-- Card 2 -->
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3 class="feature-title">Lag-Free Ledger</h3>
-                    <p class="feature-description">Memoisierte React-Trees verarbeiten Hunderte von Ausgaben, Budgets und Kontoständen flüssig und ohne spürbare Eingabeverzögerung.</p>
+                <div class="bento-card">
+                    <div class="bento-icon-wrapper">⚡</div>
+                    <h3 class="bento-title">Sub-Millisecond Speed</h3>
+                    <p class="bento-desc">
+                        Powered by fine-grained memoized React 19 component trees that handle thousands of financial records and habit logs with instantaneous 60 FPS response.
+                    </p>
+                    <div class="bento-tags">
+                        <span class="bento-tag">React 19</span>
+                        <span class="bento-tag">Vite 8</span>
+                        <span class="bento-tag">60 FPS</span>
+                    </div>
                 </div>
+
                 <!-- Card 3 -->
-                <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
-                    <h3 class="feature-title">Agent Router (MCP)</h3>
-                    <p class="feature-description">Automate commands using built-in offline Web Workers or plug in custom LLM servers like Ollama, LM Studio, OpenAI, and Claude.</p>
+                <div class="bento-card">
+                    <div class="bento-icon-wrapper">🤖</div>
+                    <h3 class="bento-title">AI MCP Neural Router</h3>
+                    <p class="bento-desc">
+                        Directly connect offline local LLMs (Ollama, LM Studio) or cloud endpoints (OpenAI, Claude) to parse natural language queries into automated application actions.
+                    </p>
+                    <div class="bento-tags">
+                        <span class="bento-tag">Model Context Protocol</span>
+                        <span class="bento-tag">Ollama / LM Studio</span>
+                        <span class="bento-tag">Web Workers</span>
+                    </div>
                 </div>
+
                 <!-- Card 4 -->
-                <div class="feature-card">
-                    <div class="feature-icon">📲</div>
-                    <h3 class="feature-title">Mobile Ready</h3>
-                    <p class="feature-description">Built with Capacitor wrapper support, enabling you to build, compile, and run your workspace 1:1 on your iPhone or Apple Simulator.</p>
+                <div class="bento-card">
+                    <div class="bento-icon-wrapper">⚔️</div>
+                    <h3 class="bento-title">RPG Skill & Rank Engine</h3>
+                    <p class="bento-desc">
+                        Transform daily disciplines into tangible RPG statistics. Rank up from Tier Z to Tier S+ by maintaining habit streaks and smashing physical milestones.
+                    </p>
+                    <div class="bento-tags">
+                        <span class="bento-tag">XP Multipliers</span>
+                        <span class="bento-tag">Tier Progression</span>
+                        <span class="bento-tag">Gamified Habits</span>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="bento-card">
+                    <div class="bento-icon-wrapper">📱</div>
+                    <h3 class="bento-title">Universal Multi-Platform</h3>
+                    <p class="bento-desc">
+                        Compile into native desktop apps for Windows and macOS, or install seamlessly as a high-performance PWA / native Capacitor bundle on iOS and Android.
+                    </p>
+                    <div class="bento-tags">
+                        <span class="bento-tag">Electron</span>
+                        <span class="bento-tag">Capacitor</span>
+                        <span class="bento-tag">PWA Standalone</span>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Join Waitlist / Contact Form Section -->
-        <section class="waitlist-section" style="padding: 60px 0; border-top: 1px solid var(--border-color);">
-            <div style="text-align: center; margin-bottom: 40px;">
-                <h2 style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 900; margin-bottom: 12px;">Join the E.O.M Agent Waitlist</h2>
-                <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">Sign up to get notified when new updates roll out and secure your agent tag.</p>
+        <!-- Architectural Comparison Section -->
+        <section id="comparison" class="comparison-section">
+            <div class="section-header-center">
+                <h2>Why E.O.M is Different</h2>
+                <p>A direct comparison between traditional SaaS life planners and the E.O.M Sovereign Operating System.</p>
             </div>
 
-            <div class="waitlist-card" style="max-width: 500px; margin: 0 auto; background: var(--bg-card); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); backdrop-filter: blur(10px);">
+            <div class="comparison-grid">
+                <!-- Legacy Cloud SaaS -->
+                <div class="comp-card legacy">
+                    <h3 class="comp-title" style="color: #ff6b6b;">
+                        <span>❌</span> Standard Cloud SaaS
+                    </h3>
+                    <ul class="comp-list">
+                        <li><span>⚠️</span> <strong>Recurring Subscriptions:</strong> $15–$30/mo fees forever.</li>
+                        <li><span>⚠️</span> <strong>Data Extraction:</strong> Your personal thoughts and financials sit on corporate servers.</li>
+                        <li><span>⚠️</span> <strong>Cloud Latency:</strong> Loading spinners on poor or absent internet connection.</li>
+                        <li><span>⚠️</span> <strong>Vendor Lock-In:</strong> If their servers go down, you lose access to your daily life OS.</li>
+                    </ul>
+                </div>
+
+                <!-- E.O.M Sovereign OS -->
+                <div class="comp-card sovereign">
+                    <h3 class="comp-title" style="color: var(--primary);">
+                        <span>⚡</span> E.O.M Sovereign OS
+                    </h3>
+                    <ul class="comp-list">
+                        <li><span>✅</span> <strong>100% Free & Open Source:</strong> No hidden paywalls or subscription models.</li>
+                        <li><span>✅</span> <strong>Absolute Data Sovereignty:</strong> Encrypted on your machine. Zero cloud telemetry.</li>
+                        <li><span>✅</span> <strong>Instant 0ms Latency:</strong> Immediate response time with full offline persistence.</li>
+                        <li><span>✅</span> <strong>Self-Contained Independence:</strong> Works forever on your hardware, anywhere on earth.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Waitlist / Contact Terminal Form -->
+        <section class="waitlist-section">
+            <div class="section-header-center">
+                <h2>Join the Sovereign Agent Network</h2>
+                <p>Register your agent codename for major feature releases, desktop builds, and specialized plugin patches.</p>
+            </div>
+
+            <div class="waitlist-card">
                 <form id="waitlist-form" action="validate.php" method="POST" novalidate>
-                    <!-- Form Status Messages -->
-                    <div id="form-status" style="margin-bottom: 20px; padding: 12px; border-radius: 6px; display: none; font-size: 0.9rem;"></div>
+                    <div id="form-status" style="margin-bottom: 20px; padding: 12px; border-radius: 8px; display: none; font-size: 0.9rem;"></div>
 
                     <div style="display: flex; flex-direction: column; gap: 18px;">
                         <div style="display: flex; flex-direction: column; gap: 6px;">
-                            <label for="agent-name" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary); letter-spacing: 1px;">AGENT CODENAME</label>
-                            <input type="text" id="agent-name" name="agent_name" placeholder="e.g. Neo, Trinity" style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; color: #fff; font-family: var(--font-body); outline: none; transition: border-color 0.2s;" required>
+                            <label for="agent-name" style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--primary); letter-spacing: 1px;">AGENT CODENAME</label>
+                            <input type="text" id="agent-name" name="agent_name" placeholder="e.g. Neo, Cypher, Sovereign" required>
                             <span id="error-name" style="color: var(--accent); font-size: 0.8rem; display: none;"></span>
                         </div>
 
                         <div style="display: flex; flex-direction: column; gap: 6px;">
-                            <label for="agent-email" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary); letter-spacing: 1px;">SECURE EMAIL ADDRESS</label>
-                            <input type="email" id="agent-email" name="agent_email" placeholder="agent@matrix.escape" style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; color: #fff; font-family: var(--font-body); outline: none; transition: border-color 0.2s;" required>
+                            <label for="agent-email" style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--primary); letter-spacing: 1px;">SECURE EMAIL UPLINK</label>
+                            <input type="email" id="agent-email" name="agent_email" placeholder="agent@matrix.escape" required>
                             <span id="error-email" style="color: var(--accent); font-size: 0.8rem; display: none;"></span>
                         </div>
 
                         <div style="display: flex; flex-direction: column; gap: 6px;">
-                            <label for="agent-reason" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary); letter-spacing: 1px;">WHY DO YOU WANT TO ESCAPE THE MATRIX? (OPTIONAL)</label>
-                            <textarea id="agent-reason" name="agent_reason" rows="3" placeholder="Tell us your motivation..." style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; color: #fff; font-family: var(--font-body); outline: none; resize: vertical; transition: border-color 0.2s;"></textarea>
+                            <label for="agent-reason" style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--primary); letter-spacing: 1px;">MOTIVATION / SYSTEM GOALS (OPTIONAL)</label>
+                            <textarea id="agent-reason" name="agent_reason" rows="3" placeholder="What parts of your life are you optimizing?"></textarea>
                             <span id="error-reason" style="color: var(--accent); font-size: 0.8rem; display: none;"></span>
                         </div>
 
-                        <button type="submit" class="btn btn-primary" style="padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; justify-content: center; font-family: var(--font-display); width: 100%; border: none; background: var(--primary); color: #000; transition: transform 0.1s, box-shadow 0.2s;">
-                            Initiate System Link
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-weight: bold;">
+                            ⚡ Establish System Uplink
                         </button>
                     </div>
                 </form>
@@ -424,15 +586,19 @@
         <footer>
             <div class="footer-container">
                 <div class="footer-left">
-                    <a href="#" class="logo" style="font-size: 1.2rem; margin-bottom: 8px; display: inline-flex;">
+                    <a href="#" class="logo" style="font-size: 1.25rem;">
+                        <div class="logo-symbol" style="width: 26px; height: 26px; font-size: 0.85rem;">⚡</div>
                         <span>E.O.M</span> OS
                     </a>
-                    <p>&copy; 2026 E.O.M <br> Created by Chetan Kaushal. <br>All rights reserved.</p>
+                    <p>&copy; 2026 E.O.M • Architected by Chetan Kaushal.<br>All rights reserved. Free & Open Source.</p>
                 </div>
                 <div class="footer-right">
                     <div class="social-links">
-                        <a href="https://github.com/FRX132" target="_blank">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+                        <a href="Documentary.html">
+                            📖 Documentation
+                        </a>
+                        <a href="https://github.com/FRX132/E.O.M" target="_blank">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                               <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
                             </svg>
                             GitHub
@@ -447,7 +613,7 @@
     <div id="download-modal" class="download-modal-overlay" style="display: none;">
         <div class="download-modal-card">
             <button class="download-modal-close" onclick="closeDownloadModal()">&times;</button>
-            <h3 id="modal-title" style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; margin-bottom: 15px; color: #fff;">Download E.O.M Bundle</h3>
+            <h3 id="modal-title" style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 800; margin-bottom: 16px; color: #fff;">Download E.O.M Bundle</h3>
             <div id="modal-body-content" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;"></div>
         </div>
     </div>

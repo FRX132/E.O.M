@@ -6,69 +6,99 @@ function toggleTheme() {
     if (activeTheme === 'eom') {
         document.body.classList.remove('theme-eom');
         activeTheme = 'matrix';
-        themeName.innerText = 'Matrix Green';
-        if (canvasEl) canvasEl.style.opacity = '0.15';
+        if (themeName) themeName.innerText = 'Matrix Green';
+        if (canvasEl) canvasEl.style.opacity = '0.12';
     } else {
         document.body.classList.add('theme-eom');
         activeTheme = 'eom';
-        themeName.innerText = 'E.O.M Obsidian Gold';
+        if (themeName) themeName.innerText = 'Obsidian Gold';
         if (canvasEl) canvasEl.style.opacity = '0.04';
     }
 }
 
-// --- 1. Matrix Digital Rain Animation ---
+// --- 1. Matrix Digital Rain Canvas Animation ---
 const canvas = document.getElementById('matrix-canvas');
-const ctx = canvas.getContext('2d');
+if (canvas) {
+    const ctx = canvas.getContext('2d');
 
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
-const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const alphabet = katakana.split('');
-
-const fontSize = 14;
-let columns = canvas.width / fontSize;
-
-const rainDrops = [];
-for (let x = 0; x < columns; x++) {
-    rainDrops[x] = 1;
-}
-
-function drawMatrix() {
-    ctx.fillStyle = activeTheme === 'matrix' ? 'rgba(10, 10, 15, 0.05)' : 'rgba(17, 17, 17, 0.05)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = activeTheme === 'matrix' ? '#00ff66' : '#d48f48';
-    ctx.font = fontSize + 'px Share Tech Mono';
-
-    for (let i = 0; i < rainDrops.length; i++) {
-        const text = alphabet[Math.floor(Math.random() * alphabet.length)];
-        ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
-
-        if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-            rainDrops[i] = 0;
-        }
-        rainDrops[i]++;
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
     }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ⚡🛡️';
+    const alphabet = katakana.split('');
+
+    const fontSize = 14;
+    let columns = Math.floor(canvas.width / fontSize);
+
+    const rainDrops = [];
+    for (let x = 0; x < columns; x++) {
+        rainDrops[x] = Math.random() * -50;
+    }
+
+    function drawMatrix() {
+        ctx.fillStyle = activeTheme === 'matrix' ? 'rgba(7, 9, 14, 0.06)' : 'rgba(9, 9, 12, 0.06)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = activeTheme === 'matrix' ? '#00ff66' : '#d48f48';
+        ctx.font = fontSize + 'px Share Tech Mono';
+
+        for (let i = 0; i < rainDrops.length; i++) {
+            const text = alphabet[Math.floor(Math.random() * alphabet.length)];
+            ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+
+            if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                rainDrops[i] = 0;
+            }
+            rainDrops[i]++;
+        }
+    }
+    setInterval(drawMatrix, 32);
 }
-setInterval(drawMatrix, 30);
 
 // --- 2. Live XP Progression Simulator ---
 let currentXP = 7000;
 let maxXp = 20000;
 let rank = 'Z';
 
+function showXPPopup(amount, event) {
+    const floatEl = document.createElement('div');
+    floatEl.className = 'xp-float-tag';
+    floatEl.innerText = `+${amount} XP`;
+    
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
+    
+    if (event && event.clientX && event.clientY) {
+        x = event.clientX;
+        y = event.clientY;
+    }
+    
+    floatEl.style.left = `${x}px`;
+    floatEl.style.top = `${y}px`;
+    
+    document.body.appendChild(floatEl);
+    
+    setTimeout(() => {
+        floatEl.remove();
+    }, 1200);
+}
+
 function updateXPDisplay() {
     const percentage = Math.min(100, Math.round((currentXP / maxXp) * 100));
-    document.getElementById('xp-fill-bar').style.width = percentage + '%';
-    document.getElementById('progress-percent').innerText = percentage + '%';
-    document.getElementById('xp-current').innerText = currentXP.toLocaleString();
-    document.getElementById('xp-max').innerText = maxXp.toLocaleString();
-    document.getElementById('rank-tag').innerText = rank;
+    const fillBar = document.getElementById('xp-fill-bar');
+    const percentLabel = document.getElementById('progress-percent');
+    const currentLabel = document.getElementById('xp-current');
+    const maxLabel = document.getElementById('xp-max');
+    const rankTag = document.getElementById('rank-tag');
+
+    if (fillBar) fillBar.style.width = percentage + '%';
+    if (percentLabel) percentLabel.innerText = percentage + '%';
+    if (currentLabel) currentLabel.innerText = currentXP.toLocaleString();
+    if (maxLabel) maxLabel.innerText = maxXp.toLocaleString();
 
     // Recalculate rank tiers
     if (currentXP >= 300000) { rank = 'S+'; maxXp = 500000; }
@@ -79,17 +109,21 @@ function updateXPDisplay() {
     else if (currentXP >= 60000) { rank = 'F'; maxXp = 80000; }
     else if (currentXP >= 20000) { rank = 'W'; maxXp = 60000; }
     else { rank = 'Z'; maxXp = 20000; }
+
+    if (rankTag) rankTag.innerText = 'RANK ' + rank;
 }
 
 function toggleHabitLive(element, xpVal) {
-    element.classList.toggle('done');
     const checkbox = element.querySelector('input[type="checkbox"]');
+    element.classList.toggle('done');
+    
     if (element.classList.contains('done')) {
-        checkbox.checked = true;
+        if (checkbox) checkbox.checked = true;
         currentXP += xpVal;
+        showXPPopup(xpVal, window.event);
     } else {
-        checkbox.checked = false;
-        currentXP -= xpVal;
+        if (checkbox) checkbox.checked = false;
+        currentXP = Math.max(0, currentXP - xpVal);
     }
     updateXPDisplay();
 }
@@ -122,8 +156,12 @@ function recalculateFinanceMockup() {
 
     const newBalance = 15000.00 - totalExpenses;
     balance = newBalance;
-    document.getElementById('overview-balance-val').innerText = '€' + balance.toFixed(2);
-    document.getElementById('finance-net-worth').innerText = '€' + balance.toFixed(2);
+    
+    const overviewVal = document.getElementById('overview-balance-val');
+    const netWorthVal = document.getElementById('finance-net-worth');
+    
+    if (overviewVal) overviewVal.innerText = '€' + balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (netWorthVal) netWorthVal.innerText = '€' + balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function deleteLedgerRow(btn) {
@@ -133,20 +171,22 @@ function deleteLedgerRow(btn) {
 
 function addLedgerRow() {
     const ledgerBox = document.getElementById('ledger-box');
+    if (!ledgerBox) return;
+
     const newRow = document.createElement('div');
     newRow.className = 'ledger-row';
     newRow.innerHTML = `
-        <input type="text" value="New expense item" onchange="recalculateFinanceMockup()">
+        <input type="text" value="New expense entry" onchange="recalculateFinanceMockup()">
         <div>
             <span class="currency">€</span>
-            <input type="number" value="15.00" style="width: 60px; font-weight: bold; color: var(--accent);" onchange="recalculateFinanceMockup()" class="finance-amount">
+            <input type="number" value="25.00" style="width: 60px; font-weight: bold; color: var(--primary);" onchange="recalculateFinanceMockup()" class="finance-amount">
         </div>
         <select>
-            <option>Utilities</option>
-            <option>Food</option>
-            <option>Entertainment</option>
+            <option>Food & Nutrition</option>
+            <option>Hardware</option>
+            <option>Cloud Services</option>
         </select>
-        <button class="ledger-delete-btn" onclick="deleteLedgerRow(this)">×</button>
+        <button class="ledger-delete-btn" onclick="deleteLedgerRow(this)" title="Delete Row">×</button>
     `;
     ledgerBox.appendChild(newRow);
     recalculateFinanceMockup();
@@ -155,27 +195,31 @@ function addLedgerRow() {
 // --- 5. Muscle Selector Interaction ---
 function clickMuscle(name) {
     const chestPath = document.getElementById('muscle-chest');
-    if (name === 'Chest') {
+    if (name === 'Chest' && chestPath) {
         chestPath.classList.toggle('active');
     }
 
     const logBox = document.getElementById('muscle-logs');
-    const newLog = document.createElement('div');
-    newLog.className = 'muscle-log-item';
-    newLog.innerHTML = `
-        <span>💪 Selected target zone: ${name}</span>
-        <span style="color: var(--secondary);">Unlocked Sport Hub drills</span>
-    `;
-    logBox.prepend(newLog);
+    if (logBox) {
+        const newLog = document.createElement('div');
+        newLog.className = 'muscle-log-item';
+        newLog.innerHTML = `
+            <span>💪 Drill Logged: ${name} Target Set</span>
+            <span style="color: var(--secondary); font-family: var(--font-mono);">3x Sets (+250 XP)</span>
+        `;
+        logBox.prepend(newLog);
+    }
 
     // Add XP
     currentXP += 250;
+    showXPPopup(250, window.event);
     updateXPDisplay();
 }
 
 // --- 6. Mock AI Assistant Chat ---
 function triggerAIChat() {
     const input = document.getElementById('chat-input');
+    if (!input) return;
     const prompt = input.value.trim();
     if (!prompt) return;
 
@@ -186,6 +230,7 @@ function triggerAIChat() {
 function submitAIPrompt(promptText) {
     switchMockupTab('ai');
     const history = document.getElementById('chat-box-history');
+    if (!history) return;
 
     // Add user bubble
     const userBubble = document.createElement('div');
@@ -195,32 +240,32 @@ function submitAIPrompt(promptText) {
 
     history.scrollTop = history.scrollHeight;
 
-    // Simple mock response based on keywords
+    // Simulate agent response
     setTimeout(() => {
         const lower = promptText.toLowerCase();
-        let reply = "I parsed your input, but no matching system router was matched. Try asking to 'log workout' or 'complete goal'.";
+        let reply = "I parsed your query, but no exact system intent was recognized. Try asking to 'log workout', 'complete goal', or 'delete expense'.";
         let statusText = "";
 
-        if (lower.includes('workout') || lower.includes('training') || lower.includes('gym')) {
-            reply = "I identified a physical workout intent. Logging your activity to the fitness records.";
-            statusText = "LOG_WORKOUT: Chest (45 minutes)";
-
-            // Trigger workout log
+        if (lower.includes('workout') || lower.includes('training') || lower.includes('gym') || lower.includes('chest')) {
+            reply = "Physical training intent detected. Registering target workout drills directly to your fitness telemetry.";
+            statusText = "LOG_WORKOUT: Chest / Upper Body (45 minutes)";
             clickMuscle('Chest');
-        } else if (lower.includes('goal') || lower.includes('ziel') || lower.includes('task')) {
-            reply = "Goal found and checked off. Congratulations on your productivity milestone!";
-            statusText = "COMPLETE_GOAL: 'Diversify cash assets'";
+        } else if (lower.includes('goal') || lower.includes('ziel') || lower.includes('task') || lower.includes('complete')) {
+            reply = "Objective matched and marked complete. Productivity telemetry updated with bonus XP.";
+            statusText = "COMPLETE_OBJECTIVE: 'Diversify cash reserves'";
 
-            // Update goal text
-            document.getElementById('overview-goal-text').style.textDecoration = 'line-through';
-            document.getElementById('overview-goal-text').style.color = 'var(--text-muted)';
+            const goalText = document.getElementById('overview-goal-text');
+            if (goalText) {
+                goalText.style.textDecoration = 'line-through';
+                goalText.style.color = 'var(--text-muted)';
+            }
             currentXP += 500;
+            showXPPopup(500);
             updateXPDisplay();
-        } else if (lower.includes('delete') || lower.includes('remove') || lower.includes('expense')) {
-            reply = "Expense identified. Removing the subscription entry from your Ledger.";
-            statusText = "DELETE_ITEM: 'Subscription Cloud Storage'";
+        } else if (lower.includes('delete') || lower.includes('remove') || lower.includes('expense') || lower.includes('cloud')) {
+            reply = "Expense record identified. Removing cloud vault subscription entry from the active ledger.";
+            statusText = "DELETE_ITEM: 'Encrypted Cloud Vault Backup'";
 
-            // Remove second row
             const rows = document.querySelectorAll('.ledger-row');
             if (rows.length > 1) {
                 rows[1].remove();
@@ -235,7 +280,7 @@ function submitAIPrompt(promptText) {
         if (statusText) {
             const statusCard = document.createElement('div');
             statusCard.className = 'chat-mcp-status';
-            statusCard.innerText = `[SYSTEM ACTION COMPLETED: ${statusText}]`;
+            statusCard.innerHTML = `<span>⚡</span> <span>[MCP_ROUTER_DISPATCH: ${statusText}]</span>`;
             aiBubble.appendChild(statusCard);
         }
 
@@ -244,7 +289,7 @@ function submitAIPrompt(promptText) {
 
         currentXP += 100;
         updateXPDisplay();
-    }, 1000);
+    }, 600);
 }
 
 // --- 7. Download Modal Controllers ---
@@ -252,52 +297,46 @@ function openDownloadModal(platform) {
     const modal = document.getElementById('download-modal');
     const title = document.getElementById('modal-title');
     const content = document.getElementById('modal-body-content');
-    
+
     if (!modal || !title || !content) return;
-    
+
     if (platform === 'pwa') {
-        title.innerText = 'Launch & Install E.O.M (PWA)';
+        title.innerText = 'Launch E.O.M Web / PWA';
         content.innerHTML = `
             <div class="modal-option-box highlight">
                 <div class="modal-option-header">
-                    <strong style="color: #fff; font-size: 1.05rem;">🚀 Instant Web App</strong>
-                    <span class="modal-option-badge">Recommended</span>
+                    <strong style="color: #fff; font-size: 1.05rem;">⚡ Instant Offline Web App</strong>
+                    <span class="modal-option-badge">Zero Install</span>
                 </div>
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
-                    Runs directly in your browser with offline support, local IndexedDB persistence, and zero setup required.
+                    Runs locally in any modern browser with full offline persistence and zero latency.
                 </p>
-                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-download-btn" style="margin-top: 5px;">
-                    Launch E.O.M Web App ➔
+                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-download-btn">
+                    Launch Web App Instantly ➔
                 </a>
             </div>
-
             <div class="modal-option-box">
-                <strong style="color: #fff; display: block; margin-bottom: 8px;">📲 How to install as an App:</strong>
-                <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
-                    • <strong>iPhone / iPad (Safari):</strong> Open link, tap Share <span style="font-size: 1rem;">📤</span>, select <strong>„Add to Home Screen“</strong> (➕).<br>
-                    • <strong>Android (Chrome):</strong> Open link, tap Menu (⋮), select <strong>„Install App“</strong>.<br>
-                    • <strong>Desktop (Chrome / Edge):</strong> Click the <strong>Install icon (⊕)</strong> in your browser address bar.
+                <div class="modal-option-header">
+                    <strong style="color: #fff; font-size: 0.95rem;">📲 Install as Standalone App</strong>
                 </div>
+                <p style="font-size: 0.82rem; color: var(--text-muted);">
+                    In Safari (iOS) tap <strong>Share ➔ Add to Home Screen</strong>. In Chrome (Android/Desktop) click <strong>Install App</strong> in the address bar.
+                </p>
             </div>
         `;
     } else if (platform === 'ios') {
-        title.innerText = 'E.O.M for iOS (iPhone & iPad)';
+        title.innerText = 'E.O.M for Apple iOS';
         content.innerHTML = `
             <!-- Option 1: PWA (Recommended) -->
             <div class="modal-option-box highlight">
                 <div class="modal-option-header">
-                    <strong style="color: #fff; font-size: 1rem;">⚡ Option 1: Instant PWA Install</strong>
-                    <span class="modal-option-badge">No Xcode Needed</span>
+                    <strong style="color: #fff; font-size: 1.05rem;">⚡ Option 1: Instant iOS Web App (Recommended)</strong>
+                    <span class="modal-option-badge">1-Tap Install</span>
                 </div>
-                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
-                    Install directly to your iPhone Home Screen without developer accounts or sideloading tools.
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
+                    Open in Safari, tap <strong>Share ➔ Add to Home Screen</strong> for a full native fullscreen experience.
                 </p>
-                <div style="font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 12px; line-height: 1.5;">
-                    1. Open in <strong>Safari</strong>: <a href="https://frx132.github.io/E.O.M/" target="_blank" style="color: var(--primary);">frx132.github.io/E.O.M</a><br>
-                    2. Tap the <strong>Share button</strong> (📤) at the bottom.<br>
-                    3. Tap <strong>„Add to Home Screen“</strong> (➕) and confirm.
-                </div>
-                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-download-btn" style="padding: 10px; font-size: 0.9rem;">
+                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-download-btn">
                     Open Web App on iPhone ➔
                 </a>
             </div>
@@ -308,11 +347,11 @@ function openDownloadModal(platform) {
                     <strong style="color: #fff; font-size: 0.95rem;">📦 Option 2: Sideload IPA Bundle</strong>
                     <span style="font-size: 0.72rem; color: var(--text-muted);">For AltStore / Xcode</span>
                 </div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px;">
                     Download the prebuilt <code>.IPA</code> binary for manual sideloading.
                 </p>
-                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M.ipa" class="modal-secondary-btn" download>
-                    📥 Download E.O.M.ipa (V2.0.0)
+                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.1/E.O.M.ipa" class="modal-secondary-btn" download>
+                    📥 Download E.O.M.ipa (V2.0.1)
                 </a>
             </div>
         `;
@@ -322,13 +361,13 @@ function openDownloadModal(platform) {
             <!-- Option 1: PWA (Recommended) -->
             <div class="modal-option-box highlight">
                 <div class="modal-option-header">
-                    <strong style="color: #fff; font-size: 1rem;">⚡ Option 1: 1-Click PWA App</strong>
+                    <strong style="color: #fff; font-size: 1.05rem;">⚡ Option 1: 1-Click PWA App</strong>
                     <span class="modal-option-badge">Instant</span>
                 </div>
-                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
                     Open in Chrome and install directly with full offline and standalone capabilities.
                 </p>
-                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-download-btn" style="padding: 10px; font-size: 0.9rem;">
+                <a href="https://frx132.github.io/E.O.M/" target="_blank" class="modal-download-btn">
                     Open Web App on Android ➔
                 </a>
             </div>
@@ -339,11 +378,11 @@ function openDownloadModal(platform) {
                     <strong style="color: #fff; font-size: 0.95rem;">📦 Option 2: Direct APK Installer</strong>
                     <span style="font-size: 0.72rem; color: var(--text-muted);">Sideload APK</span>
                 </div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px;">
                     Install the standalone Android application package.
                 </p>
-                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M.apk" class="modal-secondary-btn" download>
-                    📥 Download E.O.M.apk (V2.0.0)
+                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.1/E.O.M.apk" class="modal-secondary-btn" download>
+                    📥 Download E.O.M.apk (V2.0.1)
                 </a>
             </div>
         `;
@@ -352,14 +391,14 @@ function openDownloadModal(platform) {
         content.innerHTML = `
             <div class="modal-option-box highlight">
                 <div class="modal-option-header">
-                    <strong style="color: #fff; font-size: 1rem;">🪟 Windows Desktop Installer</strong>
+                    <strong style="color: #fff; font-size: 1.05rem;">🪟 Windows Desktop Installer</strong>
                     <span class="modal-option-badge">x64 Installer</span>
                 </div>
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
                     Download the prebuilt native desktop application for <strong>Windows 10 / 11</strong>.
                 </p>
-                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M-Setup-2.0.0.exe" class="modal-download-btn" download>
-                    📥 Download E.O.M Setup 2.0.0.exe
+                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.1/E.O.M-Setup-2.0.1.exe" class="modal-download-btn" download>
+                    📥 Download E.O.M Setup 2.0.1.exe
                 </a>
             </div>
 
@@ -377,14 +416,14 @@ function openDownloadModal(platform) {
         content.innerHTML = `
             <div class="modal-option-box highlight">
                 <div class="modal-option-header">
-                    <strong style="color: #fff; font-size: 1rem;">🍏 macOS Disk Image (.dmg)</strong>
+                    <strong style="color: #fff; font-size: 1.05rem;">🍏 macOS Disk Image (.dmg)</strong>
                     <span class="modal-option-badge">Universal DMG</span>
                 </div>
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
                     Download the native desktop disk image for <strong>Apple Silicon & Intel Macs</strong>.
                 </p>
-                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.0/E.O.M-2.0.0.dmg" class="modal-download-btn" download>
-                    📥 Download E.O.M-2.0.0.dmg
+                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.1/E.O.M-2.0.1.dmg" class="modal-download-btn" download>
+                    📥 Download E.O.M-2.0.1.dmg
                 </a>
             </div>
 
@@ -409,7 +448,7 @@ function closeDownloadModal() {
     }
 }
 
-// Close modal when clicking outside the modal-card
+// Close modal when clicking outside
 window.addEventListener('click', (event) => {
     const modal = document.getElementById('download-modal');
     if (event.target === modal) {
@@ -417,8 +456,31 @@ window.addEventListener('click', (event) => {
     }
 });
 
+// OS Auto-Detection for Platform Bar
+function detectUserPlatform() {
+    const ua = navigator.userAgent || '';
+    let plat = 'pwa';
+    
+    if (/Macintosh|Mac OS X/i.test(ua) && !/iPhone|iPad/i.test(ua)) {
+        plat = 'mac';
+    } else if (/Windows/i.test(ua)) {
+        plat = 'win';
+    } else if (/iPhone|iPad|iPod/i.test(ua)) {
+        plat = 'ios';
+    } else if (/Android/i.test(ua)) {
+        plat = 'android';
+    }
+    
+    const targetBtn = document.getElementById(`btn-plat-${plat}`);
+    if (targetBtn) {
+        targetBtn.classList.add('recommended');
+    }
+}
+
 // --- 8. Waitlist Form Handler (AJAX & Validation) ---
 document.addEventListener('DOMContentLoaded', () => {
+    detectUserPlatform();
+
     const form = document.getElementById('waitlist-form');
     if (!form) return;
 
@@ -436,9 +498,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const errReason = document.getElementById('error-reason');
 
         // Reset display
-        statusDiv.style.display = 'none';
-        statusDiv.className = '';
-        statusDiv.innerText = '';
+        if (statusDiv) {
+            statusDiv.style.display = 'none';
+            statusDiv.className = '';
+            statusDiv.innerText = '';
+        }
         
         [errName, errEmail, errReason].forEach(el => {
             if (el) {
@@ -503,10 +567,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (clientErrors) {
             if (statusDiv) {
                 statusDiv.style.display = 'block';
-                statusDiv.style.background = 'rgba(255, 107, 107, 0.1)';
+                statusDiv.style.background = 'rgba(255, 82, 82, 0.12)';
                 statusDiv.style.border = '1px solid var(--accent)';
                 statusDiv.style.color = 'var(--accent)';
-                statusDiv.innerText = 'System override rejected. Please fix errors below.';
+                statusDiv.innerText = 'System uplink rejected. Please correct the fields highlighted in red.';
             }
             return;
         }
@@ -522,20 +586,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (response.ok && result.status === 'success') {
-                // Success
                 if (statusDiv) {
                     statusDiv.style.display = 'block';
-                    statusDiv.style.background = 'rgba(0, 255, 102, 0.1)';
+                    statusDiv.style.background = 'rgba(0, 255, 102, 0.12)';
                     statusDiv.style.border = '1px solid var(--primary)';
                     statusDiv.style.color = 'var(--primary)';
-                    statusDiv.innerText = result.message;
+                    statusDiv.innerText = '⚡ ' + result.message;
                 }
                 form.reset();
             } else {
-                // Server-side validation errors
                 if (statusDiv) {
                     statusDiv.style.display = 'block';
-                    statusDiv.style.background = 'rgba(255, 107, 107, 0.1)';
+                    statusDiv.style.background = 'rgba(255, 82, 82, 0.12)';
                     statusDiv.style.border = '1px solid var(--accent)';
                     statusDiv.style.color = 'var(--accent)';
                     statusDiv.innerText = result.message || 'System override rejected. Please fix errors below.';
@@ -563,10 +625,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Submission error:', error);
             if (statusDiv) {
                 statusDiv.style.display = 'block';
-                statusDiv.style.background = 'rgba(255, 107, 107, 0.1)';
+                statusDiv.style.background = 'rgba(255, 82, 82, 0.12)';
                 statusDiv.style.border = '1px solid var(--accent)';
                 statusDiv.style.color = 'var(--accent)';
-                statusDiv.innerText = 'Network connection failed. Secure link could not be established.';
+                statusDiv.innerText = 'Network connection offline. Secure link could not be completed.';
             }
         }
     });
@@ -580,5 +642,3 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.error('Service Worker registration failed:', err));
     });
 }
-
-
