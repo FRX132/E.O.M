@@ -82,7 +82,22 @@ The RPG engine powering your daily progress:
 ### 📚 Media Databases & Secret Locker
 - **Library (Books)** & **Cinema (Movies/Series)**: Track reading progress, watchlists, and personal ratings.
 - **Password Manager & Secrets**: Client-side encrypted credential store.
-- **Markdown Journal & Project Canvas**: Creative node canvas and note editor.
+- **Markdown Journal & Project Canvas**: Creative node canvas and note editor with full OS synchronization.
+
+---
+
+## 🔒 Local-First Privacy & Security Guarantee
+
+E.O.M is architected around a strict **Local-First & Zero-Knowledge Privacy Philosophy**:
+- **100% Client-Side Storage**: All user credentials, health metrics, financial transactions, habits, workouts, and journal entries are stored **exclusively on your physical device**.
+- **Zero GitHub & Remote Exposure**: The public GitHub repository contains only the front-end application code and build scripts. No user data, passwords, or personal logs ever leave your machine or touch GitHub.
+- **Local Storage File Locations**:
+  - **macOS Desktop (Electron)**: `~/Library/Application Support/eom/Local Storage/leveldb/`
+  - **Windows Desktop (Electron)**: `%APPDATA%\eom\Local Storage\leveldb\`
+  - **Web & PWA**: Sandboxed browser `localStorage` / `IndexedDB` under the domain origin.
+  - **iOS (iPhone/iPad)**: Sandboxed native app container storage.
+- **Credential Recovery**: Built-in in-app password recovery via username match on the login screen, or via Electron DevTools (`Cmd + Shift + I` ➔ Application ➔ Local Storage ➔ `os_profile`).
+- **Encrypted Local Backups**: Export encrypted JSON snapshots directly to your local file system or configure daily auto-backup folders without third-party servers.
 
 ---
 

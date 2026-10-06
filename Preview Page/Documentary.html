@@ -53,6 +53,7 @@
                 <div class="docs-menu">
                     <div class="docs-menu-title">Get Started</div>
                     <a href="#intro" class="docs-menu-item active">Architecture Overview</a>
+                    <a href="#privacy-security" class="docs-menu-item">🔒 Privacy & Data Guarantee</a>
                     <a href="#quickstart" class="docs-menu-item">Quick Start & Setup</a>
                 </div>
 
@@ -92,6 +93,64 @@
                         <li><strong>Zustand:</strong> Directs user state, transaction ledgers, workout logs, habit histories, and AI parameters.</li>
                         <li><strong>Capacitor (iOS):</strong> Transpiles and syncs front-end code directly into an iOS-native Xcode build for iPhone compatibility.</li>
                         <li><strong>Electron:</strong> Provides cross-platform desktop shells for macOS and Windows.</li>
+                    </ul>
+                </section>
+
+                <!-- PRIVACY & DATA GUARANTEE -->
+                <section class="docs-section" id="privacy-security">
+                    <h2>🔒 Local-First Privacy & Zero-Knowledge Security</h2>
+                    <p>
+                        A foundational architectural pillar of <strong>E.O.M OS</strong> is absolute user privacy and sovereignty over personal data. 
+                        Unlike traditional SaaS platforms that upload your personal life logs to centralized cloud servers, E.O.M operates on a strict <strong>Local-First & Zero-Knowledge</strong> architecture.
+                    </p>
+
+                    <div class="docs-alert info">
+                        <div class="docs-alert-title">🛡️ Public GitHub Safety Guarantee</div>
+                        <strong>No user data ever touches GitHub or public repositories.</strong> The GitHub repository contains only the front-end source code, build scripts, and static assets. Your passwords, profile attributes, financial transactions, habit history, and journal reflections remain exclusively stored inside the sandboxed local storage of your physical device.
+                    </div>
+
+                    <h3>Where Your Data is Physically Stored</h3>
+                    <p>Depending on which platform you use, your data resides locally on your hardware:</p>
+                    <table class="docs-table">
+                        <thead>
+                            <tr>
+                                <th>Platform / Client</th>
+                                <th>Local Physical Storage Location</th>
+                                <th>Storage Mechanism</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>macOS Desktop (Electron)</strong></td>
+                                <td><code>~/Library/Application Support/eom/Local Storage/leveldb/</code></td>
+                                <td>Chromium LevelDB Engine</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Windows Desktop (Electron)</strong></td>
+                                <td><code>%APPDATA%\eom\Local Storage\leveldb\</code></td>
+                                <td>Chromium LevelDB Engine</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Web Browser & PWA</strong></td>
+                                <td>Client-side Browser Sandbox (Domain Origin)</td>
+                                <td>HTML5 localStorage & IndexedDB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>iOS (iPhone / iPad)</strong></td>
+                                <td>Sandboxed App Container Storage</td>
+                                <td>Capacitor Native Secure WebKit Storage</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Password & Profile Recovery</h3>
+                    <p>
+                        Because E.O.M is 100% decentralized and local-first, there are no remote servers to reset your password. You have full transparency and multiple ways to access your credentials:
+                    </p>
+                    <ul>
+                        <li><strong>In-App Recovery:</strong> On the Login screen, click <em>"Forgot Password"</em> and type your Username. The app will immediately display your local backup password on screen.</li>
+                        <li><strong>DevTools Inspection (Desktop):</strong> Press <kbd>Cmd + Shift + I</kbd> (Mac) or <kbd>Ctrl + Shift + I</kbd> (Windows) in the Electron app ➔ open the <strong>Application</strong> tab ➔ select <strong>Local Storage</strong> ➔ inspect <code>os_profile</code> to view your full JSON profile.</li>
+                        <li><strong>Offline JSON Backups:</strong> Use the <em>Profile Settings</em> panel to export an encrypted <code>.json</code> backup file or configure an automatic daily backup folder.</li>
                     </ul>
                 </section>
 
