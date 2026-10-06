@@ -108,7 +108,7 @@ E.O.M is a complete **Progressive Web App (PWA)** that can be installed instantl
 - **PWA & Offline**: `vite-plugin-pwa` with custom Service Worker caching.
 - **Desktop**: Electron 34 with cross-platform packaging.
 - **Mobile Container**: Capacitor iOS (optional native build).
-- **AI & NLP**: `@huggingface/transformers` (Web Worker onnxruntime-web).
+- **AI & NLP**: `AgentHunter.js` Web Worker Engine (`@xenova/transformers` & ONNX runtime-web for zero-config offline intelligence).
 - **Styling**: Vanilla CSS Variables Design System with Google Fonts (`Inter`, `Outfit`, `JetBrains Mono`, `Roboto`, `Playfair Display`, `Cinzel`, `VT323`, `Share Tech Mono`).
 
 ---

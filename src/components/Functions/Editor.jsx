@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useStore } from '../../store';
 import MarkdownViewer from './MarkdownViewer';
 
@@ -10,10 +11,20 @@ const CodeIcon = () => (
 );
 
 export default function Editor() {
+  const location = useLocation();
   const files = useStore(state => state.editorFiles || []);
   const setFiles = useStore(state => state.setEditorFiles);
 
-  const [activeFileId, setActiveFileId] = useState(files.length > 0 ? files[0].id : null);
+  const [activeFileId, setActiveFileId] = useState(() => {
+    if (location.state?.activeFileId) return location.state.activeFileId;
+    return files.length > 0 ? files[0].id : null;
+  });
+
+  useEffect(() => {
+    if (location.state?.activeFileId) {
+      setActiveFileId(location.state.activeFileId);
+    }
+  }, [location.state]);
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState(() => {
     return localStorage.getItem('editor_view_mode') || 'split';
