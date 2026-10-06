@@ -184,6 +184,7 @@ const EMPTY_STATE = {
   autoBackupPath: null,
   theme: 'dark',
   accentColor: '#d48f48',
+  globalLoading: null, // { active: true, title, subtitle, progress, icon }
   aiSettings: {
     provider: 'local',
     apiKey: '',
@@ -487,6 +488,9 @@ export const useStore = create(
       setAutoBackupPath: (path) => set({ autoBackupPath: path }),
       toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
       setAccentColor: (color) => set({ accentColor: color }),
+      setGlobalLoading: (updater) => set((state) => ({
+        globalLoading: typeof updater === 'function' ? updater(state.globalLoading) : updater
+      })),
       setAiSettings: (newSettings) => set((state) => ({
         aiSettings: { ...state.aiSettings, ...newSettings }
       })),

@@ -30,6 +30,7 @@ import TradingTerminal from './components/User/TradingTerminal';
 import Timetable from './components/User/Timetable';
 import PasswordManager from './components/Agency/PasswordManager';
 import NewsHub from './components/Agency/NewsHub';
+import LoadingScreen from './components/UI/LoadingScreen';
 import { SKILL_DEF } from './constants';
 import './components/Styles/Timetable.css';
 
@@ -224,6 +225,7 @@ function App() {
   const syncHabits = useStore((state) => state.syncHabits);
   const unlockedSkills = useStore((state) => state.skills);
   const designSettings = useStore((state) => state.designSettings);
+  const globalLoading = useStore((state) => state.globalLoading);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -580,6 +582,17 @@ function App() {
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
       />
+
+      {globalLoading && (
+        <LoadingScreen
+          mode="fullscreen"
+          title={globalLoading.title || "Lade Daten..."}
+          subtitle={globalLoading.subtitle || ""}
+          progress={globalLoading.progress}
+          icon={globalLoading.icon || "⚡"}
+          onSwitchCloud={globalLoading.onSwitchCloud}
+        />
+      )}
     </div>
   );
 }

@@ -13,6 +13,7 @@ import {
     stopAgentSpeech,
     createSpeechRecognition
 } from '../../services/aiAgentService';
+import LoadingScreen from '../UI/LoadingScreen';
 
 export default function AIAssistant() {
     const { isReady, isProcessing, progress, error, generateText } = useAI();
@@ -600,16 +601,29 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
                 {/* TAB: CHAT PREVIEW VIEW */}
                 {activeTab === 'chat' && (
                     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: '460px' }}>
-                        {/* Chat History Messages */}
-                        <div style={{
-                            flex: 1,
-                            padding: '20px',
-                            overflowY: 'auto',
-                            maxHeight: '440px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '14px'
-                        }}>
+                        {/* Model Loading Screen with Percentage Bar when local model is initializing */}
+                        {aiSettings.provider === 'local' && (!isReady || progress !== null) ? (
+                            <div style={{ padding: '24px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <LoadingScreen
+                                    progress={progress}
+                                    title="AGENT HUNTER // KI-ENGINE WIRD INITIALISIERT"
+                                    subtitle="Lade lokales LaMini-GPT Modell & ONNX-Runtime in den Browser-Cache. Dies geschieht nur einmalig beim ersten Start."
+                                    icon="🧠"
+                                    onSwitchCloud={() => setActiveTab('settings')}
+                                />
+                            </div>
+                        ) : (
+                            <>
+                                {/* Chat History Messages */}
+                                <div style={{
+                                    flex: 1,
+                                    padding: '20px',
+                                    overflowY: 'auto',
+                                    maxHeight: '440px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '14px'
+                                }}>
                             {messages.map(msg => (
                                 <div
                                     key={msg.id}
@@ -941,6 +955,8 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z" /></svg>
                             </button>
                         </form>
+                            </>
+                        )}
                     </div>
                 )}
 
@@ -1096,6 +1112,15 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
                                 {isUploading ? 'Parsing...' : '+ Upload PDF'}
                             </button>
                         </div>
+
+                        {isUploading && (
+                            <LoadingScreen
+                                mode="banner"
+                                title="PDF DOKUMENT WIRD ANALYSIERT & EXTRAHIERT"
+                                progress={65}
+                                icon="📑"
+                            />
+                        )}
 
                         {aiKnowledgeBase.length === 0 ? (
                             <div style={{ padding: '25px', textAlign: 'center', border: '1px dashed var(--border-color)', borderRadius: '8px' }}>
