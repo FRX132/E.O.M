@@ -49,26 +49,30 @@
             <!-- Sidebar Menu -->
             <aside class="docs-sidebar">
                 <input type="text" placeholder="Search guides..." class="docs-search" id="docs-search" oninput="filterDocs()">
-                
-                <div class="docs-menu">
+                       <div class="docs-menu">
                     <div class="docs-menu-title">Get Started</div>
                     <a href="#intro" class="docs-menu-item active">Architecture Overview</a>
-                    <a href="#privacy-security" class="docs-menu-item">🔒 Privacy & Data Guarantee</a>
+                    <a href="#privacy-security" class="docs-menu-item">🔒 Privacy & Zero-Knowledge</a>
                     <a href="#quickstart" class="docs-menu-item">Quick Start & Setup</a>
+                    <a href="#device-updates" class="docs-menu-item">🔄 Multi-Device Sync & Updates</a>
                 </div>
 
                 <div class="docs-menu">
-                    <div class="docs-menu-title">Core Modules</div>
-                    <a href="#ai-mcp" class="docs-menu-item">AI Connection & MCP Router</a>
-                    <a href="#finance" class="docs-menu-item">Finance & Memoization</a>
-                    <a href="#workout" class="docs-menu-item">Anatomical Muscle Map</a>
-                    <a href="#progression" class="docs-menu-item">RPG Skill Tree & Ranks</a>
+                    <div class="docs-menu-title">Core OS Modules</div>
+                    <a href="#ai-mcp" class="docs-menu-item">🤖 Agent Hunter & MCP Router</a>
+                    <a href="#project-canvas" class="docs-menu-item">🗺️ Project Canvas Master Graph</a>
+                    <a href="#loading-telemetry" class="docs-menu-item">⏳ Cybernetic Loading Telemetry</a>
+                    <a href="#finance" class="docs-menu-item">💰 Finance & Memoization</a>
+                    <a href="#workout" class="docs-menu-item">🏋️ Anatomical Muscle Map</a>
+                    <a href="#progression" class="docs-menu-item">🛡️ RPG Skill Tree & Ranks</a>
+                    <a href="#news-hub" class="docs-menu-item">📰 Global News & Intelligence</a>
                 </div>
 
                 <div class="docs-menu">
-                    <div class="docs-menu-title">Deployment</div>
-                    <a href="#ios-build" class="docs-menu-item">Capacitor & iOS Xcode Guide</a>
-                    <a href="#troubleshoot" class="docs-menu-item">Platform Troubleshooting</a>
+                    <div class="docs-menu-title">Deployment & Builds</div>
+                    <a href="#desktop-build" class="docs-menu-item">🖥️ macOS (.dmg) & Desktop Builds</a>
+                    <a href="#ios-build" class="docs-menu-item">📱 Capacitor & iOS Xcode Guide</a>
+                    <a href="#troubleshoot" class="docs-menu-item">🛠️ Platform Troubleshooting</a>
                 </div>
             </aside>
 
@@ -91,8 +95,8 @@
                     <ul>
                         <li><strong>Vite + React:</strong> Handles responsive rendering, dynamic components, and reactive states.</li>
                         <li><strong>Zustand:</strong> Directs user state, transaction ledgers, workout logs, habit histories, and AI parameters.</li>
-                        <li><strong>Capacitor (iOS):</strong> Transpiles and syncs front-end code directly into an iOS-native Xcode build for iPhone compatibility.</li>
-                        <li><strong>Electron:</strong> Provides cross-platform desktop shells for macOS and Windows.</li>
+                        <li><strong>Capacitor (iOS & Android):</strong> Transpiles and syncs front-end code directly into native mobile builds for iPhone and Android devices.</li>
+                        <li><strong>Electron:</strong> Provides cross-platform desktop shells for macOS (.dmg) and Windows (.exe).</li>
                     </ul>
                 </section>
 
@@ -140,6 +144,11 @@
                                 <td>Sandboxed App Container Storage</td>
                                 <td>Capacitor Native Secure WebKit Storage</td>
                             </tr>
+                            <tr>
+                                <td><strong>Android</strong></td>
+                                <td>Sandboxed App Internal Storage (<code>/data/data/com.eom.os/</code>)</td>
+                                <td>Capacitor Android WebStorage & SQLite</td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -179,9 +188,48 @@ cd E.O.M</code></pre>
                     <p>The application is now hosted locally, usually at <code>http://localhost:5173</code>.</p>
                 </section>
 
-                <!-- 3. AI CONNECTION & MCP -->
+                <!-- 3. MULTI-DEVICE UPDATES -->
+                <section class="docs-section" id="device-updates">
+                    <h2>🔄 Multi-Device Synchronization & Update Workflow</h2>
+                    <p>
+                        When new features or code fixes are deployed, here is how each device platform receives the update while keeping all existing local user data 100% intact:
+                    </p>
+
+                    <h3>1. Web & PWA Users (Instant Cloud Push)</h3>
+                    <p>
+                        Pushing commits to <code>main</code> automatically triggers a Vercel build. Mobile Safari / Chrome PWA users receive the updated bundle automatically on app reload or via the Service Worker cache refresh banner.
+                    </p>
+
+                    <h3>2. macOS Desktop (.dmg Distribution)</h3>
+                    <pre><code>npm run electron:build</code></pre>
+                    <p>
+                        Generates a fresh <code>.dmg</code> in <code>release/Life Planner OS-x.x.x.dmg</code>. 
+                        Dragging the new app into <code>/Applications</code> overwrites the executable binary but <strong>leaves <code>~/Library/Application Support/eom/</code> untouched</strong>. Your credentials and logs remain perfectly intact.
+                    </p>
+
+                    <h3>3. Windows Desktop (.exe Installer)</h3>
+                    <pre><code>npm run electron:build:win</code></pre>
+                    <p>
+                        Produces an installer package in <code>release/</code>. Running the installer updates the binary while preserving <code>%APPDATA%\eom</code>.
+                    </p>
+
+                    <h3>4. iOS Native App (iPhone & iPad via Xcode)</h3>
+                    <pre><code>npm run build
+npx cap sync ios
+npx cap open ios</code></pre>
+                    <p>
+                        In Xcode, click <strong>Product ➔ Archive</strong> or press <kbd>Cmd + R</kbd> to deploy to your connected iPhone or push to TestFlight.
+                    </p>
+
+                    <h3>5. Android Native App</h3>
+                    <pre><code>npm run build
+npx cap sync android
+npx cap open android</code></pre>
+                </section>
+
+                <!-- 4. AI CONNECTION & MCP -->
                 <section class="docs-section" id="ai-mcp">
-                    <h2>AI Connection & MCP Router</h2>
+                    <h2>🤖 Agent Hunter (A.H.) & MCP Router</h2>
                     <p>
                         E.O.M features an intelligent <strong>AI Assistant Panel</strong> which acts as an intent parser. 
                         It processes natural language and translates your statements into app states through our Pseudo-MCP router.
@@ -192,18 +240,18 @@ cd E.O.M</code></pre>
                         You can connect several types of AI backend servers in the <strong>Connection Settings Hub</strong> inside the Assistant panel:
                     </p>
                     <ol>
-                        <li><strong>Agent Hunter Engine (AgentHunter.js):</strong> Run lightweight models directly inside a background Web Worker in your browser. Zero-cost, 100% offline.</li>
+                        <li><strong>Agent Hunter Engine (AgentHunter.js):</strong> Run lightweight ONNX models directly inside a background Web Worker in your browser. Zero-cost, 100% offline.</li>
                         <li><strong>Ollama:</strong> Run models locally. Direct prompts to: <br><code>http://localhost:11434/api/generate</code></li>
                         <li><strong>LM Studio:</strong> Route execution to local OpenAI-compatible endpoints: <br><code>http://localhost:1234/v1</code></li>
-                        <li><strong>OpenAI / Anthropic:</strong> Connect global cloud models by providing API keys.</li>
+                        <li><strong>OpenAI / Anthropic Claude:</strong> Connect global cloud models by providing API keys.</li>
                     </ol>
 
-                    <h3>MCP Commands & Prompts Router</h3>
+                    <h3>Mac-Style Agent Preview & Live Chat Terminal</h3>
                     <p>
-                        The app uses a keyword-based syntax parser to map prompt texts to Zustand actions. 
-                        Here is a quick reference table of active commands:
+                        The AI Assistant interface features a split-pane Mac-style window with live task previews, an autonomous morning briefing generator, ingredient meal recommendations, and direct voice synthesis.
                     </p>
 
+                    <h3>MCP Commands & Prompts Router</h3>
                     <table class="docs-table">
                         <thead>
                             <tr>
@@ -240,16 +288,110 @@ cd E.O.M</code></pre>
                             </tr>
                         </tbody>
                     </table>
-
-                    <div class="docs-alert warning">
-                        <div class="docs-alert-title">⚠️ Router Order Notice</div>
-                        The intent router matches <code>COMPLETE_GOAL</code> prior to <code>ADD_GOAL</code> to prevent wildcard requests from adding new goals rather than checking them off.
-                    </div>
                 </section>
 
-                <!-- 4. FINANCE & MEMOIZATION -->
+                <!-- 5. PROJECT CANVAS MASTER GRAPH -->
+                <section class="docs-section" id="project-canvas">
+                    <h2>🗺️ Interactive Project Canvas Master Graph</h2>
+                    <p>
+                        The <strong>Project Canvas</strong> serves as the visual master graph of your entire life operating system. 
+                        It continuously monitors and synchronizes all entities from every module into a connected solar constellation:
+                    </p>
+
+                    <div class="docs-alert info">
+                        <div class="docs-alert-title">🌐 Full OS Unified Sync</div>
+                        Whenever you create, update, or check off items anywhere in E.O.M, the Canvas reflects the changes instantly across custom nodes with category rings.
+                    </div>
+
+                    <h3>Integrated OS Element Nodes</h3>
+                    <table class="docs-table">
+                        <thead>
+                            <tr>
+                                <th>Node Type</th>
+                                <th>Source Module</th>
+                                <th>Interactive Features</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Document Node</strong></td>
+                                <td>Markdown Editor</td>
+                                <td>Live markdown snippet, word count, 👁️ expandable preview modal, ✏️ 1-click jump into Editor with document loaded.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Target & Goal Node</strong></td>
+                                <td>Goal Planner</td>
+                                <td>Progress percentage ring, deadline timer, active/completed status indicator.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Habit Node</strong></td>
+                                <td>Habit Tracker</td>
+                                <td>Daily completion checkbox, streak counter, XP reward badge.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sport & Workout Node</strong></td>
+                                <td>Workout Hub</td>
+                                <td>Targeted muscle groups, workout duration, and intensity metrics.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Journal Node</strong></td>
+                                <td>Daily Journal</td>
+                                <td>Introspection excerpt, mood rating, and reflection timestamp.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Finance Ledger Node</strong></td>
+                                <td>Expense Tracker</td>
+                                <td>Income/expense type, monetary amount, recurring badge, category tag.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Media Node</strong></td>
+                                <td>Books, Movies, Trips</td>
+                                <td>Cover badge, rating stars, read/watch status, destination country.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Skill Quest Node</strong></td>
+                                <td>Skill Tree</td>
+                                <td>Attribute pillar (Health/Social/Career/Spirit/Mental), tier rank.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Timetable Routine Node</strong></td>
+                                <td>Weekly Schedule</td>
+                                <td>Weekday block, time interval, routine category.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sticky Note Node</strong></td>
+                                <td>Freeform Canvas</td>
+                                <td>Color-coded customizable draggable sticky notes.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Filtering & Search Controls</h3>
+                    <p>
+                        Use the bottom filter bar to isolate specific layers (<em>All, Docs, Targets, Habits, Sport, Journal, Finanzen, Library, Cinema, Trips, Skills, Routine</em>) or enter instant search keywords to isolate specific nodes.
+                    </p>
+                </section>
+
+                <!-- 6. CYBERNETIC LOADING & TELEMETRY -->
+                <section class="docs-section" id="loading-telemetry">
+                    <h2>⏳ Cybernetic Loading & Dynamic Telemetry Engine</h2>
+                    <p>
+                        To ensure complete transparency during resource-heavy operations (such as downloading local AI model weights or parsing complex PDF documents), E.O.M features a high-tech <strong>Cybernetic Loading Screen</strong>.
+                    </p>
+
+                    <h3>Telemetry Features</h3>
+                    <ul>
+                        <li><strong>Live Percentage Display:</strong> High-precision numerical progress readout calculated in real time.</li>
+                        <li><strong>Gradient Animated Bar:</strong> Cyberpunk glowing visual progress bar with pulsing laser indicators.</li>
+                        <li><strong>Data Transfer Metrics:</strong> Real-time downloaded MB vs total MB tracking (e.g., <code>142.5 MB / 250.0 MB (57%)</code>).</li>
+                        <li><strong>Rotating Radar Spinner:</strong> Hexagonal sci-fi HUD radar animation with pulsing status glyphs.</li>
+                        <li><strong>Cloud Fallback Switcher:</strong> Instant 1-click override button to switch to Cloud AI if local model weight downloads take too long.</li>
+                    </ul>
+                </section>
+
+                <!-- 7. FINANCE & MEMOIZATION -->
                 <section class="docs-section" id="finance">
-                    <h2>Finance Hub & Performance Memoization</h2>
+                    <h2>💰 Finance Hub & Performance Memoization</h2>
                     <p>
                         The <strong>Finance Hub (Expense Tracker)</strong> is built to manage capital entries, monthly recurring subscriptions, budgets, and net worth tallies.
                     </p>
@@ -270,9 +412,9 @@ cd E.O.M</code></pre>
                     </div>
                 </section>
 
-                <!-- 5. MUSCLE MAP -->
+                <!-- 8. MUSCLE MAP -->
                 <section class="docs-section" id="workout">
-                    <h2>Anatomical Muscle Map</h2>
+                    <h2>🏋️ Anatomical Muscle Map</h2>
                     <p>
                         The <strong>Workout Hub</strong> displays an interactive anatomical model. Clicking a muscle group lets you register exercise sets, view muscle stress levels, and get custom sport recommendations.
                     </p>
@@ -284,9 +426,9 @@ cd E.O.M</code></pre>
                     </ul>
                 </section>
 
-                <!-- 6. PROGRESSION -->
+                <!-- 9. PROGRESSION -->
                 <section class="docs-section" id="progression">
-                    <h2>RPG Skill Tree & Ranks</h2>
+                    <h2>🛡️ RPG Skill Tree & Ranks</h2>
                     <p>
                         E.O.M turns life tracking into an RPG. Completing daily habits and goals earns XP, pushing you through various ranks.
                     </p>
@@ -346,9 +488,32 @@ cd E.O.M</code></pre>
                     </table>
                 </section>
 
-                <!-- 7. IOS Xcode Guide -->
+                <!-- 10. NEWS HUB -->
+                <section class="docs-section" id="news-hub">
+                    <h2>📰 Global News & Intelligence Radar</h2>
+                    <p>
+                        A real-time global news feed connecting 14+ top world agencies (Reuters, AP, BBC, NYT, Bloomberg, Der Spiegel, Heise, NASA) with dual CORS proxies, category filtering, bookmarking, and automated Text-to-Speech audio reading.
+                    </p>
+                </section>
+
+                <!-- 11. DESKTOP BUILDS -->
+                <section class="docs-section" id="desktop-build">
+                    <h2>🖥️ Desktop Distribution (macOS & Windows)</h2>
+                    <p>
+                        Compiling standalone desktop binaries using Electron Builder:
+                    </p>
+                    <h3>macOS Build (.dmg)</h3>
+                    <pre><code>npm run electron:build</code></pre>
+                    <p>Generates <code>release/Life Planner OS-x.x.x.dmg</code>. Installs directly to <code>/Applications</code> with Apple Silicon and Intel compatibility.</p>
+
+                    <h3>Windows Build (.exe)</h3>
+                    <pre><code>npm run electron:build:win</code></pre>
+                    <p>Generates an NSIS setup executable for Windows 10 & 11.</p>
+                </section>
+
+                <!-- 12. IOS Xcode Guide -->
                 <section class="docs-section" id="ios-build">
-                    <h2>Capacitor & iOS Xcode Guide</h2>
+                    <h2>📱 Capacitor & iOS Xcode Guide</h2>
                     <p>
                         Deploying your React code to run native 1:1 on your iPhone or simulated Apple environment:
                     </p>
@@ -370,9 +535,9 @@ cd E.O.M</code></pre>
                     </div>
                 </section>
 
-                <!-- 8. PLATFORM TROUBLESHOOTING -->
+                <!-- 13. PLATFORM TROUBLESHOOTING -->
                 <section class="docs-section" id="troubleshoot">
-                    <h2>Platform Troubleshooting</h2>
+                    <h2>🛠️ Platform Troubleshooting</h2>
                     <p>
                         Here are some common platform issues when building E.O.M:
                     </p>
@@ -380,7 +545,7 @@ cd E.O.M</code></pre>
                     <h3>Electron API Blocks in Web and iOS</h3>
                     <p>
                         E.O.M contains desktop features like PDF backups that use <code>window.electronAPI</code>. 
-                        In Web browsers or iOS WebViews, this will throw an undefined error.
+                        In Web browsers or iOS WebViews, this will throw an undefined error if not properly guarded:
                     </p>
                     <pre><code>// Safe API execution pattern
 if (window.electronAPI) {

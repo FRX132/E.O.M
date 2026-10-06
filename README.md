@@ -76,28 +76,66 @@ The RPG engine powering your daily progress:
 - **Weekly Schedule Matrix**: Time-blocked weekly schedule with task status management.
 - **Big Targets Vision Board**: Track long-term milestone quests and five-year achievements.
 
+### 🗺️ Master Project Canvas Visualizer (Full OS Graph)
+A connected, interactive 2D node constellation visualizing your entire life operating system:
+- **Full OS Element Sync**: Automatically reads and displays items from every module in real time:
+  - 📝 **Markdown Documents**: Live rendered snippet cards with word counts, 👁️ quick modal expander, and ✏️ direct 1-click jump into the Markdown Editor (`location.state.activeFileId`).
+  - 🎯 **Targets & Goals**: Dynamic progress rings, deadline countdowns, and completion states.
+  - ⚡ **Daily Habits**: Live streak indicators and daily check-off triggers.
+  - 🏋️ **Workouts**: Targeted muscle group diagrams, duration, and exercise logs.
+  - 📖 **Journal Reflections**: Introspection excerpts, mood scores, and timestamps.
+  - 💳 **Finance Ledgers**: Categorized income/expense entries and running balances.
+  - 📚 **Library & Cinema**: Books, movies, watchlists, ratings, and travel itineraries.
+  - 🛡️ **Skill Quests**: Level-up milestone trees across all 5 life pillars.
+  - 📅 **Timetable Routines**: Time-blocked weekly schedule items.
+  - 📌 **Sticky Notes**: Color-coded freeform brainstorm notes.
+- **Solar Constellation Layout**: Radial galaxy structure placing the central OS Core at the center with layered orbital module rings.
+- **Instant Layer Filter & Live Search**: Fast toggle buttons (*All, Docs, Targets, Habits, Sport, Journal, Finanzen, Library, Cinema, Trips, Skills, Routine*) and instant keyword filter.
+
+### ⏳ Cybernetic Loading Screen & Telemetry Engine
+A high-tech sci-fi HUD overlay and embedded loading system:
+- **Real-Time Telemetry**: Numerical percentage readout and pulsing laser gradient progress bar.
+- **Byte Stream Telemetry**: Dynamic downloaded MB vs total MB counter (e.g. `142.5 MB / 250.0 MB`).
+- **Autonomous Triggering**: Automatically engages during `@xenova/transformers` local ONNX weight initialization, large PDF document parsing, or async system loads.
+- **Cloud Fallback Switch**: 1-click override to instantly toggle to Cloud AI if local weight downloads take too long.
+
 ### 🧊 Fridge Stock & Meal Inventory
 - Track pantry and refrigerator food items with expiry countdowns, quantity counters, and grocery list generation.
 
 ### 📚 Media Databases & Secret Locker
 - **Library (Books)** & **Cinema (Movies/Series)**: Track reading progress, watchlists, and personal ratings.
 - **Password Manager & Secrets**: Client-side encrypted credential store.
-- **Markdown Journal & Project Canvas**: Creative node canvas and note editor with full OS synchronization.
+- **Markdown Journal & Note Vault**: Creative node canvas and note editor with full OS synchronization.
 
 ---
 
-## 🔒 Local-First Privacy & Security Guarantee
+## 🔒 Local-First Privacy & Zero-Knowledge Security Architecture
 
 E.O.M is architected around a strict **Local-First & Zero-Knowledge Privacy Philosophy**:
-- **100% Client-Side Storage**: All user credentials, health metrics, financial transactions, habits, workouts, and journal entries are stored **exclusively on your physical device**.
-- **Zero GitHub & Remote Exposure**: The public GitHub repository contains only the front-end application code and build scripts. No user data, passwords, or personal logs ever leave your machine or touch GitHub.
-- **Local Storage File Locations**:
-  - **macOS Desktop (Electron)**: `~/Library/Application Support/eom/Local Storage/leveldb/`
-  - **Windows Desktop (Electron)**: `%APPDATA%\eom\Local Storage\leveldb\`
-  - **Web & PWA**: Sandboxed browser `localStorage` / `IndexedDB` under the domain origin.
-  - **iOS (iPhone/iPad)**: Sandboxed native app container storage.
-- **Credential Recovery**: Built-in in-app password recovery via username match on the login screen, or via Electron DevTools (`Cmd + Shift + I` ➔ Application ➔ Local Storage ➔ `os_profile`).
-- **Encrypted Local Backups**: Export encrypted JSON snapshots directly to your local file system or configure daily auto-backup folders without third-party servers.
+- **100% Client-Side Storage**: All user credentials, health metrics, financial transactions, habits, workouts, and journal entries are stored **exclusively on your physical device hardware**.
+- **Zero GitHub & Remote Exposure**: The public GitHub repository contains only the front-end application code, build scripts, and static assets. **No user data, passwords, or personal logs ever leave your machine or touch GitHub.**
+- **Physical Storage Locations Across Platforms**:
+  | Platform / Shell | Local Storage Path | Mechanism |
+  |---|---|---|
+  | **macOS Desktop (Electron)** | `~/Library/Application Support/eom/Local Storage/leveldb/` | Chromium LevelDB Engine |
+  | **Windows Desktop (Electron)** | `%APPDATA%\eom\Local Storage\leveldb\` | Chromium LevelDB Engine |
+  | **Web & PWA** | Sandboxed browser origin domain storage | HTML5 `localStorage` & `IndexedDB` |
+  | **iOS (iPhone/iPad)** | Sandboxed native App container | Capacitor Native WebKit Storage |
+  | **Android** | Sandboxed internal storage (`/data/data/com.eom.os/`) | Capacitor Android WebStorage / SQLite |
+- **Credential & State Recovery**:
+  1. **In-App Recovery**: Click *"Forgot Password"* on the Login screen and enter your Username to view your local backup password on screen.
+  2. **Desktop DevTools**: Press <kbd>Cmd + Shift + I</kbd> (Mac) or <kbd>Ctrl + Shift + I</kbd> (Windows) in the Electron app ➔ open the **Application** tab ➔ select **Local Storage** ➔ inspect `os_profile`.
+  3. **Encrypted Local Backups**: Export encrypted `.json` snapshots directly to your local filesystem or configure daily auto-backup folders without third-party servers.
+
+---
+
+## 🔄 Multi-Device Updates & Synchronization
+
+When code updates or new features are pushed, user data is **never overwritten or wiped**:
+- **Web & PWA**: Pushing to GitHub deploys to Vercel instantly. Service Worker reloads fresh assets while preserving browser `localStorage`.
+- **macOS Desktop (.dmg)**: Running `npm run electron:build` creates an updated `.dmg`. Replacing the app in `/Applications` updates the binary while preserving `~/Library/Application Support/eom/`.
+- **Windows Desktop (.exe)**: Running `npm run electron:build:win` updates the binary while keeping `%APPDATA%\eom` intact.
+- **iOS & Android**: Running `npm run build && npx cap sync` transfers web bundle changes into native projects for Xcode and Android Studio builds.
 
 ---
 
@@ -122,7 +160,7 @@ E.O.M is a complete **Progressive Web App (PWA)** that can be installed instantl
 - **State & Local Persistence**: Zustand with `localStorage` fallback and Cloud Sync URL loader.
 - **PWA & Offline**: `vite-plugin-pwa` with custom Service Worker caching.
 - **Desktop**: Electron 34 with cross-platform packaging.
-- **Mobile Container**: Capacitor iOS (optional native build).
+- **Mobile Container**: Capacitor iOS & Android.
 - **AI & NLP**: `AgentHunter.js` Web Worker Engine (`@xenova/transformers` & ONNX runtime-web for zero-config offline intelligence).
 - **Styling**: Vanilla CSS Variables Design System with Google Fonts (`Inter`, `Outfit`, `JetBrains Mono`, `Roboto`, `Playfair Display`, `Cinzel`, `VT323`, `Share Tech Mono`).
 
@@ -160,15 +198,22 @@ npm run preview
 ```
 
 ### Desktop App (Electron)
-- **Mac App**: `npm run electron:build`
-- **Windows Executable**: `npm run electron:build:win`
+- **Mac App (.dmg)**: `npm run electron:build`
+- **Windows Executable (.exe)**: `npm run electron:build:win`
 
 ### Native iOS (Capacitor Xcode Project)
 ```sh
 npm run build
 npx cap sync ios
+npx cap open ios
 ```
-Open the `ios/App` folder in Xcode to build directly to a connected iPhone.
+
+### Native Android (Capacitor Android Studio Project)
+```sh
+npm run build
+npx cap sync android
+npx cap open android
+```
 
 ---
 
@@ -178,15 +223,18 @@ E.O.M/
 ├── Preview Page/            # Interactive Vercel showcase landing page & serverless API
 │   ├── api/validate.js      # Serverless validation function
 │   ├── index.html           # Landing page with PWA launch modal
+│   ├── Documentary.html     # Comprehensive system documentation & guides
 │   └── vercel.json          # Deployment & routing configuration
 ├── electron/                # Electron main process & desktop preload scripts
 ├── ios/                     # Native Capacitor iOS container
+├── android/                 # Native Capacitor Android container
 ├── src/
 │   ├── components/
 │   │   ├── Agency/          # NewsHub, Journal, MovieList, PasswordManager, etc.
 │   │   ├── Functions/       # AIAssistant, ProjectCanvas, Editor
 │   │   ├── Health/          # HabitTracker, FridgeStock, SportHub
 │   │   ├── Intelligence/    # GoalPlanner, BookList
+│   │   ├── UI/              # LoadingScreen, Modals, Buttons
 │   │   ├── Styles/          # Templates_Interface.css, Default.css, NewsHub.css
 │   │   └── User/            # ProfileSettings, Overview, ExpenseTracker, Timetable
 │   ├── services/            # newsService.js (RSS parser & live channels)
@@ -194,6 +242,7 @@ E.O.M/
 │   ├── store.js             # Zustand store & persistence schema
 │   └── index.css            # Design token system & typography imports
 ├── vite.config.js           # Vite + PWA configuration
+├── how_to_build.md          # Multi-platform build & update manual
 └── package.json
 ```
 
