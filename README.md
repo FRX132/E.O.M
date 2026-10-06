@@ -18,16 +18,16 @@ Try the interactive web showcase and documentation:
 
 ## ✨ Core Modules & Capabilities
 
-### 🤖 AI Assistant & Connection Hub (Pseudo-MCP)
-An integrated intelligence agent coordinating your workspace:
-- **Zero-Config Local AI**: Runs local LLMs directly inside a background Web Worker using `Transformers.js`.
-- **Custom Provider Integration**: Connect OpenAI, Anthropic Claude, or local API servers (Ollama, LM Studio) using custom endpoints and API keys.
-- **Pseudo-MCP Command Router**: Translate natural language prompt commands directly into system state actions:
-  - *"Log workout chest for 45 minutes"*
-  - *"Complete goal read 5 books"*
-  - *"Add goal learn React"*
-  - *"Delete expense 12"* or *"remove milk from fridge"*
-- **Cloud-Synced Settings**: Settings and API choices are synchronized along with your planner workspace.
+### 🤖 Agent Hunter (A.H.) & Leistungszustand Engine [0..10]
+An integrated autonomous intelligence work-agent coordinating your entire Life OS workspace:
+- **Handwritten Blueprint Architecture**: Seamlessly links **Register Baseline** (Age, Weight, Height, Education) ➔ **Settings** ➔ **System Quad** (Expense, Targets, Goals, Habits) ➔ **Execution Feedback Loop** (Tracker, Workout Hub ➔ Journal, Timetable, Skill Tree).
+- **Algorithmic Leistungszustand Index [0..10]**: Real-time performance calculation from `0 = Basics (0%)` to `10 = Professional (100%)` across all 7 life pillars.
+- **Tages-Jagd & Autonomous Hunter Quests**: Identifies life bottlenecks and prescribes 3 immediate high-impact directives.
+- **Daily Executive Morning Briefing**: Synthesizes habits, timetable blocks, budget radar, fridge meal inventory, and global RSS news into a motivational morning kickoff.
+- **Smart Kitchen & Restock Agent**: Analyzes in-stock ingredients and invents targeted fitness meals with 1-click grocery restock.
+- **Hands-Free Voice Interface**: Web Speech API Speech-to-Text (Microphone with pulsing ring) and Text-to-Speech (Audio Voice Readout).
+- **Zero-Config Local AI & Cloud Providers**: Runs offline via `Transformers.js` or connects OpenAI, Anthropic Claude, Ollama, and LM Studio.
+- **Pseudo-MCP Command Router**: Translate natural language prompt commands directly into system state actions.
 
 ### 📰 Global News & Intelligence Hub
 A multi-tier real-time news radar and intelligence center powered by top global media:

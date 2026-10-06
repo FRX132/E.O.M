@@ -246,7 +246,17 @@ function submitAIPrompt(promptText) {
         let reply = "I parsed your query, but no exact system intent was recognized. Try asking to 'log workout', 'complete goal', or 'delete expense'.";
         let statusText = "";
 
-        if (lower.includes('workout') || lower.includes('training') || lower.includes('gym') || lower.includes('chest')) {
+        if (lower.includes('briefing') || lower.includes('morgen') || lower.includes('morning')) {
+            reply = "☀️ <strong>Executive Morning Briefing:</strong><br>• Focus: Deep Work & High Output<br>• Schedule: 3 Timeblocks active<br>• Habits: 2/5 completed today<br>• Budget: €18.50 spent / €50.00 daily target<br>• World Pulse: Global news feeds in sync.";
+            statusText = "AGENT_WORKFLOW: Morning Briefing Synthesized & TTS Readout Ready";
+            currentXP += 300;
+            showXPPopup(300);
+        } else if (lower.includes('recipe') || lower.includes('kochen') || lower.includes('rezept') || lower.includes('cook') || lower.includes('fridge')) {
+            reply = "🍳 <strong>Smart Kitchen Agent:</strong><br>Found: Eggs, Avocado, Spinach.<br>Proposed Dish: <em>Avocado Omelette Deluxe</em> (380 kcal, 24g Protein).<br>[MISSING_INGREDIENTS: Sourdough Bread, Olive Oil]";
+            statusText = "AGENT_WORKFLOW: Smart Meal Plan Generated";
+            currentXP += 200;
+            showXPPopup(200);
+        } else if (lower.includes('workout') || lower.includes('training') || lower.includes('gym') || lower.includes('chest')) {
             reply = "Physical training intent detected. Registering target workout drills directly to your fitness telemetry.";
             statusText = "LOG_WORKOUT: Chest / Upper Body (45 minutes)";
             clickMuscle('Chest');

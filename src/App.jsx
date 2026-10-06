@@ -408,7 +408,7 @@ function App() {
       items: [
         { path: '/canvas', label: 'Canvas', icon: <CanvasIcon /> },
         { path: '/editor', label: 'Editor', icon: <CodeIcon /> },
-        { path: '/ai', label: 'AI Assistant', icon: <RobotIcon /> },
+        { path: '/ai', label: 'Agent Hunter (AI)', icon: <RobotIcon /> },
       ]
     }
   ];

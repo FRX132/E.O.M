@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import AIWorker from '../workers/aiWorker.js?worker&inline';
+import AgentHunterWorker from '../workers/AgentHunter.js?worker&inline';
 import { useStore } from '../store';
 
 const DEFAULT_AI_SETTINGS = { provider: 'local', apiKey: '', model: 'gpt-4o-mini', endpoint: '' };
@@ -12,6 +12,7 @@ export function useAI() {
     const [output, setOutput] = useState('');
     const [error, setError] = useState(null);
     const worker = useRef(null);
+    const pendingPromiseRef = useRef(null);
 
     useEffect(() => {
         if (aiSettings.provider !== 'local') {
@@ -21,7 +22,7 @@ export function useAI() {
         }
 
         setIsReady(false);
-        worker.current = new AIWorker();
+        worker.current = new AgentHunterWorker();
 
         const onMessageReceived = (e) => {
             const { status, data, output, error } = e.data;
@@ -41,10 +42,18 @@ export function useAI() {
                 case 'complete':
                     setOutput(output);
                     setIsProcessing(false);
+                    if (pendingPromiseRef.current) {
+                        pendingPromiseRef.current.resolve(output);
+                        pendingPromiseRef.current = null;
+                    }
                     break;
                 case 'error':
                     setError(error);
                     setIsProcessing(false);
+                    if (pendingPromiseRef.current) {
+                        pendingPromiseRef.current.reject(new Error(error));
+                        pendingPromiseRef.current = null;
+                    }
                     break;
                 default:
                     break;
@@ -69,11 +78,15 @@ export function useAI() {
 
         if (aiSettings.provider === 'local') {
             if (worker.current) {
-                worker.current.postMessage({ type: 'generate', text, context });
+                return new Promise((resolve, reject) => {
+                    pendingPromiseRef.current = { resolve, reject };
+                    worker.current.postMessage({ type: 'generate', text, context });
+                });
             } else {
-                setError('Local AI worker is not initialized.');
+                const errMsg = 'Local AI worker is not initialized.';
+                setError(errMsg);
+                throw new Error(errMsg);
             }
-            return;
         }
 
         setIsProcessing(true);
@@ -198,9 +211,11 @@ export function useAI() {
             }
 
             setOutput(responseText);
+            return responseText;
         } catch (err) {
             console.error(err);
             setError(err.message);
+            throw err;
         } finally {
             setIsProcessing(false);
         }
@@ -211,6 +226,7 @@ export function useAI() {
         isProcessing,
         progress,
         output,
+        setOutput,
         error,
         generateText
     };
