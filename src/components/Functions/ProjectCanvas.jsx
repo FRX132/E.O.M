@@ -226,7 +226,7 @@ const DocumentNode = ({ id, data }) => {
 // ---------------------------------------------------------------------------
 // CUSTOM NODE: Target & Goal Node
 // ---------------------------------------------------------------------------
-const TargetGoalNode = ({ id, data }) => {
+const TargetGoalNode = ({ data }) => {
   const [hovered, setHovered] = useState(false);
   const progress = data.progress !== undefined ? data.progress : (data.completed ? 100 : 0);
   const isTarget = data.isTarget;
@@ -296,7 +296,7 @@ const TargetGoalNode = ({ id, data }) => {
 // ---------------------------------------------------------------------------
 // CUSTOM NODE: Habit Node
 // ---------------------------------------------------------------------------
-const HabitNode = ({ id, data }) => {
+const HabitNode = ({ data }) => {
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -360,7 +360,7 @@ const HabitNode = ({ id, data }) => {
 // ---------------------------------------------------------------------------
 // CUSTOM NODE: Workout Node
 // ---------------------------------------------------------------------------
-const WorkoutNode = ({ id, data }) => {
+const WorkoutNode = ({ data }) => {
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -422,7 +422,7 @@ const WorkoutNode = ({ id, data }) => {
 // ---------------------------------------------------------------------------
 // CUSTOM NODE: Journal & Reflection Node
 // ---------------------------------------------------------------------------
-const JournalNode = ({ id, data }) => {
+const JournalNode = ({ data }) => {
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -484,7 +484,7 @@ const JournalNode = ({ id, data }) => {
 // ---------------------------------------------------------------------------
 // CUSTOM NODE: Finance Expense Node
 // ---------------------------------------------------------------------------
-const FinanceNode = ({ id, data }) => {
+const FinanceNode = ({ data }) => {
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -548,7 +548,7 @@ const FinanceNode = ({ id, data }) => {
 // ---------------------------------------------------------------------------
 // CUSTOM NODE: Media Node (Books, Movies, Trips)
 // ---------------------------------------------------------------------------
-const MediaNode = ({ id, data }) => {
+const MediaNode = ({ data }) => {
   const [hovered, setHovered] = useState(false);
   const color = data.color || '#ec4899';
 
@@ -637,7 +637,7 @@ const MediaNode = ({ id, data }) => {
 // ---------------------------------------------------------------------------
 // CUSTOM NODE: Skill Tree / Quest Node
 // ---------------------------------------------------------------------------
-const SkillQuestNode = ({ id, data }) => {
+const SkillQuestNode = ({ data }) => {
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -698,7 +698,7 @@ const SkillQuestNode = ({ id, data }) => {
 // ---------------------------------------------------------------------------
 // CUSTOM NODE: Timetable Block Node
 // ---------------------------------------------------------------------------
-const TimetableNode = ({ id, data }) => {
+const TimetableNode = ({ data }) => {
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -843,26 +843,6 @@ export default function ProjectCanvas() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Sticky Handlers
-  const handleStickyChange = useCallback((id, newText) => {
-    setNodes((nds) => nds.map(n => n.id === id ? { ...n, data: { ...n.data, text: newText } } : n));
-  }, []);
-
-  const handleStickyStyleChange = useCallback((id, styleUpdates) => {
-    setNodes((nds) => nds.map(n => n.id === id ? { ...n, data: { ...n.data, ...styleUpdates } } : n));
-  }, []);
-
-  const handleDeleteNode = useCallback((id) => {
-    if (window.confirm("Dieses Element vom Canvas entfernen?")) {
-      setNodes((nds) => nds.filter(n => n.id !== id));
-      setEdges((eds) => eds.filter(e => e.source !== id && e.target !== id));
-    }
-  }, []);
-
-  const handleNavigate = useCallback((path, stateData) => {
-    navigate(path, { state: stateData });
-  }, [navigate]);
-
   // Comprehensive OS Solar Constellation Layout Generator
   const generateDefaultLayout = useCallback(() => {
     const nodes = [];
@@ -913,8 +893,8 @@ export default function ProjectCanvas() {
           position: { x: itemX, y: itemY },
           data: {
             ...mapped.data,
-            onNavigate: handleNavigate,
-            onDeleteNode: handleDeleteNode
+            onNavigate: (path, stateData) => handlersRef.current.handleNavigate?.(path, stateData),
+            onDeleteNode: (id) => handlersRef.current.handleDeleteNode?.(id)
           }
         });
 
@@ -1042,7 +1022,7 @@ export default function ProjectCanvas() {
     }));
 
     return { nodes, edges };
-  }, [store, handleNavigate, handleDeleteNode]);
+  }, [store]);
 
   // Initial Data
   const initialData = useMemo(() => {
@@ -1076,6 +1056,30 @@ export default function ProjectCanvas() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialData.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialData.edges);
 
+  // Sticky Handlers & Actions
+  const handleStickyChange = useCallback((id, newText) => {
+    setNodes((nds) => nds.map(n => n.id === id ? { ...n, data: { ...n.data, text: newText } } : n));
+  }, [setNodes]);
+
+  const handleStickyStyleChange = useCallback((id, styleUpdates) => {
+    setNodes((nds) => nds.map(n => n.id === id ? { ...n, data: { ...n.data, ...styleUpdates } } : n));
+  }, [setNodes]);
+
+  const handleDeleteNode = useCallback((id) => {
+    if (window.confirm("Remove this element from the canvas?")) {
+      setNodes((nds) => nds.filter(n => n.id !== id));
+      setEdges((eds) => eds.filter(e => e.source !== id && e.target !== id));
+    }
+  }, [setNodes, setEdges]);
+
+  const handleNavigate = useCallback((path, stateData) => {
+    navigate(path, { state: stateData });
+  }, [navigate]);
+
+  useEffect(() => {
+    handlersRef.current = { handleStickyChange, handleStickyStyleChange, handleDeleteNode, handleNavigate };
+  }, [handleStickyChange, handleStickyStyleChange, handleDeleteNode, handleNavigate]);
+
   // Save layout debounced
   const saveLayout = useCallback(() => {
     const cleanNodes = nodes.map(n => {
@@ -1094,10 +1098,6 @@ export default function ProjectCanvas() {
   }, [nodes, edges, saveLayout]);
 
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
-
-  useEffect(() => {
-    handlersRef.current = { handleStickyChange, handleStickyStyleChange, handleDeleteNode, handleNavigate };
-  }, [handleStickyChange, handleStickyStyleChange, handleDeleteNode, handleNavigate]);
 
   // REAL-TIME AUTO-SYNCHRONIZATION FOR ALL OS MODULES
   useEffect(() => {
