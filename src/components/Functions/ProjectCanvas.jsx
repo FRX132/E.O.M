@@ -962,9 +962,24 @@ export default function ProjectCanvas() {
     return nodes.map(node => {
       let isVisible = true;
       if (activeFilter !== 'all') {
+        const clusterId = node.data?.clusterId || node.clusterId;
         if (node.id === 'root') {
           isVisible = true;
-        } else if (node.id === activeFilter || node.id.startsWith(`${activeFilter}-`)) {
+        } else if (
+          node.id === activeFilter ||
+          clusterId === activeFilter ||
+          node.id.startsWith(`${activeFilter}-`) ||
+          (activeFilter === 'documents' && node.id.startsWith('doc-')) ||
+          (activeFilter === 'targets' && node.id.startsWith('target-')) ||
+          (activeFilter === 'habits' && node.id.startsWith('habit-')) ||
+          (activeFilter === 'workouts' && node.id.startsWith('workout-')) ||
+          (activeFilter === 'finance' && node.id.startsWith('expense-')) ||
+          (activeFilter === 'books' && node.id.startsWith('book-')) ||
+          (activeFilter === 'movies' && node.id.startsWith('movie-')) ||
+          (activeFilter === 'trips' && node.id.startsWith('trip-')) ||
+          (activeFilter === 'skills' && node.id.startsWith('skill-')) ||
+          (activeFilter === 'timetable' && node.id.startsWith('tb-'))
+        ) {
           isVisible = true;
         } else {
           isVisible = false;

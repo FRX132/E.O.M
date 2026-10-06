@@ -47,6 +47,14 @@ const COLORS = ['blue', 'green', 'orange', 'purple', 'pink', 'yellow', 'red'];
 
 // Helper to get local YYYY-MM-DD date for a weekday in the current week
 function getLocalDateOfWeekday(dayName) {
+  if (dayName === 'Daily') {
+    const today = new Date();
+    const ye = today.getFullYear();
+    const mo = String(today.getMonth() + 1).padStart(2, '0');
+    const da = String(today.getDate()).padStart(2, '0');
+    return `${ye}-${mo}-${da}`;
+  }
+
   const weekdayMapping = {
     'Sunday': 0,
     'Monday': 1,

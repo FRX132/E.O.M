@@ -155,7 +155,7 @@ function RiskCalc({ currency }) {
             transition: 'all 0.2s'
           }}
         >
-          📈 Stocks (Aktien)
+          📈 Stocks
         </button>
         <button 
           className={`asset-type-btn ${assetType === 'forex' ? 'active' : ''}`}
@@ -172,7 +172,7 @@ function RiskCalc({ currency }) {
             transition: 'all 0.2s'
           }}
         >
-          💱 Forex (Devisen)
+          💱 Forex
         </button>
       </div>
 
@@ -181,7 +181,7 @@ function RiskCalc({ currency }) {
           {assetType === 'forex' && (
             <>
               <div className="risk-input-group">
-                <label>Forex Paar</label>
+                <label>Forex Pair</label>
                 <select 
                   value={selectedPair} 
                   onChange={e => handlePairChange(e.target.value)}

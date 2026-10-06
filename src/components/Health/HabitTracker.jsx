@@ -246,8 +246,17 @@ export default function HabitTracker() {
   const toggleHabit = (dayId, habitId) => {
     if (habitId.startsWith('quest-')) {
       const skillId = habitId.replace('quest-', '');
+      const day = days.find(d => d.id === dayId);
+      const isAlreadyDone = (day?.completedQuests || []).includes(skillId);
+      if (isAlreadyDone) return; // Prevent duplicate progress on same day
+
       updateQuestProgress(skillId);
       addXP(100);
+      setDays(days.map(d => {
+        if (d.id !== dayId) return d;
+        const currentCompleted = d.completedQuests || [];
+        return { ...d, completedQuests: [...currentCompleted, skillId] };
+      }));
       return;
     }
     const day = days.find(d => d.id === dayId);
@@ -642,12 +651,23 @@ export default function HabitTracker() {
 
                   {activeQuests.map(q => {
                     const skill = SKILL_DEF.find(s => s.id === q.skillId);
+                    const isDoneToday = (day.completedQuests || []).includes(q.skillId);
                     return (
-                      <div key={q.skillId} className="quest-roadmap-item">
-                        <input type="checkbox" onChange={() => toggleHabit(day.id, `quest-${q.skillId}`)} style={{ cursor: 'pointer', marginTop: 3 }} />
+                      <div key={q.skillId} className={`quest-roadmap-item ${isDoneToday ? 'completed' : ''}`} style={{ opacity: isDoneToday ? 0.7 : 1 }}>
+                        <input
+                          type="checkbox"
+                          checked={isDoneToday}
+                          disabled={isDoneToday}
+                          onChange={() => toggleHabit(day.id, `quest-${q.skillId}`)}
+                          style={{ cursor: isDoneToday ? 'default' : 'pointer', marginTop: 3 }}
+                        />
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary)' }}>{skill?.icon} {skill?.name} Unlock Quest</span>
-                          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Progress: {q.progress} / {q.total}</span>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary)', textDecoration: isDoneToday ? 'line-through' : 'none' }}>
+                            {skill?.icon} {skill?.name} Unlock Quest
+                          </span>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                            {isDoneToday ? '✓ Done today (+100 XP)' : `Progress: ${q.progress} / ${q.total} Days`}
+                          </span>
                         </div>
                       </div>
                     );

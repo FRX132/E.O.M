@@ -149,7 +149,6 @@ const EMPTY_STATE = {
   fridge: [],
   targets: [],
   books: [],
-  habit: [],
   movies: [],
   workouts: [],
   languages: [],
@@ -333,9 +332,9 @@ const shouldTemplateBeActiveOnDate = (template, dateStr) => {
   }
 
   if (template.repeat === 'Once') {
-    if (!template.createdAt) return false;
-    const createDateStr = template.createdAt.split('T')[0];
-    return dateStr === createDateStr;
+    const targetDateStr = template.startDate || (template.createdAt ? template.createdAt.split('T')[0] : null);
+    if (!targetDateStr) return false;
+    return dateStr === targetDateStr;
   }
 
   return false;

@@ -302,13 +302,20 @@ export default function Overview({ navigate }) {
     return formatter.format(new Date());
   }, []);
 
-  // Filter today's reminders
+  // Filter today's reminders (supports specific weekday or Daily)
   const todayReminders = useMemo(() => {
-    return timetableBlocks.filter(b => b.day === todayDayName && b.isReminder);
+    return timetableBlocks.filter(b => (b.day === todayDayName || b.day === 'Daily') && b.isReminder);
   }, [timetableBlocks, todayDayName]);
 
   // Translate weekday to date string
   const getLocalDateOfWeekday = (targetDay) => {
+    if (targetDay === 'Daily') {
+      const today = new Date();
+      const ye = today.getFullYear();
+      const mo = String(today.getMonth() + 1).padStart(2, '0');
+      const da = String(today.getDate()).padStart(2, '0');
+      return `${ye}-${mo}-${da}`;
+    }
     const weekdaysOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const targetIdx = weekdaysOrder.indexOf(targetDay);
     if (targetIdx === -1) return null;
@@ -317,7 +324,10 @@ export default function Overview({ navigate }) {
     const diff = targetIdx - currentIdx;
     const targetDate = new Date(now);
     targetDate.setDate(now.getDate() + diff);
-    return targetDate.toISOString().split('T')[0];
+    const ye = targetDate.getFullYear();
+    const mo = String(targetDate.getMonth() + 1).padStart(2, '0');
+    const da = String(targetDate.getDate()).padStart(2, '0');
+    return `${ye}-${mo}-${da}`;
   };
 
   // Toggle habit done state from overview card

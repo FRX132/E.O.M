@@ -237,7 +237,12 @@ export const buildDefaultLayout = (store) => {
 
     cluster.items.forEach((item, index) => {
       const { id, type, data } = cluster.toNode(item, index);
-      nodes.push({ id, type, data, position: getOrbitPosition(cluster.position, index, cluster.items.length) });
+      nodes.push({
+        id,
+        type,
+        data: { ...data, clusterId: cluster.id },
+        position: getOrbitPosition(cluster.position, index, cluster.items.length)
+      });
       edges.push(createItemEdge(cluster, id));
     });
   });
@@ -278,11 +283,16 @@ export const syncLayoutWithStore = (currentNodes, store) => {
       const existingIndex = nodeIndexById.get(id);
 
       if (existingIndex === undefined) {
-        addNode({ id, type, data, position: getOrbitPosition(cluster.position, index, cluster.items.length) });
+        addNode({
+          id,
+          type,
+          data: { ...data, clusterId: cluster.id },
+          position: getOrbitPosition(cluster.position, index, cluster.items.length)
+        });
         newEdges.push(createItemEdge(cluster, id));
       } else {
         const existing = nodes[existingIndex];
-        nodes[existingIndex] = { ...existing, data: { ...existing.data, ...data } };
+        nodes[existingIndex] = { ...existing, data: { ...existing.data, ...data, clusterId: cluster.id } };
       }
     });
   });

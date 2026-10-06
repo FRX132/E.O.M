@@ -28,20 +28,18 @@ export default function GoalPlanner() {
 
     const isNowDone = !goal.done;
 
-    // Award XP if completed
-    if (isNowDone) {
-      const difficultyBonus = {
-        'Easy': 10,
-        'Medium': 20,
-        'Hard': 50,
-        'Super Hard': 100
-      }[goal.difficulty || 'Easy'] || 0;
+    // Symmetric XP award / deduction
+    const difficultyBonus = {
+      'Easy': 10,
+      'Medium': 20,
+      'Hard': 50,
+      'Super Hard': 100
+    }[goal.difficulty || 'Easy'] || 0;
 
-      const earned = (goal.minutes || 0) * 10 + difficultyBonus;
-      addXP(earned);
-    }
+    const earned = (goal.minutes || 0) * 10 + difficultyBonus;
+    addXP(isNowDone ? earned : -earned);
 
-    const updated = goals[col].map(g => g.id === id ? { ...g, done: isNowDone } : g);
+    const updated = goals[col].map(g => g.id === id ? { ...g, done: isNowDone, completed: isNowDone } : g);
     setGoals({ ...goals, [col]: updated });
   };
 
@@ -76,6 +74,7 @@ export default function GoalPlanner() {
       const newGoal = {
         id: window.crypto.randomUUID(),
         done: false,
+        completed: false,
         ...rest
       };
 

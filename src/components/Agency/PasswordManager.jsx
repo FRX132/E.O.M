@@ -11,30 +11,47 @@ const hashPassword = async (password) => {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 };
 
-// Salted XOR encryption helper
+// UTF-8 & binary-safe XOR encryption helper
 const encryptText = (text, key) => {
   if (!text) return '';
-  let result = '';
-  for (let i = 0; i < text.length; i++) {
-    const charCode = text.charCodeAt(i) ^ key.charCodeAt(i % key.length);
-    result += String.fromCharCode(charCode);
+  const textBytes = new TextEncoder().encode(text);
+  const keyBytes = new TextEncoder().encode(key || 'eom_vault');
+  const xorBytes = new Uint8Array(textBytes.length);
+  for (let i = 0; i < textBytes.length; i++) {
+    xorBytes[i] = textBytes[i] ^ keyBytes[i % keyBytes.length];
   }
-  return btoa(unescape(encodeURIComponent(result)));
+  let binary = '';
+  for (let i = 0; i < xorBytes.length; i++) {
+    binary += String.fromCharCode(xorBytes[i]);
+  }
+  return btoa(binary);
 };
 
-// Salted XOR decryption helper
+// UTF-8 & binary-safe XOR decryption helper with backward-compatibility
 const decryptText = (encoded, key) => {
   if (!encoded) return '';
+  const k = key || 'eom_vault';
   try {
-    const decoded = decodeURIComponent(escape(atob(encoded)));
-    let result = '';
-    for (let i = 0; i < decoded.length; i++) {
-      const charCode = decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length);
-      result += String.fromCharCode(charCode);
+    const binary = atob(encoded);
+    const keyBytes = new TextEncoder().encode(k);
+    const xorBytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      xorBytes[i] = binary.charCodeAt(i) ^ keyBytes[i % keyBytes.length];
     }
-    return result;
+    return new TextDecoder().decode(xorBytes);
   } catch {
-    return 'Decryption Error';
+    // Backward compatibility fallback for legacy XOR format
+    try {
+      const decoded = decodeURIComponent(escape(atob(encoded)));
+      let result = '';
+      for (let i = 0; i < decoded.length; i++) {
+        const charCode = decoded.charCodeAt(i) ^ k.charCodeAt(i % k.length);
+        result += String.fromCharCode(charCode);
+      }
+      return result;
+    } catch {
+      return 'Decryption Error';
+    }
   }
 };
 

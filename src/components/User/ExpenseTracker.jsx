@@ -111,19 +111,32 @@ export default function ExpenseTracker() {
   const monthlyTotals = useMemo(() => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const data = months.map(m => ({ name: m, amount: 0 }));
+    const currentYear = new Date().getFullYear();
 
     (expenses || []).forEach(exp => {
-      const d = new Date(exp.date);
-      if (!isNaN(d)) {
-        const monthIdx = d.getMonth();
-        data[monthIdx].amount += (exp.amount || 0);
+      if (!exp || !exp.date) return;
+      // Extract year & month without timezone offset issues
+      const parts = String(exp.date).split('-');
+      let year, monthIdx;
+      if (parts.length >= 2) {
+        year = parseInt(parts[0], 10);
+        monthIdx = parseInt(parts[1], 10) - 1;
+      } else {
+        const d = new Date(exp.date);
+        year = d.getFullYear();
+        monthIdx = d.getMonth();
+      }
+
+      if (year === currentYear && monthIdx >= 0 && monthIdx < 12) {
+        data[monthIdx].amount += (parseFloat(exp.amount) || 0);
       }
     });
     return data;
   }, [expenses]);
 
   const currentMonthTotal = useMemo(() => {
-    return monthlyTotals[new Date().getMonth()].amount;
+    const currentMonthIdx = new Date().getMonth();
+    return monthlyTotals[currentMonthIdx]?.amount || 0;
   }, [monthlyTotals]);
 
   const limits = useMemo(() => {

@@ -26,7 +26,7 @@ export const calculatePerformanceState = (state) => {
   // 2. Goal & Target Velocity (Weight: 20%)
   const weekGoals = state.goals?.week || [];
   const goalTotal = weekGoals.length;
-  const goalDone = weekGoals.filter(g => g && g.completed).length;
+  const goalDone = weekGoals.filter(g => g && (g.done || g.completed)).length;
   const goalPct = goalTotal > 0 ? (goalDone / goalTotal) * 100 : (state.goals?.month?.length > 0 ? 60 : 40);
 
   // 3. Financial Discipline & Budget Radar (Weight: 15%)
@@ -133,7 +133,7 @@ export const buildAgentHunterContext = (state, missionType = 'general') => {
   const safeMap = (arr, fn) => Array.isArray(arr) ? arr.map(fn).filter(Boolean).join(', ') : 'None';
   const safeMapLines = (arr, fn) => Array.isArray(arr) ? arr.map(fn).filter(Boolean).join('\n') : 'None';
 
-  const currentGoals = [...(Array.isArray(state.goals?.week) ? state.goals.week : []), ...(Array.isArray(state.goals?.month) ? state.goals.month : [])].map(g => `[${g.completed ? 'DONE' : 'OPEN'}] ${g?.text}`).filter(Boolean).join(', ') || 'None';
+  const currentGoals = [...(Array.isArray(state.goals?.week) ? state.goals.week : []), ...(Array.isArray(state.goals?.month) ? state.goals.month : [])].map(g => `[${(g.done || g.completed) ? 'DONE' : 'OPEN'}] ${g?.text}`).filter(Boolean).join(', ') || 'None';
   const bigTargets = safeMap(state.targets || [], t => t?.title ? `${t.title} (${t.progress || 0}%)` : null);
   const recentWorkouts = safeMap((state.workouts || []).slice(-5), w => w?.name ? `${w.name} (${w.duration || w.date || ''})` : null);
   const recentJournal = safeMapLines((state.journal || []).slice(-3), j => j?.title ? `- ${j.title} (${j.date || ''})` : null);

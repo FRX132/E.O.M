@@ -151,10 +151,17 @@ export function mapCsvRowsToTrades(rows, mappings, startRowIndex) {
       const rawDate = row[mappings.date].trim();
       const cleanDate = rawDate.replace(/\./g, '-').replace(/\//g, '-');
       const parts = cleanDate.split('-');
-      if (parts[0].length === 2 && parts[2].length === 4) {
-        // DD-MM-YYYY to YYYY-MM-DD
-        date = `${parts[2]}-${parts[1]}-${parts[0]}`;
-      } else if (parts[0].length === 4) {
+      if (parts[0] && parts[0].length === 2 && parts[2] && parts[2].length === 4) {
+        const num1 = parseInt(parts[0], 10);
+        const num2 = parseInt(parts[1], 10);
+        // If second number is > 12, it's MM-DD-YYYY (e.g. 05-20-2026)
+        if (num2 > 12 && num1 <= 12) {
+          date = `${parts[2]}-${String(num1).padStart(2, '0')}-${String(num2).padStart(2, '0')}`;
+        } else {
+          // Default DD-MM-YYYY to YYYY-MM-DD
+          date = `${parts[2]}-${String(parts[1]).padStart(2, '0')}-${String(parts[0]).padStart(2, '0')}`;
+        }
+      } else if (parts[0] && parts[0].length === 4) {
         date = cleanDate.substring(0, 10);
       }
     }
