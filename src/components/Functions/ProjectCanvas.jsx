@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect, useState, useRef } from 'react';
+import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ReactFlow,
@@ -7,6 +7,7 @@ import {
   Background,
   useNodesState,
   useEdgesState,
+  useReactFlow,
   Handle,
   Position,
   Panel,
@@ -71,6 +72,8 @@ const CategoryNode = ({ data }) => {
 // CUSTOM NODE: Editor Document (Markdown Notes & Guides)
 // ---------------------------------------------------------------------------
 const DocumentNode = ({ id, data }) => {
+  const navigate = useNavigate();
+  const { setNodes, setEdges } = useReactFlow();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -189,7 +192,7 @@ const DocumentNode = ({ id, data }) => {
             {isExpanded ? '🔼 Less' : '👁️ View'}
           </button>
           <button
-            onClick={() => data.onNavigate && data.onNavigate('/editor', { activeFileId: data.id })}
+            onClick={() => navigate('/editor', { state: { activeFileId: data.id } })}
             style={{
               background: 'linear-gradient(135deg, #0284c7, #0369a1)',
               border: 'none',
@@ -206,14 +209,17 @@ const DocumentNode = ({ id, data }) => {
           >
             ✏️ Editor ↗
           </button>
-          {data.onDeleteNode && (
-            <button
-              onClick={() => data.onDeleteNode(id)}
-              style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '2px 4px', fontSize: '0.75rem' }}
-            >
-              🗑️
-            </button>
-          )}
+          <button
+            onClick={() => {
+              if (window.confirm("Remove this document from the canvas?")) {
+                setNodes((nds) => nds.filter((n) => n.id !== id));
+                setEdges((eds) => eds.filter((e) => e.source !== id && e.target !== id));
+              }
+            }}
+            style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '2px 4px', fontSize: '0.75rem' }}
+          >
+            🗑️
+          </button>
         </div>
       </div>
 
@@ -227,6 +233,7 @@ const DocumentNode = ({ id, data }) => {
 // CUSTOM NODE: Target & Goal Node
 // ---------------------------------------------------------------------------
 const TargetGoalNode = ({ data }) => {
+  const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   const progress = data.progress !== undefined ? data.progress : (data.completed ? 100 : 0);
   const isTarget = data.isTarget;
@@ -280,7 +287,7 @@ const TargetGoalNode = ({ data }) => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: '#cbd5e1', paddingTop: '2px' }}>
         <span>{progress}% completed</span>
         <button
-          onClick={() => data.onNavigate && data.onNavigate(isTarget ? '/targets' : '/goals')}
+          onClick={() => navigate(isTarget ? '/targets' : '/goals')}
           style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '4px', color: '#34d399', padding: '2px 6px', fontSize: '0.7rem', cursor: 'pointer' }}
         >
           Open ↗
@@ -297,6 +304,7 @@ const TargetGoalNode = ({ data }) => {
 // CUSTOM NODE: Habit Node
 // ---------------------------------------------------------------------------
 const HabitNode = ({ data }) => {
+  const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -344,7 +352,7 @@ const HabitNode = ({ data }) => {
           {data.isDoneToday ? '✅ Done Today' : '⏳ Pending'}
         </span>
         <button
-          onClick={() => data.onNavigate && data.onNavigate('/habits')}
+          onClick={() => navigate('/habits')}
           style={{ background: 'rgba(168, 85, 247, 0.2)', border: '1px solid rgba(168, 85, 247, 0.4)', borderRadius: '4px', color: '#c084fc', padding: '2px 6px', fontSize: '0.7rem', cursor: 'pointer' }}
         >
           Habits ↗
@@ -361,6 +369,7 @@ const HabitNode = ({ data }) => {
 // CUSTOM NODE: Workout Node
 // ---------------------------------------------------------------------------
 const WorkoutNode = ({ data }) => {
+  const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -406,7 +415,7 @@ const WorkoutNode = ({ data }) => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: '#cbd5e1', paddingTop: '2px' }}>
         <span>{data.exercisesCount ? `${data.exercisesCount} exercises` : 'Workout Log'}</span>
         <button
-          onClick={() => data.onNavigate && data.onNavigate('/sport')}
+          onClick={() => navigate('/sport')}
           style={{ background: 'rgba(244, 63, 94, 0.2)', border: '1px solid rgba(244, 63, 94, 0.4)', borderRadius: '4px', color: '#fb7185', padding: '2px 6px', fontSize: '0.7rem', cursor: 'pointer' }}
         >
           Sport Hub ↗
@@ -423,6 +432,7 @@ const WorkoutNode = ({ data }) => {
 // CUSTOM NODE: Journal & Reflection Node
 // ---------------------------------------------------------------------------
 const JournalNode = ({ data }) => {
+  const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -468,7 +478,7 @@ const JournalNode = ({ data }) => {
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '2px' }}>
         <button
-          onClick={() => data.onNavigate && data.onNavigate('/journal')}
+          onClick={() => navigate('/journal')}
           style={{ background: 'rgba(99, 102, 241, 0.2)', border: '1px solid rgba(99, 102, 241, 0.4)', borderRadius: '4px', color: '#818cf8', padding: '2px 6px', fontSize: '0.7rem', cursor: 'pointer' }}
         >
           Journal ↗
@@ -485,6 +495,7 @@ const JournalNode = ({ data }) => {
 // CUSTOM NODE: Finance Expense Node
 // ---------------------------------------------------------------------------
 const FinanceNode = ({ data }) => {
+  const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -532,7 +543,7 @@ const FinanceNode = ({ data }) => {
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '2px' }}>
         <button
-          onClick={() => data.onNavigate && data.onNavigate('/expenses')}
+          onClick={() => navigate('/expenses')}
           style={{ background: 'rgba(245, 158, 11, 0.2)', border: '1px solid rgba(245, 158, 11, 0.4)', borderRadius: '4px', color: '#fbbf24', padding: '2px 6px', fontSize: '0.7rem', cursor: 'pointer' }}
         >
           Expenses ↗
@@ -549,6 +560,7 @@ const FinanceNode = ({ data }) => {
 // CUSTOM NODE: Media Node (Books, Movies, Trips)
 // ---------------------------------------------------------------------------
 const MediaNode = ({ data }) => {
+  const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   const color = data.color || '#ec4899';
 
@@ -620,7 +632,7 @@ const MediaNode = ({ data }) => {
       <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '4px' }}>
         {data.targetRoute && (
           <button
-            onClick={() => data.onNavigate && data.onNavigate(data.targetRoute)}
+            onClick={() => navigate(data.targetRoute)}
             style={{ background: `${color}22`, border: `1px solid ${color}44`, borderRadius: '4px', color: color, padding: '2px 6px', fontSize: '0.7rem', cursor: 'pointer' }}
           >
             Open ↗
@@ -638,6 +650,7 @@ const MediaNode = ({ data }) => {
 // CUSTOM NODE: Skill Tree / Quest Node
 // ---------------------------------------------------------------------------
 const SkillQuestNode = ({ data }) => {
+  const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -682,7 +695,7 @@ const SkillQuestNode = ({ data }) => {
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '2px' }}>
         <button
-          onClick={() => data.onNavigate && data.onNavigate('/skills')}
+          onClick={() => navigate('/skills')}
           style={{ background: 'rgba(59, 130, 246, 0.2)', border: '1px solid rgba(59, 130, 246, 0.4)', borderRadius: '4px', color: '#60a5fa', padding: '2px 6px', fontSize: '0.7rem', cursor: 'pointer' }}
         >
           Skill Tree ↗
@@ -699,6 +712,7 @@ const SkillQuestNode = ({ data }) => {
 // CUSTOM NODE: Timetable Block Node
 // ---------------------------------------------------------------------------
 const TimetableNode = ({ data }) => {
+  const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -743,7 +757,7 @@ const TimetableNode = ({ data }) => {
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '2px' }}>
         <button
-          onClick={() => data.onNavigate && data.onNavigate('/timetable')}
+          onClick={() => navigate('/timetable')}
           style={{ background: 'rgba(20, 184, 166, 0.2)', border: '1px solid rgba(20, 184, 166, 0.4)', borderRadius: '4px', color: '#2dd4bf', padding: '2px 6px', fontSize: '0.7rem', cursor: 'pointer' }}
         >
           Timetable ↗
@@ -760,7 +774,23 @@ const TimetableNode = ({ data }) => {
 // CUSTOM NODE: Sticky Note Node
 // ---------------------------------------------------------------------------
 const StickyNode = ({ id, data }) => {
+  const { setNodes, setEdges } = useReactFlow();
   const [hovered, setHovered] = useState(false);
+
+  const updateStyle = (styleUpdates) => {
+    setNodes((nds) => nds.map((n) => (n.id === id ? { ...n, data: { ...n.data, ...styleUpdates } } : n)));
+  };
+
+  const updateText = (newText) => {
+    setNodes((nds) => nds.map((n) => (n.id === id ? { ...n, data: { ...n.data, text: newText } } : n)));
+  };
+
+  const deleteSticky = () => {
+    if (window.confirm("Remove this sticky note?")) {
+      setNodes((nds) => nds.filter((n) => n.id !== id));
+      setEdges((eds) => eds.filter((e) => e.source !== id && e.target !== id));
+    }
+  };
 
   return (
     <div className="nodrag"
@@ -782,23 +812,23 @@ const StickyNode = ({ id, data }) => {
       {hovered && (
         <div style={{ position: 'absolute', top: '-35px', left: 0, background: 'var(--bg-card, #1e293b)', padding: '5px', borderRadius: '6px', display: 'flex', gap: '5px', boxShadow: '0 4px 10px rgba(0,0,0,0.5)', zIndex: 10, alignItems: 'center' }}>
           {['#fef08a', '#bbf7d0', '#bfdbfe', '#fbcfe8', 'transparent'].map(c => (
-            <div key={c} onClick={() => data.onChangeStyle && data.onChangeStyle(id, { color: c })} style={{ width: 16, height: 16, borderRadius: '50%', background: c === 'transparent' ? '#333' : c, border: c === 'transparent' ? '1px dashed #fff' : 'none', cursor: 'pointer' }} title={c === 'transparent' ? 'Transparent' : 'Farbe'} />
+            <div key={c} onClick={() => updateStyle({ color: c })} style={{ width: 16, height: 16, borderRadius: '50%', background: c === 'transparent' ? '#333' : c, border: c === 'transparent' ? '1px dashed #fff' : 'none', cursor: 'pointer' }} title={c === 'transparent' ? 'Transparent' : 'Color'} />
           ))}
           <div style={{ width: 1, height: '16px', background: '#555', margin: '0 5px' }} />
           {['0.9rem', '1.2rem', '1.8rem', '2.5rem'].map((s, i) => (
-            <button key={s} onClick={() => data.onChangeStyle && data.onChangeStyle(id, { fontSize: s })} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '0 4px', fontSize: '0.8rem' }}>{['S', 'M', 'L', 'XL'][i]}</button>
+            <button key={s} onClick={() => updateStyle({ fontSize: s })} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '0 4px', fontSize: '0.8rem' }}>{['S', 'M', 'L', 'XL'][i]}</button>
           ))}
           <div style={{ width: 1, height: '16px', background: '#555', margin: '0 5px' }} />
-          <button onClick={() => data.onChangeStyle && data.onChangeStyle(id, { fontWeight: data.fontWeight === 'bold' ? 'normal' : 'bold' })} style={{ background: 'transparent', border: 'none', color: data.fontWeight === 'bold' ? 'var(--primary, #38bdf8)' : '#fff', cursor: 'pointer', padding: '0 4px', fontWeight: 'bold' }}>B</button>
+          <button onClick={() => updateStyle({ fontWeight: data.fontWeight === 'bold' ? 'normal' : 'bold' })} style={{ background: 'transparent', border: 'none', color: data.fontWeight === 'bold' ? 'var(--primary, #38bdf8)' : '#fff', cursor: 'pointer', padding: '0 4px', fontWeight: 'bold' }}>B</button>
           <div style={{ width: 1, height: '16px', background: '#555', margin: '0 5px' }} />
-          <button onClick={() => data.onDelete && data.onDelete(id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 4px' }}>🗑️</button>
+          <button onClick={deleteSticky} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 4px' }}>🗑️</button>
         </div>
       )}
       <div className="custom-drag-handle" style={{ height: '20px', cursor: 'grab', background: data.color === 'transparent' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', marginBottom: '5px', borderRadius: '2px' }}></div>
       <Handle type="target" position={Position.Top} style={{ background: '#555' }} />
       <textarea
         defaultValue={data.text}
-        onChange={(e) => data.onChange && data.onChange(id, e.target.value)}
+        onChange={(e) => updateText(e.target.value)}
         style={{
           flex: 1,
           width: '100%',
@@ -811,7 +841,7 @@ const StickyNode = ({ id, data }) => {
           fontSize: data.fontSize || '0.9rem',
           fontWeight: data.fontWeight || 'normal'
         }}
-        placeholder={data.color === 'transparent' ? "Heading..." : "Notiz hier..."}
+        placeholder={data.color === 'transparent' ? "Heading..." : "Note here..."}
       />
       <Handle type="source" position={Position.Bottom} style={{ background: '#555' }} />
     </div>
@@ -838,8 +868,6 @@ const nodeTypes = {
 // ---------------------------------------------------------------------------
 export default function ProjectCanvas() {
   const store = useStore();
-  const navigate = useNavigate();
-  const handlersRef = useRef({});
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -891,11 +919,7 @@ export default function ProjectCanvas() {
           id: nodeId,
           type: mapped.type || 'media',
           position: { x: itemX, y: itemY },
-          data: {
-            ...mapped.data,
-            onNavigate: (path, stateData) => handlersRef.current.handleNavigate?.(path, stateData),
-            onDeleteNode: (id) => handlersRef.current.handleDeleteNode?.(id)
-          }
+          data: mapped.data
         });
 
         edges.push({
@@ -1027,28 +1051,7 @@ export default function ProjectCanvas() {
   // Initial Data
   const initialData = useMemo(() => {
     if (store.canvasNodes && store.canvasNodes.length > 0) {
-      const restoredNodes = store.canvasNodes.map(node => {
-        if (node.type === 'sticky') {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              onChange: (id, val) => handlersRef.current.handleStickyChange?.(id, val),
-              onChangeStyle: (id, style) => handlersRef.current.handleStickyStyleChange?.(id, style),
-              onDelete: (id) => handlersRef.current.handleDeleteNode?.(id)
-            }
-          };
-        }
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            onNavigate: (path, stateData) => handlersRef.current.handleNavigate?.(path, stateData),
-            onDeleteNode: (id) => handlersRef.current.handleDeleteNode?.(id)
-          }
-        };
-      });
-      return { nodes: restoredNodes, edges: store.canvasEdges || [] };
+      return { nodes: store.canvasNodes, edges: store.canvasEdges || [] };
     }
     return generateDefaultLayout();
   }, [store.canvasNodes, store.canvasEdges, generateDefaultLayout]);
@@ -1056,37 +1059,9 @@ export default function ProjectCanvas() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialData.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialData.edges);
 
-  // Sticky Handlers & Actions
-  const handleStickyChange = useCallback((id, newText) => {
-    setNodes((nds) => nds.map(n => n.id === id ? { ...n, data: { ...n.data, text: newText } } : n));
-  }, [setNodes]);
-
-  const handleStickyStyleChange = useCallback((id, styleUpdates) => {
-    setNodes((nds) => nds.map(n => n.id === id ? { ...n, data: { ...n.data, ...styleUpdates } } : n));
-  }, [setNodes]);
-
-  const handleDeleteNode = useCallback((id) => {
-    if (window.confirm("Remove this element from the canvas?")) {
-      setNodes((nds) => nds.filter(n => n.id !== id));
-      setEdges((eds) => eds.filter(e => e.source !== id && e.target !== id));
-    }
-  }, [setNodes, setEdges]);
-
-  const handleNavigate = useCallback((path, stateData) => {
-    navigate(path, { state: stateData });
-  }, [navigate]);
-
-  useEffect(() => {
-    handlersRef.current = { handleStickyChange, handleStickyStyleChange, handleDeleteNode, handleNavigate };
-  }, [handleStickyChange, handleStickyStyleChange, handleDeleteNode, handleNavigate]);
-
   // Save layout debounced
   const saveLayout = useCallback(() => {
-    const cleanNodes = nodes.map(n => {
-      const { onChange: _o, onChangeStyle: _s, onDelete: _d, onNavigate: _nav, onDeleteNode: _del, ...cleanData } = n.data || {};
-      return { ...n, data: cleanData };
-    });
-    useStore.getState().setCanvasNodes(cleanNodes);
+    useStore.getState().setCanvasNodes(nodes);
     useStore.getState().setCanvasEdges(edges);
   }, [nodes, edges]);
 
@@ -1111,7 +1086,7 @@ export default function ProjectCanvas() {
       const syncCluster = (categoryId, label, icon, color, posX, posY, items, mapFn) => {
         if (!items || items.length === 0) return;
 
-        // Ensure Category Node
+        // Ensure Category Hub Node
         if (!existingNodeIds.has(categoryId)) {
           newNodes.push({
             id: categoryId,
@@ -1135,7 +1110,7 @@ export default function ProjectCanvas() {
               id: nodeId,
               type: mapped.type,
               position: { x: posX + Math.cos(angle) * radius, y: posY + Math.sin(angle) * radius },
-              data: { ...mapped.data, onNavigate: handleNavigate, onDeleteNode: handleDeleteNode }
+              data: mapped.data
             });
             existingNodeIds.add(nodeId);
             newEdges.push({ id: `e-${categoryId}-${nodeId}`, source: categoryId, target: nodeId, style: { stroke: color, strokeWidth: 1.5, strokeDasharray: '4 4' } });
@@ -1148,9 +1123,7 @@ export default function ProjectCanvas() {
                 ...newNodes[nodeIndex],
                 data: {
                   ...newNodes[nodeIndex].data,
-                  ...mapped.data,
-                  onNavigate: handleNavigate,
-                  onDeleteNode: handleDeleteNode
+                  ...mapped.data
                 }
               };
             }
@@ -1243,17 +1216,17 @@ export default function ProjectCanvas() {
 
       return hasChanges ? newNodes : currentNodes;
     });
-  }, [store, handleNavigate, handleDeleteNode, setEdges, setNodes]);
+  }, [store, setEdges, setNodes]);
 
   // Quick Add Methods
   const addDocumentNote = () => {
-    const title = window.prompt("Titel des Dokuments (z.B. 'Research.md'):", "Neue Notiz.md");
+    const title = window.prompt("Document title (e.g. 'Research.md'):", "New Note.md");
     if (!title) return;
     const newFile = {
       id: Date.now(),
       name: title.endsWith('.md') ? title : `${title}.md`,
       folder: 'Inbox',
-      content: `# ${title.replace('.md', '')}\n\nErstellt im Canvas.`,
+      content: `# ${title.replace('.md', '')}\n\nCreated in Canvas.`,
       timestamp: Date.now()
     };
     useStore.getState().setEditorFiles(prev => [newFile, ...(prev || [])]);
@@ -1268,10 +1241,7 @@ export default function ProjectCanvas() {
         text: '',
         color: '#fef08a',
         fontSize: '0.9rem',
-        fontWeight: 'normal',
-        onChange: (id, val) => handlersRef.current.handleStickyChange?.(id, val),
-        onChangeStyle: (id, style) => handlersRef.current.handleStickyStyleChange?.(id, style),
-        onDelete: (id) => handlersRef.current.handleDeleteNode?.(id)
+        fontWeight: 'normal'
       },
       dragHandle: '.custom-drag-handle'
     };
