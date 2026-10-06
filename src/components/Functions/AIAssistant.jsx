@@ -4,7 +4,7 @@ import { useAI } from '../../hooks/useAI';
 import { useStore } from '../../store';
 import { SKILL_DEF } from '../../constants';
 import {
-    calculateLeistungszustand,
+    calculatePerformanceState,
     buildAgentHunterContext,
     buildMorningBriefingContext,
     buildRecipeAgentContext,
@@ -58,8 +58,8 @@ export default function AIAssistant() {
     const [model, setModel] = useState(aiSettings.model || 'gpt-4o-mini');
     const [endpoint, setEndpoint] = useState(aiSettings.endpoint || '');
 
-    // Real-time Leistungszustand calculation
-    const perf = calculateLeistungszustand(fullState);
+    // Real-time Performance State calculation
+    const perf = calculatePerformanceState(fullState);
 
     // Auto-scroll chat history
     useEffect(() => {
@@ -205,10 +205,10 @@ export default function AIAssistant() {
         return `
 System Context: You are Agent Hunter (A.H.), the executive Life Operating System work-agent and optimizer.
 You coordinate the 8 workflow pillars: Register/Profile -> Settings -> Habits/Goals/Targets/Expense -> Timetable/Skills/Workout/Journal.
-Your mission is to elevate the user's Leistungszustand towards 10.0 (100% Professional).
+Your mission is to elevate the user's Performance State towards 10.0 (100% Professional).
 --- USER BASELINE ---
 Name: ${state.profile?.username || 'Agent'}, Age: ${state.profile?.age || 'N/A'}, Weight: ${state.profile?.weight || 'N/A'}kg, Height: ${state.profile?.height || 'N/A'}cm, Education: ${state.profile?.education || 'N/A'}, Goal: ${state.profile?.fitnessGoal || 'Maintain'}, XP: ${state.profile?.xp || 0}
---- PERFORMANCE STATE (LEISTUNGSZUSTAND: 0..10) ---
+--- PERFORMANCE STATE (0..10) ---
 Current Index: ${perf.score} / 10.0 (${perf.overallPct}% - ${perf.tier})
 Active Goals: ${currentGoals}
 Recent Expenses: ${recentExpenses}
@@ -568,7 +568,7 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
                     </div>
                 </div>
 
-                {/* 2. Mini Leistungszustand Ribbon Strip */}
+                {/* 2. Mini Performance State Ribbon Strip */}
                 <div style={{
                     padding: '8px 18px',
                     background: 'rgba(0, 0, 0, 0.25)',
@@ -581,7 +581,7 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
                     gap: '10px'
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ color: 'var(--text-muted)' }}>Leistungszustand:</span>
+                        <span style={{ color: 'var(--text-muted)' }}>Performance State:</span>
                         <strong style={{ color: perf.tierColor, fontSize: '0.82rem' }}>{perf.score} / 10.0 ({perf.overallPct}%)</strong>
                         <span style={{ padding: '1px 6px', borderRadius: '3px', background: `${perf.tierColor}22`, color: perf.tierColor, fontSize: '0.68rem', fontWeight: 700 }}>
                             {perf.tier}
@@ -960,13 +960,13 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
                     </div>
                 )}
 
-                {/* TAB: LEISTUNGSZUSTAND STATS VIEW */}
+                {/* TAB: PERFORMANCE STATE STATS VIEW */}
                 {activeTab === 'stats' && (
                     <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div>
                                 <h3 style={{ margin: '0 0 4px 0', fontSize: '1.05rem', color: 'var(--text-main)' }}>
-                                    Leistungszustand Diagnostic Matrix [0..10]
+                                    Performance State Diagnostic Matrix [0..10]
                                 </h3>
                                 <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                                     Scale: 0 = Basics (0%) ➔ 10 = Professional (100%). Weighted telemetry across all life modules.
@@ -1042,7 +1042,7 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
                                 🗺️ Agent Hunter Blueprint
                             </h3>
                             <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                Register Baseline ➔ Settings ➔ System Quad ➔ Feedback Execution Engine ➔ Leistungszustand Algorithm.
+                                Register Baseline ➔ Settings ➔ System Quad ➔ Feedback Execution Engine ➔ Performance State Algorithm.
                             </p>
                         </div>
 
@@ -1076,7 +1076,7 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
                                 fontFamily: 'monospace',
                                 color: 'var(--primary)'
                             }}>
-                                def Leistungszustand(0, 10): Overall Score = {perf.score} / 10.0 ({perf.overallPct}%)
+                                def PerformanceState(0, 10): Overall Score = {perf.score} / 10.0 ({perf.overallPct}%)
                             </div>
                         </div>
                     </div>

@@ -1,16 +1,16 @@
 // src/services/aiAgentService.js
 // Autonomous Agent workflows for "Agent Hunter (A.H.)":
-// - Leistungszustand (Performance State Index: 0..10 / 0%..100%)
+// - Performance State Index (0..10 / 0%..100%)
 // - Full Multi-Module Orchestration (Profile -> Settings -> Habits/Goals/Targets/Expense -> Timetable/Skills/Workout/Journal)
 // - Morning Briefing, Smart Recipe & Grocery Agent, Voice STT/TTS
 
 import { SKILL_DEF } from '../constants';
 
 /**
- * Calculates the real-time "Leistungszustand" (Performance State Index: 0.0 - 10.0 / 0% - 100%)
+ * Calculates the real-time Performance State Index (0.0 - 10.0 / 0% - 100%)
  * based on the workflow blueprint for AI Agent Hunter (A.H.)
  */
-export const calculateLeistungszustand = (state) => {
+export const calculatePerformanceState = (state) => {
   if (!state) return { score: 5.0, overallPct: 50, tier: 'Basics', tierColor: '#f59e0b', breakdown: {} };
 
   const todayId = new Date().toISOString().split('T')[0];
@@ -127,13 +127,12 @@ export const calculateLeistungszustand = (state) => {
  */
 export const buildAgentHunterContext = (state, missionType = 'general') => {
   const profile = state.profile || {};
-  const perf = calculateLeistungszustand(state);
+  const perf = calculatePerformanceState(state);
   const currency = profile.currencySymbol || '€';
 
   const safeMap = (arr, fn) => Array.isArray(arr) ? arr.map(fn).filter(Boolean).join(', ') : 'None';
   const safeMapLines = (arr, fn) => Array.isArray(arr) ? arr.map(fn).filter(Boolean).join('\n') : 'None';
 
-  const habits = safeMap(state.customHabitTemplates || [], h => h?.name ? `${h.name} (${h.repeat || 'Daily'})` : null);
   const currentGoals = [...(Array.isArray(state.goals?.week) ? state.goals.week : []), ...(Array.isArray(state.goals?.month) ? state.goals.month : [])].map(g => `[${g.completed ? 'DONE' : 'OPEN'}] ${g?.text}`).filter(Boolean).join(', ') || 'None';
   const bigTargets = safeMap(state.targets || [], t => t?.title ? `${t.title} (${t.progress || 0}%)` : null);
   const recentWorkouts = safeMap((state.workouts || []).slice(-5), w => w?.name ? `${w.name} (${w.duration || w.date || ''})` : null);
@@ -191,7 +190,7 @@ Analyze vulnerabilities, emphasize strengths, and deliver clear "Hunter Directiv
  */
 export const buildMorningBriefingContext = (state, recentNews = []) => {
   const profile = state.profile || {};
-  const perf = calculateLeistungszustand(state);
+  const perf = calculatePerformanceState(state);
   const today = new Date();
   const dayNameEn = today.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const todayId = today.toISOString().split('T')[0];
@@ -209,21 +208,18 @@ export const buildMorningBriefingContext = (state, recentNews = []) => {
   const timetableToday = (state.timetableBlocks || []).filter(b => b.day === todayDayName || b.day === 'Daily');
   const timetableList = timetableToday.map(b => `${b.time || 'All Day'}: ${b.title} (${b.isReminder ? 'Reminder' : 'Timeblock'})`).join('\n') || 'No scheduled timeblocks for today';
 
-  // 3. Active Goals
-  const weekGoals = (state.goals?.week || []).map(g => `[${g.completed ? 'COMPLETED' : 'PENDING'}] ${g.text}`).join(', ') || 'None';
-
-  // 4. Finances
+  // 3. Finances
   const expenses = state.expenses || [];
   const todayExpenses = expenses.filter(e => e.date === todayId);
   const todaySpend = todayExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
   const dailyLimit = state.financeSettings?.limits?.daily || 50;
 
-  // 5. Fridge Status
+  // 4. Fridge Status
   const fridge = state.fridge || [];
   const inStockItems = fridge.filter(f => f.status === 'In stock').map(f => f.name).join(', ') || 'No items listed';
   const lowStockItems = fridge.filter(f => f.status === 'Not in stock').map(f => f.name).join(', ') || 'All stocked';
 
-  // 6. News Highlights (top 3)
+  // 5. News Highlights (top 3)
   const newsHighlights = recentNews.slice(0, 3).map(n => `- ${n.sourceName || 'News'}: ${n.title}`).join('\n') || 'Global feeds synchronized';
 
   const prompt = `

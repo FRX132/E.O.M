@@ -18,10 +18,10 @@ Try the interactive web showcase and documentation:
 
 ## ✨ Core Modules & Capabilities
 
-### 🤖 Agent Hunter (A.H.) & Leistungszustand Engine [0..10]
+### 🤖 Agent Hunter (A.H.) & Performance State Engine [0..10]
 An integrated autonomous intelligence work-agent coordinating your entire Life OS workspace:
 - **Handwritten Blueprint Architecture**: Seamlessly links **Register Baseline** (Age, Weight, Height, Education) ➔ **Settings** ➔ **System Quad** (Expense, Targets, Goals, Habits) ➔ **Execution Feedback Loop** (Tracker, Workout Hub ➔ Journal, Timetable, Skill Tree).
-- **Algorithmic Leistungszustand Index [0..10]**: Real-time performance calculation from `0 = Basics (0%)` to `10 = Professional (100%)` across all 7 life pillars.
+- **Algorithmic Performance State Index [0..10]**: Real-time performance calculation from `0 = Basics (0%)` to `10 = Professional (100%)` across all 7 life pillars.
 - **Tages-Jagd & Autonomous Hunter Quests**: Identifies life bottlenecks and prescribes 3 immediate high-impact directives.
 - **Daily Executive Morning Briefing**: Synthesizes habits, timetable blocks, budget radar, fridge meal inventory, and global RSS news into a motivational morning kickoff.
 - **Smart Kitchen & Restock Agent**: Analyzes in-stock ingredients and invents targeted fitness meals with 1-click grocery restock.

@@ -16,6 +16,7 @@ import {
 import '@xyflow/react/dist/style.css';
 import { useStore } from '../../store';
 import MarkdownViewer from './MarkdownViewer';
+import { buildDefaultLayout, syncLayoutWithStore } from './canvasClusters';
 
 // ---------------------------------------------------------------------------
 // CUSTOM NODE: Category Hub (Central or Module Hubs)
@@ -871,184 +872,10 @@ export default function ProjectCanvas() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Comprehensive OS Solar Constellation Layout Generator
-  const generateDefaultLayout = useCallback(() => {
-    const nodes = [];
-    const edges = [];
+  // Default "solar constellation" layout built from all OS modules (see canvasClusters.js)
+  const generateDefaultLayout = useCallback(() => buildDefaultLayout(store), [store]);
 
-    // Central Core
-    nodes.push({
-      id: 'root',
-      type: 'category',
-      position: { x: 0, y: 0 },
-      data: { label: 'Life Planner OS', icon: '🌌', color: '#ffffff' }
-    });
-
-    const createCategoryCluster = (categoryId, label, icon, color, posX, posY, items, mapItemFn) => {
-      if (!items || items.length === 0) return;
-
-      // Add Category Hub Node
-      nodes.push({
-        id: categoryId,
-        type: 'category',
-        position: { x: posX, y: posY },
-        data: { label, icon, color, count: items.length }
-      });
-
-      // Connect to Core Root
-      edges.push({
-        id: `e-root-${categoryId}`,
-        source: 'root',
-        target: categoryId,
-        animated: true,
-        style: { stroke: color, strokeWidth: 2 }
-      });
-
-      // Arrange items in orbit around category hub
-      const radius = Math.max(340, Math.min(650, items.length * 60));
-      const angleStep = (2 * Math.PI) / items.length;
-
-      items.forEach((item, index) => {
-        const angle = index * angleStep - Math.PI / 2;
-        const itemX = posX + Math.cos(angle) * radius;
-        const itemY = posY + Math.sin(angle) * radius;
-        const mapped = mapItemFn(item, index);
-        const nodeId = mapped.id || `${categoryId}-${index}`;
-
-        nodes.push({
-          id: nodeId,
-          type: mapped.type || 'media',
-          position: { x: itemX, y: itemY },
-          data: mapped.data
-        });
-
-        edges.push({
-          id: `e-${categoryId}-${nodeId}`,
-          source: categoryId,
-          target: nodeId,
-          style: { stroke: color, strokeWidth: 1.5, strokeDasharray: '4 4' }
-        });
-      });
-    };
-
-    // 1. 📄 DOCUMENTS (Editor Markdown Notes)
-    createCategoryCluster('documents', 'DOCUMENTS', '📄', '#38bdf8', 0, -850, store.editorFiles || [], (f) => ({
-      id: `doc-${f.id}`,
-      type: 'document',
-      data: { id: f.id, name: f.name, folder: f.folder, content: f.content, timestamp: f.timestamp }
-    }));
-
-    // 2. 🎯 TARGETS & GOALS
-    const allGoalsList = [
-      ...(store.targets || []).map(t => ({ ...t, isTarget: true, title: t.title, progress: t.progress || 0 })),
-      ...(store.goals?.year || []).map(g => ({ ...g, isTarget: false, title: g.text, category: 'Year Goal' })),
-      ...(store.goals?.month || []).map(g => ({ ...g, isTarget: false, title: g.text, category: 'Month Goal' })),
-      ...(store.goals?.week || []).map(g => ({ ...g, isTarget: false, title: g.text, category: 'Week Goal' }))
-    ];
-    createCategoryCluster('targets', 'TARGETS & GOALS', '🎯', '#10b981', 850, -550, allGoalsList, (g, i) => ({
-      id: `target-${g.id || i}`,
-      type: 'targetGoal',
-      data: { title: g.title, progress: g.progress, isTarget: g.isTarget, completed: g.completed, category: g.category, deadline: g.deadline }
-    }));
-
-    // 3. ⚡ HABITS & ROUTINES
-    const habitList = store.customHabitTemplates || [];
-    createCategoryCluster('habits', 'HABITS', '⚡', '#a855f7', -850, -550, habitList, (h, i) => ({
-      id: `habit-${h.id || i}`,
-      type: 'habit',
-      data: { title: h.name, repeat: h.repeat, category: h.category }
-    }));
-
-    // 4. 🏋️ WORKOUTS & FITNESS
-    createCategoryCluster('workouts', 'WORKOUTS', '🏋️', '#f43f5e', -950, 200, store.workouts || [], (w, i) => ({
-      id: `workout-${w.id || i}`,
-      type: 'workout',
-      data: { title: w.name || 'Workout', date: w.date, duration: w.duration, exercisesCount: w.exercises?.length }
-    }));
-
-    // 5. 📔 JOURNAL & MINDSET
-    createCategoryCluster('journal', 'JOURNAL', '📔', '#6366f1', -550, 850, store.journal || [], (j, i) => ({
-      id: `journal-${j.id || i}`,
-      type: 'journal',
-      data: { title: j.title || 'Entry', date: j.date, mood: j.mood, excerpt: j.content?.slice(0, 80) }
-    }));
-
-    // 6. 💰 EXPENSES & FINANCE
-    createCategoryCluster('finance', 'FINANCES', '💰', '#f59e0b', 550, 850, (store.expenses || []).slice(-15), (e, i) => ({
-      id: `expense-${e.id || i}`,
-      type: 'finance',
-      data: { title: e.note || e.category, amount: `${e.amount} ${store.profile?.currencySymbol || '€'}`, category: e.category, date: e.date }
-    }));
-
-    // 7. 📚 LIBRARY (Books)
-    createCategoryCluster('books', 'LIBRARY', '📚', '#ec4899', 950, 200, store.books || [], (b, i) => ({
-      id: `book-${b.id || i}`,
-      type: 'media',
-      data: {
-        title: b.title,
-        subtitle: b.subtitle,
-        img: b.img,
-        color: '#ec4899',
-        icon: '📖',
-        badge: `${b.rating || 5} ★`,
-        tags: [b.status].filter(Boolean),
-        targetRoute: '/books'
-      }
-    }));
-
-    // 8. 🎬 CINEMA (Movies)
-    createCategoryCluster('movies', 'CINEMA', '🎬', '#8b5cf6', 850, 600, store.movies || [], (m, i) => ({
-      id: `movie-${m.id || i}`,
-      type: 'media',
-      data: {
-        title: m.title,
-        subtitle: m.genre,
-        img: m.poster,
-        color: '#8b5cf6',
-        icon: '🎬',
-        badge: m.status || 'Watched',
-        tags: [m.rating ? `${m.rating} ★` : null].filter(Boolean),
-        targetRoute: '/movies'
-      }
-    }));
-
-    // 9. ✈️ TRIPS & TRAVEL
-    createCategoryCluster('trips', 'TRIP MODE', '✈️', '#06b6d4', -850, 600, store.trips || [], (t, i) => ({
-      id: `trip-${t.id || i}`,
-      type: 'media',
-      data: {
-        title: t.location,
-        subtitle: t.date ? new Date(t.date).toLocaleDateString() : '',
-        color: '#06b6d4',
-        icon: '✈️',
-        badge: t.type || 'Trip',
-        tags: [t.resolvedCountry].filter(Boolean),
-        targetRoute: '/trips'
-      }
-    }));
-
-    // 10. 🛡️ SKILLS & QUESTS
-    const skillList = [
-      ...(store.skills || []).map(s => ({ title: s.toUpperCase(), isQuest: false })),
-      ...(store.activeQuests || []).map(q => ({ title: q.skillId?.replace(/-/g, ' ').toUpperCase(), subtitle: `Progress: ${q.progress}/${q.total}`, isQuest: true }))
-    ];
-    createCategoryCluster('skills', 'SKILL TREE', '🛡️', '#3b82f6', -450, -850, skillList, (s, i) => ({
-      id: `skill-${i}`,
-      type: 'skillQuest',
-      data: { title: s.title, subtitle: s.subtitle, isQuest: s.isQuest }
-    }));
-
-    // 11. 📅 TIMETABLE
-    createCategoryCluster('timetable', 'TIMETABLE', '📅', '#14b8a6', 450, -850, store.timetableBlocks || [], (tb, i) => ({
-      id: `tb-${tb.id || i}`,
-      type: 'timetable',
-      data: { title: tb.title || tb.activity, day: tb.day, time: `${tb.startTime || ''} - ${tb.endTime || ''}` }
-    }));
-
-    return { nodes, edges };
-  }, [store]);
-
-  // Initial Data
+  // Restore the saved canvas if present, otherwise start from the default layout
   const initialData = useMemo(() => {
     if (store.canvasNodes && store.canvasNodes.length > 0) {
       return { nodes: store.canvasNodes, edges: store.canvasEdges || [] };
@@ -1074,147 +901,19 @@ export default function ProjectCanvas() {
 
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
-  // REAL-TIME AUTO-SYNCHRONIZATION FOR ALL OS MODULES
+  // Keep the canvas in sync with module data (new documents, habits, workouts, ...)
   useEffect(() => {
     setNodes((currentNodes) => {
-      const existingNodeIds = new Set(currentNodes.map(n => n.id));
-      let hasChanges = false;
-      const newNodes = [...currentNodes];
-      const newEdges = [];
-
-      // Helper to check and inject missing element
-      const syncCluster = (categoryId, label, icon, color, posX, posY, items, mapFn) => {
-        if (!items || items.length === 0) return;
-
-        // Ensure Category Hub Node
-        if (!existingNodeIds.has(categoryId)) {
-          newNodes.push({
-            id: categoryId,
-            type: 'category',
-            position: { x: posX, y: posY },
-            data: { label, icon, color, count: items.length }
-          });
-          existingNodeIds.add(categoryId);
-          newEdges.push({ id: `e-root-${categoryId}`, source: 'root', target: categoryId, animated: true, style: { stroke: color, strokeWidth: 2 } });
-          hasChanges = true;
-        }
-
-        items.forEach((item, idx) => {
-          const mapped = mapFn(item, idx);
-          const nodeId = mapped.id || `${categoryId}-${idx}`;
-
-          if (!existingNodeIds.has(nodeId)) {
-            const angle = (idx / Math.max(1, items.length)) * Math.PI * 2 - Math.PI / 2;
-            const radius = Math.max(340, Math.min(650, items.length * 60));
-            newNodes.push({
-              id: nodeId,
-              type: mapped.type,
-              position: { x: posX + Math.cos(angle) * radius, y: posY + Math.sin(angle) * radius },
-              data: mapped.data
-            });
-            existingNodeIds.add(nodeId);
-            newEdges.push({ id: `e-${categoryId}-${nodeId}`, source: categoryId, target: nodeId, style: { stroke: color, strokeWidth: 1.5, strokeDasharray: '4 4' } });
-            hasChanges = true;
-          } else {
-            // Keep content and details updated
-            const nodeIndex = newNodes.findIndex(n => n.id === nodeId);
-            if (nodeIndex !== -1) {
-              newNodes[nodeIndex] = {
-                ...newNodes[nodeIndex],
-                data: {
-                  ...newNodes[nodeIndex].data,
-                  ...mapped.data
-                }
-              };
-            }
-          }
-        });
-      };
-
-      // 1. Documents
-      syncCluster('documents', 'DOCUMENTS', '📄', '#38bdf8', 0, -850, store.editorFiles || [], (f) => ({
-        id: `doc-${f.id}`,
-        type: 'document',
-        data: { id: f.id, name: f.name, folder: f.folder, content: f.content, timestamp: f.timestamp }
-      }));
-
-      // 2. Targets & Goals
-      const allGoalsList = [
-        ...(store.targets || []).map(t => ({ ...t, isTarget: true, title: t.title, progress: t.progress || 0 })),
-        ...(store.goals?.year || []).map(g => ({ ...g, isTarget: false, title: g.text, category: 'Year Goal' })),
-        ...(store.goals?.month || []).map(g => ({ ...g, isTarget: false, title: g.text, category: 'Month Goal' })),
-        ...(store.goals?.week || []).map(g => ({ ...g, isTarget: false, title: g.text, category: 'Week Goal' }))
-      ];
-      syncCluster('targets', 'TARGETS & GOALS', '🎯', '#10b981', 850, -550, allGoalsList, (g, i) => ({
-        id: `target-${g.id || i}`,
-        type: 'targetGoal',
-        data: { title: g.title, progress: g.progress, isTarget: g.isTarget, completed: g.completed, category: g.category, deadline: g.deadline }
-      }));
-
-      // 3. Habits
-      syncCluster('habits', 'HABITS', '⚡', '#a855f7', -850, -550, store.customHabitTemplates || [], (h, i) => ({
-        id: `habit-${h.id || i}`,
-        type: 'habit',
-        data: { title: h.name, repeat: h.repeat, category: h.category }
-      }));
-
-      // 4. Workouts
-      syncCluster('workouts', 'WORKOUTS', '🏋️', '#f43f5e', -950, 200, store.workouts || [], (w, i) => ({
-        id: `workout-${w.id || i}`,
-        type: 'workout',
-        data: { title: w.name || 'Workout', date: w.date, duration: w.duration, exercisesCount: w.exercises?.length }
-      }));
-
-      // 5. Journal
-      syncCluster('journal', 'JOURNAL', '📔', '#6366f1', -550, 850, store.journal || [], (j, i) => ({
-        id: `journal-${j.id || i}`,
-        type: 'journal',
-        data: { title: j.title || 'Entry', date: j.date, mood: j.mood, excerpt: j.content?.slice(0, 80) }
-      }));
-
-      // 6. Finances
-      syncCluster('finance', 'FINANCES', '💰', '#f59e0b', 550, 850, (store.expenses || []).slice(-15), (e, i) => ({
-        id: `expense-${e.id || i}`,
-        type: 'finance',
-        data: { title: e.note || e.category, amount: `${e.amount} ${store.profile?.currencySymbol || '€'}`, category: e.category, date: e.date }
-      }));
-
-      // 7. Books
-      syncCluster('books', 'LIBRARY', '📚', '#ec4899', 950, 200, store.books || [], (b, i) => ({
-        id: `book-${b.id || i}`,
-        type: 'media',
-        data: { title: b.title, subtitle: b.subtitle, img: b.img, color: '#ec4899', icon: '📖', badge: `${b.rating || 5} ★`, tags: [b.status].filter(Boolean), targetRoute: '/books' }
-      }));
-
-      // 8. Movies
-      syncCluster('movies', 'CINEMA', '🎬', '#8b5cf6', 850, 600, store.movies || [], (m, i) => ({
-        id: `movie-${m.id || i}`,
-        type: 'media',
-        data: { title: m.title, subtitle: m.genre, img: m.poster, color: '#8b5cf6', icon: '🎬', badge: m.status || 'Watched', tags: [m.rating ? `${m.rating} ★` : null].filter(Boolean), targetRoute: '/movies' }
-      }));
-
-      // 9. Trips
-      syncCluster('trips', 'TRIP MODE', '✈️', '#06b6d4', -850, 600, store.trips || [], (t, i) => ({
-        id: `trip-${t.id || i}`,
-        type: 'media',
-        data: { title: t.location, subtitle: t.date ? new Date(t.date).toLocaleDateString() : '', color: '#06b6d4', icon: '✈️', badge: t.type || 'Trip', tags: [t.resolvedCountry].filter(Boolean), targetRoute: '/trips' }
-      }));
-
-      // 10. Timetable
-      syncCluster('timetable', 'TIMETABLE', '📅', '#14b8a6', 450, -850, store.timetableBlocks || [], (tb, i) => ({
-        id: `tb-${tb.id || i}`,
-        type: 'timetable',
-        data: { title: tb.title || tb.activity, day: tb.day, time: `${tb.startTime || ''} - ${tb.endTime || ''}` }
-      }));
+      const { nodes: syncedNodes, newEdges } = syncLayoutWithStore(currentNodes, store);
 
       if (newEdges.length > 0) {
-        setEdges(eds => {
-          const edgeSet = new Set(eds.map(e => e.id));
-          return [...eds, ...newEdges.filter(e => !edgeSet.has(e.id))];
+        setEdges((eds) => {
+          const existingEdgeIds = new Set(eds.map(e => e.id));
+          return [...eds, ...newEdges.filter(e => !existingEdgeIds.has(e.id))];
         });
       }
 
-      return hasChanges ? newNodes : currentNodes;
+      return syncedNodes;
     });
   }, [store, setEdges, setNodes]);
 
