@@ -550,7 +550,7 @@ function App() {
 
 
 
-        <div className="view-transition" style={{ paddingTop: '40px' }}>
+        <div className="view-transition" style={{ paddingTop: '10px' }}>
           <Routes>
             <Route path="/" element={<Overview navigate={navigate} />} />
             <Route path="/overview" element={<Overview navigate={navigate} />} />

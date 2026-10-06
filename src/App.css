@@ -158,9 +158,10 @@
 
 .dashboard-content {
   flex: 1;
-  padding: 40px var(--content-padding, 40px);
+  padding: 16px var(--content-padding, 24px);
   overflow-y: auto;
   min-height: 100vh;
+  min-height: 100dvh;
   transition: padding 0.3s ease;
 }
 

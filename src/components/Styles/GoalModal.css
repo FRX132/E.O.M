@@ -14,18 +14,19 @@
 
 .mac-modal {
   width: 480px;
-  max-width: 90vw;
+  max-width: 92vw;
+  max-height: min(90vh, 90dvh);
   min-width: min(320px, 95vw);
-  min-height: 200px;
   background: var(--bg-card);
   border-radius: 12px;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   box-shadow: var(--shadow-float);
   color: var(--text-main);
   font-family: var(--font-main);
   border: 1px solid var(--border-color);
   animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  resize: both;
 }
 
 @keyframes modalFadeIn {
@@ -34,7 +35,7 @@
 }
 
 .mac-modal-header {
-  padding: 16px 20px;
+  padding: 14px 20px;
   font-size: 1rem;
   font-weight: 600;
   border-bottom: 1px solid var(--border-color);
@@ -43,12 +44,14 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
-.mac-modal-content {
+.mac-modal-content, .mac-modal-form {
   padding: 0;
-  max-height: 70vh;
+  max-height: calc(90vh - 125px);
   overflow-y: auto;
+  flex: 1;
 }
 
 .mac-input-group {
@@ -155,9 +158,10 @@ input:checked + .mac-slider:before {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding: 16px 20px;
+  padding: 14px 20px;
   background: var(--bg-card);
   border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 .mac-btn {
