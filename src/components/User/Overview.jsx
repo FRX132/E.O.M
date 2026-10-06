@@ -26,14 +26,17 @@ export default function Overview({ navigate }) {
   const overviewSettings = useStore(state => state.overviewSettings);
   const setOverviewSettings = useStore(state => state.setOverviewSettings);
 
-  // Reminders Integration States
+  // Reminders & Habits Integration States
   const timetableBlocks = useStore(state => state.timetableBlocks || []);
   const setTimetableBlocks = useStore(state => state.setTimetableBlocks);
   const habitsDays = useStore(state => state.habits || []);
   const setHabitsDays = useStore(state => state.setHabits);
+  const customHabitTemplates = useStore(state => state.customHabitTemplates || []);
   const addXP = useStore(state => state.addXP);
+  const updateQuestProgress = useStore(state => state.updateQuestProgress);
   const [newReminderTitle, setNewReminderTitle] = useState('');
   const [overviewNews, setOverviewNews] = useState([]);
+  const [selectedHabitPreview, setSelectedHabitPreview] = useState(null);
 
   useEffect(() => {
     fetchAllNewsArticles().then(items => {
@@ -101,13 +104,62 @@ export default function Overview({ navigate }) {
   }, []);
 
   // Calculate habit progress for today
-  const todayHabitsList = habits[0]?.habits || [];
-  const completedToday = todayHabitsList.filter(h => h.done).length;
+  const todayDateStr = new Date().toISOString().split('T')[0];
+  const todayHabitDay = habitsDays.find(d => d.id === todayDateStr) || habitsDays[0];
+  const todayHabitsList = todayHabitDay?.habits || [];
+  const completedToday = todayHabitsList.filter(h => h && h.done).length;
   const habitXpEarned = completedToday * 50;
   const habitXpMax = todayHabitsList.length * 50;
   const habitProgress = todayHabitsList.length > 0
     ? Math.round((completedToday / todayHabitsList.length) * 100)
     : 0;
+
+  const calcHabitStreak = (habitId) => {
+    const sorted = [...habitsDays].sort((a, b) => b.id.localeCompare(a.id));
+    let streak = 0;
+    for (const day of sorted) {
+      const habit = (day.habits || []).find(h => h.id === habitId);
+      if (habit?.done) streak++;
+      else break;
+    }
+    return streak;
+  };
+
+  const handleDirectHabitToggle = (habitId) => {
+    if (!todayHabitDay) return;
+    const dateStr = todayHabitDay.id;
+
+    if (habitId.startsWith('quest-')) {
+      const skillId = habitId.replace('quest-', '');
+      const isAlreadyDone = (todayHabitDay.completedQuests || []).includes(skillId);
+      if (isAlreadyDone) return;
+
+      if (updateQuestProgress) updateQuestProgress(skillId);
+      addXP(100);
+      const updatedDays = habitsDays.map(d => {
+        if (d.id !== dateStr) return d;
+        const currentCompleted = d.completedQuests || [];
+        return { ...d, completedQuests: [...currentCompleted, skillId] };
+      });
+      setHabitsDays(updatedDays);
+      return;
+    }
+
+    const habit = todayHabitsList.find(h => h.id === habitId);
+    if (!habit) return;
+
+    const points = habit.done ? -50 : 50;
+    addXP(points);
+
+    const updatedDays = habitsDays.map(day => {
+      if (day.id !== dateStr) return day;
+      return {
+        ...day,
+        habits: day.habits.map(h => h.id === habitId ? { ...h, done: !h.done } : h)
+      };
+    });
+    setHabitsDays(updatedDays);
+  };
 
   // Calculate monthly expenses
   const monthlyTotal = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
@@ -542,30 +594,84 @@ export default function Overview({ navigate }) {
       <div className="overview-grid">
         {settings.visibleWidgets?.habits !== false && (
           <div className="overview-card habit-card">
-            <div className="card-header">
-              <span className="card-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-list" viewBox="0 0 16 16">
-                  <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
-                </svg>
-              </span>
-              <h3>{settings.widgetTitles?.habits || "Daily Habits"}</h3>
-            </div>
-            <div className="card-content" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <div className="progress-circle-wrapper">
-                <div className="progress-circle-container">
-                  <div className="progress-circle" style={{ '--progress': `${habitProgress}%` }}>
-                    <div className="progress-inner">
-                      <span className="xp-value">{habitXpEarned}</span>
-                      <span className="xp-label">XP EARNED</span>
-                    </div>
+            <div className="card-header" style={{ justifyContent: 'space-between', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span className="card-icon" style={{ color: 'var(--purple-text)' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-check2-circle" viewBox="0 0 16 16">
+                    <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0"/>
+                    <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+                  </svg>
+                </span>
+                <div>
+                  <h3 style={{ margin: 0 }}>{settings.widgetTitles?.habits || "Daily Habits"}</h3>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    {completedToday} of {todayHabitsList.length} completed • +{habitXpEarned} XP
                   </div>
                 </div>
               </div>
-              <div style={{ marginTop: 'auto', textAlign: 'center' }}>
-                <span className="stat-label">{completedToday} of {todayHabitsList.length} habits completed</span>
+              <div style={{
+                background: 'rgba(168, 85, 247, 0.12)',
+                border: '1px solid rgba(168, 85, 247, 0.3)',
+                borderRadius: '8px',
+                padding: '4px 10px',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                color: 'var(--purple-text)'
+              }}>
+                {habitProgress}%
               </div>
             </div>
-            <button className="card-action" onClick={() => navigate('/habits')}>View Tracker</button>
+
+            <div className="habit-widget-content">
+              <div className="habit-progress-bar-bg">
+                <div className="habit-progress-bar-fill" style={{ width: `${habitProgress}%` }}></div>
+              </div>
+
+              <ul className="habit-tasks-list">
+                {todayHabitsList.map(habit => {
+                  const isDone = !!habit.done;
+                  const streak = calcHabitStreak(habit.id);
+                  const isQuest = habit.id.startsWith('quest-');
+
+                  return (
+                    <li
+                      key={habit.id}
+                      className={`habit-task-item ${isDone ? 'is-completed' : ''}`}
+                      onClick={() => setSelectedHabitPreview(habit)}
+                      title="Click to view habit details & description"
+                    >
+                      <input
+                        type="checkbox"
+                        className="habit-task-checkbox"
+                        checked={isDone}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDirectHabitToggle(habit.id);
+                        }}
+                        onChange={() => {}}
+                      />
+                      <span className="habit-task-name" title={habit.name}>
+                        {habit.name}
+                      </span>
+                      {streak > 0 && (
+                        <span className={`habit-task-streak ${streak >= 3 ? 'hot' : 'normal'}`}>
+                          {streak >= 3 ? '🔥 ' : ''}{streak}d
+                        </span>
+                      )}
+                      <span className={`habit-task-xp ${isDone ? 'earned' : 'pending'}`}>
+                        {isQuest ? '+100 XP' : '+50 XP'}
+                      </span>
+                    </li>
+                  );
+                })}
+                {todayHabitsList.length === 0 && (
+                  <li className="empty-msg" style={{ padding: '20px 0' }}>
+                    No habits scheduled for today.
+                  </li>
+                )}
+              </ul>
+            </div>
+            <button className="card-action" onClick={() => navigate('/habits')}>Open Habit Tracker</button>
           </div>
         )}
 
@@ -1096,6 +1202,188 @@ export default function Overview({ navigate }) {
           </div>
         </div>
       )}
+
+      {/* Habit Preview & Description Modal Overlay */}
+      {selectedHabitPreview && (() => {
+        const liveHabit = todayHabitsList.find(h => h.id === selectedHabitPreview.id) || selectedHabitPreview;
+        const template = customHabitTemplates.find(t => t.id === selectedHabitPreview.id);
+        const skillDef = SKILL_DEF.find(s => s.id === selectedHabitPreview.id || s.habit === selectedHabitPreview.name || selectedHabitPreview.id === `quest-${s.id}`);
+        const isDone = !!liveHabit.done;
+        const isQuest = selectedHabitPreview.id?.startsWith('quest-');
+        const streak = calcHabitStreak(selectedHabitPreview.id);
+        const description = selectedHabitPreview.notes || template?.notes || skillDef?.quest || (isQuest ? `Daily Quest task to unlock ${skillDef?.name || 'Skill'}. Complete this routine to build mastery.` : 'Daily discipline habit to build consistency and elevate performance state.');
+
+        return (
+          <div
+            className="mac-modal-overlay"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              background: 'rgba(0, 0, 0, 0.75)',
+              backdropFilter: 'blur(10px)',
+              zIndex: 10000,
+              padding: '20px'
+            }}
+            onClick={() => setSelectedHabitPreview(null)}
+          >
+            <div
+              className="mac-modal"
+              style={{
+                width: '480px',
+                maxWidth: '92vw',
+                background: 'var(--bg-card)',
+                borderRadius: '16px',
+                border: isDone ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid var(--border-color)',
+                boxShadow: 'var(--shadow-lg)',
+                overflow: 'hidden'
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div style={{
+                padding: '18px 24px',
+                borderBottom: '1px solid var(--border-color)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                background: 'var(--bg-card-alt)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{ fontSize: '1.5rem' }}>{skillDef?.icon || '✨'}</span>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.15rem', color: 'var(--text-main)', fontWeight: 700 }}>
+                      {liveHabit.name}
+                    </h3>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                      {skillDef?.category || (template?.repeat ? `${template.repeat} Habit` : 'Daily Routine')}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedHabitPreview(null)}
+                  style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.3rem', cursor: 'pointer', lineHeight: 1 }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Body */}
+              <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                {/* Stats Bar */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border-light)', textAlign: 'center' }}>
+                    <div style={{ fontSize: '1.3rem', fontWeight: 800, color: streak >= 3 ? '#f97316' : 'var(--text-main)' }}>
+                      {streak >= 3 ? '🔥 ' : ''}{streak} {streak === 1 ? 'Day' : 'Days'}
+                    </div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '3px' }}>Current Streak</div>
+                  </div>
+
+                  <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border-light)', textAlign: 'center' }}>
+                    <div style={{ fontSize: '1.3rem', fontWeight: 800, color: isDone ? 'var(--green-text)' : 'var(--purple-text)' }}>
+                      {isDone ? 'Completed' : (isQuest ? '+100 XP' : '+50 XP')}
+                    </div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '3px' }}>
+                      {isDone ? 'Earned' : 'Status'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description & Notes Section */}
+                <div>
+                  <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-muted)', fontWeight: 700, marginBottom: '8px' }}>
+                    Description & Instructions
+                  </div>
+                  <div style={{
+                    background: 'var(--bg-card-alt)',
+                    border: '1px solid var(--border-light)',
+                    borderRadius: '10px',
+                    padding: '14px',
+                    fontSize: '0.88rem',
+                    lineHeight: '1.55',
+                    color: 'var(--text-main)',
+                    whiteSpace: 'pre-wrap'
+                  }}>
+                    {description}
+                  </div>
+                </div>
+
+                {/* Habit Metadata Tags */}
+                {(template?.repeat || template?.streakGoal || skillDef?.xpReq !== undefined) && (
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {template?.repeat && (
+                      <span style={{ fontSize: '0.75rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-light)', padding: '4px 10px', borderRadius: '6px', color: 'var(--text-muted)' }}>
+                        🔄 Frequency: {template.repeat}
+                      </span>
+                    )}
+                    {template?.streakGoal && (
+                      <span style={{ fontSize: '0.75rem', background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.25)', padding: '4px 10px', borderRadius: '6px', color: '#eab308' }}>
+                        🎯 Goal: {template.streakGoal} Days
+                      </span>
+                    )}
+                    {skillDef?.xpReq !== undefined && (
+                      <span style={{ fontSize: '0.75rem', background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '4px 10px', borderRadius: '6px', color: 'var(--purple-text)' }}>
+                        ⚡ Qualification: {skillDef.xpReq} XP
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div style={{
+                padding: '16px 24px',
+                borderTop: '1px solid var(--border-color)',
+                background: 'var(--bg-card-alt)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                gap: '12px'
+              }}>
+                <button
+                  onClick={() => {
+                    setSelectedHabitPreview(null);
+                    navigate('/habits');
+                  }}
+                  style={{
+                    background: 'none',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '8px',
+                    color: 'var(--text-main)',
+                    padding: '8px 16px',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Open in Tracker ➔
+                </button>
+
+                <button
+                  onClick={() => handleDirectHabitToggle(liveHabit.id)}
+                  style={{
+                    background: isDone ? 'rgba(239, 68, 68, 0.15)' : 'var(--primary)',
+                    border: isDone ? '1px solid rgba(239, 68, 68, 0.4)' : 'none',
+                    color: isDone ? 'var(--red-text)' : '#fff',
+                    borderRadius: '8px',
+                    padding: '8px 18px',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {isDone ? 'Mark as Incomplete' : '✓ Mark as Completed (+50 XP)'}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
