@@ -754,10 +754,10 @@ export default function Timetable() {
           <div className="timetable-modal-content mac-confirm-dialog" onClick={e => e.stopPropagation()}>
             <div style={{ padding: '20px', textAlign: 'center' }}>
               <h3 className="mac-confirm-title">
-                Wiederkehrende Aufgabe löschen
+                Delete Recurring Task
               </h3>
               <p className="mac-confirm-text">
-                Möchtest du nur diese einzelne Aufgabe oder alle wiederkehrenden Aufgaben dieser Serie löschen?
+                Do you want to delete only this single occurrence or all recurring tasks in this series?
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <button
@@ -768,7 +768,7 @@ export default function Timetable() {
                     setDeleteConfirmation(null);
                   }}
                 >
-                  Alle Vorkommen löschen
+                  Delete All Occurrences
                 </button>
                 <button
                   type="button"
@@ -778,14 +778,14 @@ export default function Timetable() {
                     setDeleteConfirmation(null);
                   }}
                 >
-                  Nur dieses Vorkommen löschen
+                  Delete Only This Occurrence
                 </button>
                 <button
                   type="button"
                   className="mac-btn-confirm-choice text"
                   onClick={() => setDeleteConfirmation(null)}
                 >
-                  Abbrechen
+                  Cancel
                 </button>
               </div>
             </div>
@@ -799,10 +799,10 @@ export default function Timetable() {
           <div className="timetable-modal-content mac-confirm-dialog" onClick={e => e.stopPropagation()}>
             <div style={{ padding: '20px', textAlign: 'center' }}>
               <h3 className="mac-confirm-title">
-                Wiederkehrende Aufgabe bearbeiten
+                Edit Recurring Task
               </h3>
               <p className="mac-confirm-text">
-                Möchtest du nur diese einzelne Aufgabe oder alle wiederkehrenden Aufgaben dieser Serie ändern?
+                Do you want to apply changes to only this task or all recurring tasks in this series?
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <button
@@ -810,21 +810,21 @@ export default function Timetable() {
                   className="mac-btn-confirm-choice primary"
                   onClick={handleConfirmEditAll}
                 >
-                  Alle Vorkommen ändern
+                  Change All Occurrences
                 </button>
                 <button
                   type="button"
                   className="mac-btn-confirm-choice secondary"
                   onClick={handleConfirmEditOnlyThis}
                 >
-                  Nur dieses Vorkommen ändern
+                  Change Only This Occurrence
                 </button>
                 <button
                   type="button"
                   className="mac-btn-confirm-choice text"
                   onClick={handleCancelEditConfirmation}
                 >
-                  Abbrechen
+                  Cancel
                 </button>
               </div>
             </div>

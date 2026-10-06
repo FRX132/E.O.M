@@ -24,13 +24,13 @@ const FOREX_PAIRS = [
   { symbol: 'EUR/JPY', pipSize: 0.01, typicalSpread: 1.6 },
   { symbol: 'GBP/JPY', pipSize: 0.01, typicalSpread: 2.0 },
   { symbol: 'NZD/USD', pipSize: 0.0001, typicalSpread: 1.6 },
-  // Metalle (Gold, Silber)
+  // Metals (Gold, Silver)
   { symbol: 'XAU/USD (Gold)', pipSize: 0.1, typicalSpread: 2.5 },
   { symbol: 'XAG/USD (Silver)', pipSize: 0.01, typicalSpread: 3.0 },
-  // Öl
+  // Commodities / Oil
   { symbol: 'WTI/USD (Crude Oil)', pipSize: 0.01, typicalSpread: 3.0 },
   { symbol: 'BRENT/USD (Brent Oil)', pipSize: 0.01, typicalSpread: 3.0 },
-  // Krypto
+  // Crypto
   { symbol: 'BTC/USD (Bitcoin)', pipSize: 1.0, typicalSpread: 15.0 },
   { symbol: 'ETH/USD (Ethereum)', pipSize: 1.0, typicalSpread: 1.5 },
 ];
@@ -494,13 +494,13 @@ function TradeImportModal({ isOpen, onClose, currency }) {
         
         <div className="import-steps">
           <div className={`import-step-item ${step === 1 ? 'active' : ''} ${step > 1 ? 'completed' : ''}`}>
-            <span>1. Datei auswählen {step > 1 ? '✓' : ''}</span>
+            <span>1. Select File {step > 1 ? '✓' : ''}</span>
           </div>
           <div className={`import-step-item ${step === 2 ? 'active' : ''} ${step > 2 ? 'completed' : ''}`}>
-            <span>2. Spalten zuordnen {step > 2 ? '✓' : ''}</span>
+            <span>2. Map Columns {step > 2 ? '✓' : ''}</span>
           </div>
           <div className={`import-step-item ${step === 3 ? 'active' : ''}`}>
-            <span>3. Vorschau & Import</span>
+            <span>3. Preview & Import</span>
           </div>
         </div>
 
@@ -530,7 +530,7 @@ function TradeImportModal({ isOpen, onClose, currency }) {
                 />
               </div>
 
-              <div className="import-or-divider">oder PDF-Bericht einlesen</div>
+              <div className="import-or-divider">or parse PDF report</div>
 
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
                 <button className="notion-button" style={{ background: 'rgba(var(--primary-rgb), 0.15)', color: 'var(--primary)', border: '1px solid rgba(var(--primary-rgb), 0.4)' }} onClick={handleNativePDF}>
@@ -538,7 +538,7 @@ function TradeImportModal({ isOpen, onClose, currency }) {
                 </button>
               </div>
 
-              <div className="import-or-divider">oder Rohtext einfügen</div>
+              <div className="import-or-divider">or paste raw text</div>
 
               <div className="import-textarea-container">
                 <textarea 
@@ -991,7 +991,7 @@ function TradingSessions() {
       const diffSecs = Math.max(0, Math.floor((s.close - currentDec) * 3600));
       const hours = Math.floor(diffSecs / 3600);
       const minutes = Math.floor((diffSecs % 3600) / 60);
-      countdownText = `Schließt in ${hours} Std. ${minutes} Min.`;
+      countdownText = `Closes in ${hours}h ${minutes}m`;
     } else {
       let diffHours = 0;
       if (currentDec < s.open) {
@@ -1002,7 +1002,7 @@ function TradingSessions() {
       const diffSecs = Math.max(0, Math.floor(diffHours * 3600));
       const hours = Math.floor(diffSecs / 3600);
       const minutes = Math.floor((diffSecs % 3600) / 60);
-      countdownText = `Öffnet in ${hours} Std. ${minutes} Min.`;
+      countdownText = `Opens in ${hours}h ${minutes}m`;
     }
     
     return { isOpen, countdownText };
@@ -1035,13 +1035,13 @@ function TradingSessions() {
 
   const overlaps = [];
   if (londonStatus.isOpen && newyorkStatus.isOpen) {
-    overlaps.push({ name: 'London & New York Overlap', desc: '🔥 Peak Volatility & Volume (Haupt-Handelszeit)', color: 'var(--primary)' });
+    overlaps.push({ name: 'London & New York Overlap', desc: '🔥 Peak Volatility & Volume (Prime Trading Session)', color: 'var(--primary)' });
   }
   if (tokyoStatus.isOpen && londonStatus.isOpen) {
-    overlaps.push({ name: 'Tokyo & London Overlap', desc: '⚡ Moderate Volatility (Asien/Europa-Übergang)', color: 'var(--green-text)' });
+    overlaps.push({ name: 'Tokyo & London Overlap', desc: '⚡ Moderate Volatility (Asia/Europe Transition)', color: 'var(--green-text)' });
   }
   if (sydneyStatus.isOpen && tokyoStatus.isOpen) {
-    overlaps.push({ name: 'Sydney & Tokyo Overlap', desc: '🌏 Standard Volatility (Pazifik/Asien-Sitzung)', color: '#4cc9f0' });
+    overlaps.push({ name: 'Sydney & Tokyo Overlap', desc: '🌏 Standard Volatility (Pacific/Asia Session)', color: '#4cc9f0' });
   }
 
   return (

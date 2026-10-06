@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../../store';
 
-const DEFAULT_CATEGORIES = ['Dairy & Eggs', 'Fruits', 'Vegetables', 'Meat', 'Snacks', 'Bakery', 'Beverages', 'Öle', 'Gewürze'];
+const DEFAULT_CATEGORIES = ['Dairy & Eggs', 'Fruits', 'Vegetables', 'Meat', 'Snacks', 'Bakery', 'Beverages', 'Oils & Fats', 'Spices & Condiments'];
 const STATUSES = ['In stock', 'Not in stock'];
 
 const FridgeIcon = () => (

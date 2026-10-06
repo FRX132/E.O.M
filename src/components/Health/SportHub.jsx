@@ -40,7 +40,7 @@ export default function SportHub() {
   };
 
   const deleteWorkout = (id) => {
-    if (confirm('Workout löschen?')) {
+    if (confirm('Delete this workout?')) {
       setWorkouts(workouts.filter(w => w.id !== id));
     }
   };

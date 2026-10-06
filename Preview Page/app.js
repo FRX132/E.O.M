@@ -335,25 +335,25 @@ function openDownloadModal(platform) {
             </div>
         `;
     } else if (platform === 'ios') {
-        title.innerText = 'E.O.M für Apple iOS (iPhone & iPad)';
+        title.innerText = 'E.O.M for Apple iOS (iPhone & iPad)';
         content.innerHTML = `
             <!-- Option 1: PWA (Recommended) -->
             <div class="modal-option-box highlight">
                 <div class="modal-option-header">
-                    <strong style="color: #fff; font-size: 1.05rem;">⚡ Option 1: Als App auf dem Homescreen (Empfohlen)</strong>
-                    <span class="modal-option-badge">1-Klick Install</span>
+                    <strong style="color: #fff; font-size: 1.05rem;">⚡ Option 1: Add to Home Screen (Recommended)</strong>
+                    <span class="modal-option-badge">1-Click Install</span>
                 </div>
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
-                    Auf dem iPhone wird E.O.M als vollwertige Offline-App ohne App Store installiert:
+                    On iPhone and iPad, E.O.M installs directly as a standalone offline application without the App Store:
                 </p>
                 <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; font-size: 0.82rem; color: var(--text-main); margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px;">
-                    <div>1. Öffne die Web-App unten im <strong>Safari-Browser</strong>.</div>
-                    <div>2. Tippe unten auf das <strong>Teilen-Symbol</strong> (📤 Quadrat mit Pfeil nach oben).</div>
-                    <div>3. Scrolle etwas runter und tippe auf <strong>„Zum Home-Bildschirm“</strong>.</div>
-                    <div>4. Tippe oben rechts auf <strong>„Hinzufügen“</strong>. Fertig! 🎉</div>
+                    <div>1. Open the Web App below in <strong>Safari Browser</strong>.</div>
+                    <div>2. Tap the <strong>Share icon</strong> (📤 square with upward arrow) at the bottom.</div>
+                    <div>3. Scroll down and tap <strong>"Add to Home Screen"</strong>.</div>
+                    <div>4. Tap <strong>"Add"</strong> in the top right. Done! 🎉</div>
                 </div>
                 <a href="https://eom-app-eta.vercel.app" target="_blank" class="modal-download-btn">
-                    🚀 Web App jetzt im Safari öffnen ➔
+                    🚀 Launch Web App in Safari ➔
                 </a>
             </div>
 
@@ -364,7 +364,7 @@ function openDownloadModal(platform) {
                     <span style="font-size: 0.72rem; color: var(--text-muted);">AltStore / Xcode</span>
                 </div>
                 <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px;">
-                    Prebuilt <code>.IPA</code> Binary für manuelles Sideloading (z. B. via AltStore / TrollStore).
+                    Prebuilt <code>.IPA</code> binary for manual sideloading (e.g. via AltStore / TrollStore).
                 </p>
                 <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.2/E.O.M.ipa" class="modal-secondary-btn" download>
                     📥 Download E.O.M.ipa (V2.0.2)

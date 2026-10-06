@@ -184,7 +184,7 @@ export default function WorkoutModal({ isOpen, onClose, onSave, selectedMuscle, 
         </div>
 
         <div className="mac-modal-footer">
-          <button className="mac-btn mac-btn-cancel" onClick={onClose}>Abbrechen</button>
+          <button className="mac-btn mac-btn-cancel" onClick={onClose}>Cancel</button>
           <button
             className="mac-btn mac-btn-add"
             onClick={handleSave}

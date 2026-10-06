@@ -471,7 +471,7 @@ function App() {
           onMouseLeave={profile.backgroundImage ? ((e) => e.currentTarget.style.background = theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)') : undefined}
         >
           {profile.profilePicture ? (
-            <img src={profile.profilePicture} alt="Profile" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+            <img src={profile.profilePicture} alt="User Profile Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
           ) : (
             <div className="avatar-circle">{profile.username ? profile.username.charAt(0).toUpperCase() : 'U'}</div>
           )}

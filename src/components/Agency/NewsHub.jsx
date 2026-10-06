@@ -108,7 +108,7 @@ function NewsCard({ item, isSaved, onToggleBookmark, onRead, onTts }) {
             <button
               className="news-icon-btn"
               onClick={(e) => { e.stopPropagation(); onTts(item); }}
-              title="Vorlesen lassen"
+              title="Read Aloud"
             >
               <SpeakerIcon />
             </button>
@@ -118,7 +118,7 @@ function NewsCard({ item, isSaved, onToggleBookmark, onRead, onTts }) {
               rel="noreferrer"
               className="news-icon-btn"
               onClick={(e) => e.stopPropagation()}
-              title="Im Browser öffnen"
+              title="Open in Browser"
             >
               <ExternalLinkIcon />
             </a>
@@ -283,7 +283,7 @@ export default function NewsHub() {
     const newEntry = {
       id: Date.now(),
       title: `📰 News: ${article.title}`,
-      content: `### [${article.title}](${article.url})\n**Quelle:** ${article.source} | **Datum:** ${new Date(article.pubDate).toLocaleDateString()}\n\n#### Zusammenfassung & Key Takeaways:\n- ${summary.takeaways.join('\n- ')}\n\n#### Auszug:\n> ${article.description || article.content}\n\n---\n*Gespeichert über E.O.M News Hub*`,
+      content: `### [${article.title}](${article.url})\n**Source:** ${article.source} | **Date:** ${new Date(article.pubDate).toLocaleDateString()}\n\n#### Summary & Key Takeaways:\n- ${summary.takeaways.join('\n- ')}\n\n#### Excerpt:\n> ${article.description || article.content}\n\n---\n*Saved via E.O.M News Hub*`,
       timestamp: Date.now()
     };
 
@@ -292,7 +292,7 @@ export default function NewsHub() {
     } else {
       useStore.setState({ journal: [newEntry, ...journal] });
     }
-    alert('✅ Artikel wurde erfolgreich als Eintrag in dein Journal übernommen!');
+    alert('✅ Article successfully saved as an entry in your Journal!');
   };
 
   // Save to AI Knowledge Base
@@ -301,7 +301,7 @@ export default function NewsHub() {
     const doc = {
       id: `news-doc-${Date.now()}`,
       name: `News: ${article.title.slice(0, 50)}...`,
-      content: `Titel: ${article.title}\nQuelle: ${article.source} (${article.url})\nKategorie: ${article.category}\nDatum: ${article.pubDate}\n\nInhalt / Auszug:\n${article.content || article.description}\n\nKey Takeaways:\n${summary.takeaways.join('\n')}`,
+      content: `Title: ${article.title}\nSource: ${article.source} (${article.url})\nCategory: ${article.category}\nDate: ${article.pubDate}\n\nContent / Excerpt:\n${article.content || article.description}\n\nKey Takeaways:\n${summary.takeaways.join('\n')}`,
       date: new Date().toLocaleDateString(),
       type: 'news'
     };
@@ -312,7 +312,7 @@ export default function NewsHub() {
       const currentKB = useStore.getState().aiKnowledgeBase || [];
       useStore.setState({ aiKnowledgeBase: [...currentKB, doc] });
     }
-    alert('🧠 Artikel wurde in der AI Knowledge Base gespeichert!');
+    alert('🧠 Article saved to AI Knowledge Base!');
   };
 
   // Add Custom RSS Feed
@@ -325,11 +325,11 @@ export default function NewsHub() {
       name: newFeedName.trim(),
       url: newFeedUrl.trim(),
       category: newFeedCategory,
-      language: 'de',
+      language: 'en',
       tier: 'custom',
-      tierLabel: 'Benutzerdefiniert',
+      tierLabel: 'Custom',
       country: 'Custom',
-      description: 'Benutzerdefinierter RSS Feed',
+      description: 'Custom RSS Feed',
       enabled: true,
       icon: '📡'
     };
@@ -343,7 +343,7 @@ export default function NewsHub() {
 
     setNewFeedUrl('');
     setNewFeedName('');
-    alert('✅ Feed hinzugefügt! Die neuen Nachrichten werden beim nächsten Refresh geladen.');
+    alert('✅ Feed added! New articles will be fetched on next refresh.');
     loadNews();
   };
 
@@ -410,7 +410,7 @@ export default function NewsHub() {
               <h1>
                 News Hub <span style={{ fontSize: '1rem', color: 'var(--primary)', fontWeight: 600 }}>LIVE</span>
               </h1>
-              <p>Echtzeit-Nachrichten aus den 10 führenden globalen Medienhäusern, Technologie, Finanzen und Geopolitik.</p>
+              <p>Real-time global news aggregation across leading media powerhouses, technology, finance, and science.</p>
             </div>
           </div>
 
@@ -435,10 +435,10 @@ export default function NewsHub() {
               className="news-btn"
               onClick={handleManualRefresh}
               disabled={isRefreshing}
-              title="Aktualisieren"
+              title="Refresh News Feeds"
             >
               <RefreshIcon spinning={isRefreshing} />
-              {isRefreshing ? 'Lädt...' : 'Refresh'}
+              {isRefreshing ? 'Loading...' : 'Refresh'}
             </button>
           </div>
         </div>
@@ -451,7 +451,7 @@ export default function NewsHub() {
             </svg>
             <input
               type="text"
-              placeholder="Thema, Quelle oder Schlagwort suchen (z.B. Reuters, BBC, Bloomberg, KI)..."
+              placeholder="Search topic, source, or keyword (e.g. Reuters, BBC, Bloomberg, AI)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -473,7 +473,7 @@ export default function NewsHub() {
                 style={{ padding: '4px 10px', fontSize: '0.78rem' }}
                 onClick={() => setSelectedLanguage('all')}
               >
-                🌐 Alle
+                🌐 All
               </button>
               <button
                 className={`news-btn ${selectedLanguage === 'de' ? 'active' : ''}`}
@@ -497,7 +497,7 @@ export default function NewsHub() {
                 className={`news-btn ${layoutMode === 'grid' ? 'active' : ''}`}
                 style={{ padding: '6px 10px' }}
                 onClick={() => setLayoutMode('grid')}
-                title="Grid Ansicht"
+                title="Grid View"
               >
                 🎴
               </button>
@@ -505,7 +505,7 @@ export default function NewsHub() {
                 className={`news-btn ${layoutMode === 'magazine' ? 'active' : ''}`}
                 style={{ padding: '6px 10px' }}
                 onClick={() => setLayoutMode('magazine')}
-                title="Magazin Ansicht"
+                title="Magazine View"
               >
                 📰
               </button>
@@ -513,7 +513,7 @@ export default function NewsHub() {
                 className={`news-btn ${layoutMode === 'compact' ? 'active' : ''}`}
                 style={{ padding: '6px 10px' }}
                 onClick={() => setLayoutMode('compact')}
-                title="Kompakte Liste"
+                title="Compact List"
               >
                 📋
               </button>
@@ -537,14 +537,14 @@ export default function NewsHub() {
                 onClick={() => setSelectedCategory(cat.id)}
               >
                 <span>{cat.icon}</span>
-                <span>{cat.deLabel}</span>
+                <span>{cat.label || cat.deLabel}</span>
                 <span className="news-count-badge">{count}</span>
               </button>
             );
           })}
         </div>
 
-        {/* 4b. Source Tier Filter Pills (Fakten-Agenturen, Globale Giganten, Geopolitik) */}
+        {/* 4b. Source Tier Filter Pills */}
         <div className="news-tiers-bar">
           {SOURCE_TIERS.map((tier) => {
             const isActive = selectedTier === tier.id;
@@ -553,10 +553,10 @@ export default function NewsHub() {
                 key={tier.id}
                 className={`news-tier-pill ${isActive ? 'active' : ''}`}
                 onClick={() => setSelectedTier(tier.id)}
-                title={tier.description || tier.deLabel}
+                title={tier.description || tier.label}
               >
                 <span>{tier.icon}</span>
-                <span>{tier.deLabel}</span>
+                <span>{tier.label || tier.deLabel}</span>
               </button>
             );
           })}
@@ -569,25 +569,25 @@ export default function NewsHub() {
           <div style={{ display: 'inline-block', marginBottom: '15px' }}>
             <RefreshIcon spinning={true} />
           </div>
-          <h3>Nachrichten werden aggregiert & verarbeitet...</h3>
-          <p style={{ fontSize: '0.9rem' }}>Verbindung zu Tagesschau, Heise, Hacker News, Dev.to und RSS Feeds...</p>
+          <h3>Aggregating & processing news feeds...</h3>
+          <p style={{ fontSize: '0.9rem' }}>Fetching updates from global powerhouses, tech radars, and RSS streams...</p>
         </div>
       ) : filteredArticles.length === 0 ? (
         <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--bg-card)', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
           <div style={{ fontSize: '3rem', marginBottom: '10px' }}>🔍</div>
-          <h3>Keine Artikel gefunden</h3>
+          <h3>No articles found</h3>
           <p style={{ color: 'var(--text-muted)', maxWidth: '400px', margin: '0 auto 20px auto' }}>
             {selectedCategory === 'bookmarks'
-              ? 'Du hast noch keine Artikel gespeichert. Klicke auf das Lesezeichen-Symbol bei einem Beitrag, um ihn für später zu merken.'
-              : 'Passe deine Suchbegriffe oder Filter an, um passende Meldungen anzuzeigen.'}
+              ? 'You have not saved any articles yet. Click the bookmark icon on any headline to save it for later.'
+              : 'Adjust your search query or filters to discover relevant stories.'}
           </p>
           {selectedCategory === 'bookmarks' ? (
             <button className="news-btn primary" onClick={() => setSelectedCategory('all')}>
-              Zu allen News wechseln
+              Switch to All News
             </button>
           ) : (
             <button className="news-btn" onClick={() => { setSearchQuery(''); setSelectedCategory('all'); setSelectedLanguage('all'); }}>
-              Filter zurücksetzen
+              Reset Filters
             </button>
           )}
         </div>
@@ -807,13 +807,13 @@ export default function NewsHub() {
                     onClick={(e) => handleToggleBookmark(activeReaderArticle, e)}
                   >
                     <StarIcon filled={isArticleBookmarked(activeReaderArticle)} />
-                    {isArticleBookmarked(activeReaderArticle) ? 'Gespeichert' : 'Merken'}
+                    {isArticleBookmarked(activeReaderArticle) ? 'Saved' : 'Bookmark'}
                   </button>
 
                   <button
                     className="news-btn"
                     onClick={() => handleSendToJournal(activeReaderArticle)}
-                    title="Als Notiz ins Journal übernehmen"
+                    title="Save as note in Journal"
                   >
                     📓 Journal
                   </button>
@@ -821,7 +821,7 @@ export default function NewsHub() {
                   <button
                     className="news-btn"
                     onClick={() => handleSaveToKnowledge(activeReaderArticle)}
-                    title="In die AI Wissensdatenbank aufnehmen"
+                    title="Save to AI Knowledge Base"
                   >
                     🧠 AI Knowledge
                   </button>
@@ -845,7 +845,7 @@ export default function NewsHub() {
                   <div className="news-ai-summary-card">
                     <div className="news-ai-summary-header">
                       <div className="news-ai-badge">
-                        <span>🤖</span> AI Key Takeaways & Analyse
+                        <span>🤖</span> AI Key Takeaways & Analysis
                       </div>
                       <span style={{ fontSize: '0.78rem', background: 'rgba(var(--primary-rgb), 0.15)', color: 'var(--primary)', padding: '2px 8px', borderRadius: '6px', fontWeight: 600 }}>
                         {summary.sentiment}
@@ -895,10 +895,10 @@ export default function NewsHub() {
             <div className="news-modal-body">
               <div style={{ background: 'rgba(var(--primary-rgb), 0.1)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(var(--primary-rgb), 0.25)' }}>
                 <h4 style={{ margin: '0 0 6px 0', color: 'var(--primary)' }}>
-                  Guten Tag, {useStore.getState().profile?.username || 'Commander'}!
+                  Welcome, {useStore.getState().profile?.username || 'Commander'}!
                 </h4>
                 <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                  Hier ist deine automatisierte Zusammenfassung der wichtigsten Schlagzeilen von heute:
+                  Here is your automated intelligence digest of today's key headlines across global media:
                 </p>
               </div>
 
@@ -938,14 +938,14 @@ export default function NewsHub() {
             <div className="news-modal-body">
               {/* Add Feed Form */}
               <form onSubmit={handleAddFeed} style={{ background: 'var(--bg-input)', padding: '18px', borderRadius: '14px', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-main)' }}>Eigenen RSS Feed hinzufügen</h4>
+                <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-main)' }}>Add Custom RSS Feed</h4>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div>
-                    <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Name / Quelle</label>
+                    <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Name / Source</label>
                     <input
                       type="text"
-                      placeholder="z.B. Mein Tech Blog"
+                      placeholder="e.g. My Tech Radar"
                       value={newFeedName}
                       onChange={(e) => setNewFeedName(e.target.value)}
                       style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '8px 12px', borderRadius: '8px', color: 'var(--text-main)' }}
@@ -954,7 +954,7 @@ export default function NewsHub() {
                   </div>
 
                   <div>
-                    <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Kategorie</label>
+                    <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Category</label>
                     <select
                       value={newFeedCategory}
                       onChange={(e) => setNewFeedCategory(e.target.value)}
@@ -983,14 +983,14 @@ export default function NewsHub() {
                 </div>
 
                 <button type="submit" className="news-btn primary" style={{ alignSelf: 'flex-start', marginTop: '4px' }}>
-                  + Feed hinzufügen
+                  + Add Feed
                 </button>
               </form>
 
               {/* Feed List */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
-                <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-main)' }}>Verfügbare Globale Feeds ({customFeeds.length})</h4>
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Top 10 Leitmedien & Fakten-Standards</span>
+                <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-main)' }}>Available Global Feeds ({customFeeds.length})</h4>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Top Media Outlets & Fact Standard Sources</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '420px', overflowY: 'auto', paddingRight: '4px' }}>
                 {customFeeds.map((feed) => (
@@ -1015,7 +1015,7 @@ export default function NewsHub() {
                           </div>
                         )}
                         <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)', opacity: 0.8 }}>
-                          Kategorie: {feed.category} • Sprache: {feed.language?.toUpperCase() || 'DE'}
+                          Category: {feed.category} • Language: {feed.language?.toUpperCase() || 'EN'}
                         </div>
                       </div>
                     </div>
@@ -1026,14 +1026,14 @@ export default function NewsHub() {
                         style={{ padding: '6px 12px', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
                         onClick={() => handleToggleFeed(feed.id)}
                       >
-                        {feed.enabled !== false ? 'Aktiviert ✓' : 'Pausiert'}
+                        {feed.enabled !== false ? 'Active ✓' : 'Paused'}
                       </button>
 
                       {feed.id.startsWith('custom-feed') && (
                         <button
                           className="news-icon-btn"
                           onClick={() => handleDeleteFeed(feed.id)}
-                          title="Löschen"
+                          title="Delete"
                           style={{ color: 'var(--red-text)' }}
                         >
                           🗑️

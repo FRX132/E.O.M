@@ -160,7 +160,7 @@ const DocumentNode = ({ id, data }) => {
         {data.content ? (
           <MarkdownViewer content={isExpanded ? data.content : previewSnippet} />
         ) : (
-          <span style={{ color: '#64748b', fontStyle: 'italic' }}>Leeres Dokument...</span>
+          <span style={{ color: '#64748b', fontStyle: 'italic' }}>Empty document...</span>
         )}
       </div>
 
@@ -172,7 +172,7 @@ const DocumentNode = ({ id, data }) => {
         fontSize: '0.72rem',
         color: '#94a3b8'
       }}>
-        <span>📝 {wordCount} Wörter</span>
+        <span>📝 {wordCount} words</span>
         <div style={{ display: 'flex', gap: '5px' }}>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
@@ -270,7 +270,7 @@ const TargetGoalNode = ({ id, data }) => {
       </div>
 
       <strong style={{ fontSize: '0.9rem', color: '#fff', lineHeight: '1.3' }}>{data.title}</strong>
-      {data.deadline && <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>📅 Bis {data.deadline}</div>}
+      {data.deadline && <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>📅 Due {data.deadline}</div>}
 
       {/* Progress bar */}
       <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden', marginTop: '2px' }}>
@@ -278,12 +278,12 @@ const TargetGoalNode = ({ id, data }) => {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: '#cbd5e1', paddingTop: '2px' }}>
-        <span>{progress}% abgeschlossen</span>
+        <span>{progress}% completed</span>
         <button
           onClick={() => data.onNavigate && data.onNavigate(isTarget ? '/targets' : '/goals')}
           style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '4px', color: '#34d399', padding: '2px 6px', fontSize: '0.7rem', cursor: 'pointer' }}
         >
-          Öffnen ↗
+          Open ↗
         </button>
       </div>
 
@@ -341,7 +341,7 @@ const HabitNode = ({ id, data }) => {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: '#cbd5e1', paddingTop: '4px' }}>
         <span style={{ color: data.isDoneToday ? '#34d399' : '#f59e0b' }}>
-          {data.isDoneToday ? '✅ Heute erledigt' : '⏳ Offen'}
+          {data.isDoneToday ? '✅ Done Today' : '⏳ Pending'}
         </span>
         <button
           onClick={() => data.onNavigate && data.onNavigate('/habits')}
@@ -404,7 +404,7 @@ const WorkoutNode = ({ id, data }) => {
       {data.date && <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>📅 {data.date}</div>}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: '#cbd5e1', paddingTop: '2px' }}>
-        <span>{data.exercisesCount ? `${data.exercisesCount} Übungen` : 'Workout Log'}</span>
+        <span>{data.exercisesCount ? `${data.exercisesCount} exercises` : 'Workout Log'}</span>
         <button
           onClick={() => data.onNavigate && data.onNavigate('/sport')}
           style={{ background: 'rgba(244, 63, 94, 0.2)', border: '1px solid rgba(244, 63, 94, 0.4)', borderRadius: '4px', color: '#fb7185', padding: '2px 6px', fontSize: '0.7rem', cursor: 'pointer' }}
@@ -623,7 +623,7 @@ const MediaNode = ({ id, data }) => {
             onClick={() => data.onNavigate && data.onNavigate(data.targetRoute)}
             style={{ background: `${color}22`, border: `1px solid ${color}44`, borderRadius: '4px', color: color, padding: '2px 6px', fontSize: '0.7rem', cursor: 'pointer' }}
           >
-            Öffnen ↗
+            Open ↗
           </button>
         )}
       </div>
@@ -1279,7 +1279,7 @@ export default function ProjectCanvas() {
   };
 
   const resetCanvas = () => {
-    if (window.confirm("Möchtest du das gesamte Canvas auf die vollständige OS Solar-Constellation zurücksetzen? Alle Elemente aller Module werden frisch radial angeordnet.")) {
+    if (window.confirm("Do you want to reset the entire canvas to the complete OS Solar Constellation? All elements from all modules will be freshly arranged radially.")) {
       const defaultLayout = generateDefaultLayout();
       useStore.getState().setCanvasNodes(null);
       useStore.getState().setCanvasEdges(null);
@@ -1363,10 +1363,10 @@ export default function ProjectCanvas() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <h2 style={{ margin: 0, fontSize: '1.15rem', color: '#fff' }}>E.O.M OS Master Canvas</h2>
                 <span style={{ background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', padding: '2px 8px', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 'bold', border: '1px solid rgba(56, 189, 248, 0.4)' }}>
-                  {totalCount} OS Elemente
+                  {totalCount} OS Elements
                 </span>
               </div>
-              <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>Vollständige interaktive Mindmap aller OS Module.</p>
+              <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>Full interactive mindmap across all OS modules.</p>
             </div>
           </div>
         </Panel>
@@ -1375,7 +1375,7 @@ export default function ProjectCanvas() {
         <Panel position="top-right" style={{ display: 'flex', gap: '8px', background: 'rgba(15, 23, 42, 0.85)', padding: '8px 12px', borderRadius: '14px', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 8px 30px rgba(0,0,0,0.5)' }}>
           <input
             type="text"
-            placeholder="🔍 Suchen..."
+            placeholder="🔍 Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -1394,7 +1394,7 @@ export default function ProjectCanvas() {
             onClick={addDocumentNote}
             style={{ margin: 0, padding: '6px 12px', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #0369a1)', color: '#fff', border: 'none', fontWeight: '600' }}
           >
-            📄 + Notiz
+            📄 + Note
           </button>
           <button
             className="notion-button secondary"
@@ -1407,7 +1407,7 @@ export default function ProjectCanvas() {
             className="notion-button secondary"
             onClick={resetCanvas}
             style={{ margin: 0, padding: '6px 12px', fontSize: '0.8rem', color: '#ef4444' }}
-            title="Auf standardmäßige Solar-Constellation zurücksetzen"
+            title="Reset to default solar constellation layout"
           >
             🔄 Reset
           </button>
@@ -1422,7 +1422,7 @@ export default function ProjectCanvas() {
             { id: 'habits', label: '⚡ Habits' },
             { id: 'workouts', label: '🏋️ Sport' },
             { id: 'journal', label: '📔 Journal' },
-            { id: 'finance', label: '💰 Finanzen' },
+            { id: 'finance', label: '💰 Finance' },
             { id: 'books', label: '📚 Library' },
             { id: 'movies', label: '🎬 Cinema' },
             { id: 'trips', label: '✈️ Trips' },

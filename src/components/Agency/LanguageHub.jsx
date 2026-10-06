@@ -41,7 +41,7 @@ export default function LanguageHub() {
 
   const deleteLanguage = (e, id) => {
     e.stopPropagation();
-    if (confirm('Bist du sicher, dass du diese Sprache entfernen möchtest?')) {
+    if (confirm('Are you sure you want to remove this language?')) {
       setLanguages(languages.filter(l => l.id !== id));
     }
   };

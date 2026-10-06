@@ -47,7 +47,7 @@ export default function MovieList() {
 
   const deleteMovie = (e, id) => {
     e.stopPropagation();
-    if (confirm('Bist du sicher, dass du diesen Film/Serie löschen möchtest?')) {
+    if (confirm('Are you sure you want to delete this movie/series?')) {
       setMovies(movies.filter(m => m.id !== id));
     }
   };

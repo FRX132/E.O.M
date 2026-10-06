@@ -48,7 +48,7 @@ export default function BookList() {
 
   const deleteBook = (e, id) => {
     e.stopPropagation();
-    if (confirm('Bist du sicher, dass du dieses Buch löschen möchtest?')) {
+    if (confirm('Are you sure you want to delete this book?')) {
       setBooks(books.filter(b => b.id !== id));
     }
   };

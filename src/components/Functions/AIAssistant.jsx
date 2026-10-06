@@ -28,7 +28,7 @@ export default function AIAssistant() {
         {
             id: 'init',
             sender: 'agent',
-            text: `⚡ **Agent Hunter (A.H.) online.**\n\nSystem Neural MCP Router & Leistungszustand Engine [0..10] bereit.\n\nDu kannst freie Fragen stellen oder Sprach-/Textbefehle eingeben wie:\n- *"spent 15€ for coffee"*\n- *"complete habit workout"*\n- *"what should I cook from my fridge?"*\n- *"starte mein Morning Briefing"*`,
+            text: `⚡ **Agent Hunter (A.H.) online.**\n\nSystem Neural MCP Router & Performance State Engine [0..10] ready.\n\nYou can ask open questions or provide voice/text directives like:\n- *"spent 15€ for coffee"*\n- *"complete habit workout"*\n- *"what should I cook from my fridge?"*\n- *"start my Daily Morning Briefing"*`,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             statusTag: 'ENGINE_INITIALIZED: AgentHunter.js Ready'
         }
@@ -776,7 +776,7 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
                         }}>
                             <button
                                 type="button"
-                                onClick={() => executeChatPrompt('Starte meine heutige Tages-Jagd und berechne meine 3 Hunter Directives.')}
+                                onClick={() => executeChatPrompt('Start today\'s Daily Hunt and calculate my 3 Hunter Directives.')}
                                 style={{
                                     background: 'rgba(var(--primary-rgb), 0.15)',
                                     border: '1px solid var(--primary)',
@@ -789,11 +789,11 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
                                     whiteSpace: 'nowrap'
                                 }}
                             >
-                                🎯 Tages-Jagd
+                                🎯 Daily Hunt
                             </button>
                             <button
                                 type="button"
-                                onClick={() => executeChatPrompt('Erstelle mein Executive Morning Briefing.')}
+                                onClick={() => executeChatPrompt('Generate my Executive Morning Briefing.')}
                                 style={{
                                     background: 'rgba(255, 255, 255, 0.04)',
                                     border: '1px solid var(--border-color)',
@@ -809,7 +809,7 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
                             </button>
                             <button
                                 type="button"
-                                onClick={() => executeChatPrompt('Was kann ich mit meinen aktuellen Lebensmitteln aus dem Kühlschrank kochen?')}
+                                onClick={() => executeChatPrompt('What can I cook using ingredients currently in my fridge?')}
                                 style={{
                                     background: 'rgba(255, 255, 255, 0.04)',
                                     border: '1px solid var(--border-color)',
@@ -821,7 +821,7 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
                                     whiteSpace: 'nowrap'
                                 }}
                             >
-                                🍳 Kühlschrank-Rezept
+                                🍳 Fridge Recipe
                             </button>
                             <button
                                 type="button"
@@ -1016,7 +1016,7 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
 
                         <button
                             type="button"
-                            onClick={() => executeChatPrompt('Führe einen tiefen Leistungszustand-Audit durch und sag mir, wie ich auf 10.0 komme.')}
+                            onClick={() => executeChatPrompt('Perform a comprehensive Performance State diagnostic audit and explain how I can reach 10.0.')}
                             style={{
                                 alignSelf: 'flex-start',
                                 background: 'var(--primary)',
@@ -1029,7 +1029,7 @@ ${state.aiKnowledgeBase?.find(d => d.id === activeDocId) ? `\n--- ACTIVE REFEREN
                                 cursor: 'pointer'
                             }}
                         >
-                            📊 Deep Audit im Chat starten
+                            📊 Run Deep Audit in Chat
                         </button>
                     </div>
                 )}

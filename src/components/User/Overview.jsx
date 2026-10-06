@@ -401,7 +401,7 @@ export default function Overview({ navigate }) {
 
       <div className="overview-hero">
         <div className="hero-cover">
-          <img src={profile.heroImage || DEFAULT_HERO} alt="Cover" />
+          <img src={profile.heroImage || DEFAULT_HERO} alt="User Profile Cover Banner" />
           <div className="hero-overlay"></div>
           <label className="change-cover-btn" style={{ opacity: 0.8, cursor: 'pointer' }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-camera" viewBox="0 0 16 16">
@@ -421,7 +421,7 @@ export default function Overview({ navigate }) {
           <div className="hero-user">
             <div className="hero-avatar">
               {profile.profilePicture ? (
-                <img src={profile.profilePicture} alt="Avatar" />
+                <img src={profile.profilePicture} alt="User Profile Avatar" />
               ) : (
                 profile.username?.charAt(0).toUpperCase() || 'U'
               )}

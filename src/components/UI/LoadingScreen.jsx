@@ -11,8 +11,8 @@ const formatBytes = (bytes) => {
 
 export default function LoadingScreen({
   progress = null,
-  title = "AGENT HUNTER // INITIALISIERUNG",
-  subtitle = "Lade neuronales KI-Modell und System-Komponenten...",
+  title = "AGENT HUNTER // INITIALIZING",
+  subtitle = "Loading neural AI model and system components...",
   mode = "embedded", // 'embedded' | 'fullscreen' | 'banner'
   onSwitchCloud = null,
   icon = "⚡"
@@ -51,7 +51,7 @@ export default function LoadingScreen({
       if (progress.total) {
         return `${formatBytes(progress.loaded)} / ${formatBytes(progress.total)}`;
       }
-      return `${formatBytes(progress.loaded)} geladen`;
+      return `${formatBytes(progress.loaded)} loaded`;
     }
     return null;
   }, [progress]);
@@ -192,7 +192,7 @@ export default function LoadingScreen({
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: 600 }}>
-            {fileName ? `📦 ${fileName}` : '⚡ Lade Pipeline & Modellgewichte...'}
+            {fileName ? `📦 ${fileName}` : '⚡ Loading pipeline & model weights...'}
           </span>
           <span style={{
             fontSize: '1.2rem',
@@ -231,7 +231,7 @@ export default function LoadingScreen({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: '#94a3b8' }}>
           <span>{byteInfo || 'Local In-Browser WASM Execution'}</span>
           <span style={{ color: percent >= 100 ? '#34d399' : '#38bdf8' }}>
-            {percent >= 100 ? '✅ Fast fertig...' : '⏳ Einmaliger Download (Cache)'}
+            {percent >= 100 ? '✅ Almost ready...' : '⏳ One-time download (cached)'}
           </span>
         </div>
       </div>
@@ -239,7 +239,7 @@ export default function LoadingScreen({
       {/* Cloud Switcher Option */}
       {onSwitchCloud && (
         <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Dauert es zu lange?</span>
+          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Taking too long?</span>
           <button
             type="button"
             onClick={onSwitchCloud}
@@ -255,7 +255,7 @@ export default function LoadingScreen({
               transition: 'all 0.2s'
             }}
           >
-            ☁️ Auf Cloud-Modell (OpenAI/Claude) wechseln
+            ☁️ Switch to Cloud Model (OpenAI/Claude)
           </button>
         </div>
       )}

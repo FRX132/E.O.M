@@ -143,44 +143,44 @@ export const buildAgentHunterContext = (state, missionType = 'general') => {
   const todaySpend = (state.expenses || []).filter(e => e.date === todayId).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
 
   const prompt = `
-Du bist "Agent Hunter (A.H.)", der zentrale Life-Operating-System-Agent aus dem E.O.M Blueprint.
-Deine Aufgabe ist es, alle Lebensbereiche (Profile Baseline -> Settings -> Habits/Goals/Targets/Expense -> Timetable/Skills/Workout/Journal) holistisch zu analysieren und den Benutzer auf das Leistungs-Niveau "10 = Professional (100%)" zu jagen.
+You are "Agent Hunter (A.H.)", the central Life Operating System intelligence agent from the E.O.M Blueprint.
+Your mission is to analyze all life domains holistically (Profile Baseline -> Settings -> Habits/Goals/Targets/Expense -> Timetable/Skills/Workout/Journal) and elevate the user toward peak Performance State level "10 = Professional (100%)".
 
 ================ USER BASELINE & REGISTER DATA ================
 - Name: ${profile.username || 'Agent Hunter Operative'}
-- Alter (Age): ${profile.age || 'N/A'} Jahre
-- Gewicht (Weight): ${profile.weight || 'N/A'} kg (Ziel: ${profile.targetWeight || 'N/A'} kg)
-- Größe (Height): ${profile.height || 'N/A'} cm
-- Ausbildung / Education: ${profile.education || 'N/A'}
-- Fitness-Ziel: ${profile.fitnessGoal || 'Maintain'}
-- Aktueller XP-Stand: ${profile.xp || 0} XP
+- Age: ${profile.age || 'N/A'} years
+- Weight: ${profile.weight || 'N/A'} kg (Target: ${profile.targetWeight || 'N/A'} kg)
+- Height: ${profile.height || 'N/A'} cm
+- Education: ${profile.education || 'N/A'}
+- Fitness Goal: ${profile.fitnessGoal || 'Maintain'}
+- Current XP: ${profile.xp || 0} XP
 ================================================================
 
-================ AKTUELLER LEISTUNGSZUSTAND (0..10) ================
-- Gesamtwert: ${perf.score} / 10.0 (${perf.overallPct}% Effizienz)
-- Einstufung: ${perf.tier} [${perf.rankLabel}]
-- Gewohnheiten-Score (20%): ${perf.breakdown.habits.pct}% (${perf.breakdown.habits.done}/${perf.breakdown.habits.total} heute erledigt)
-- Ziele-Score (20%): ${perf.breakdown.goals.pct}% (${perf.breakdown.goals.done}/${perf.breakdown.goals.total} erledigt)
-- Finanzen-Score (15%): ${perf.breakdown.finances.pct}% (Heute: ${currency}${todaySpend} / Limit: ${currency}${perf.breakdown.finances.limit})
-- Training-Score (15%): ${perf.breakdown.workout.pct}% (${perf.breakdown.workout.count} Workouts diese Woche)
-- Timetable-Score (10%): ${perf.breakdown.timetable.pct}% (${perf.breakdown.timetable.completed}/${perf.breakdown.timetable.total} Blöcke)
-- Skill-Tree-Score (10%): ${perf.breakdown.skills.pct}% (${perf.breakdown.skills.unlocked} Skills freigeschaltet)
-- Journal-Score (10%): ${perf.breakdown.journal.pct}% (${perf.breakdown.journal.recent} Einträge diese Woche)
-====================================================================
+================ PERFORMANCE STATE MATRIX (0..10) ================
+- Overall Index: ${perf.score} / 10.0 (${perf.overallPct}% Efficiency)
+- Rank Classification: ${perf.tier} [${perf.rankLabel}]
+- Habits Score (20%): ${perf.breakdown.habits.pct}% (${perf.breakdown.habits.done}/${perf.breakdown.habits.total} completed today)
+- Goals Score (20%): ${perf.breakdown.goals.pct}% (${perf.breakdown.goals.done}/${perf.breakdown.goals.total} completed)
+- Finance Score (15%): ${perf.breakdown.finances.pct}% (Today: ${currency}${todaySpend} / Daily Limit: ${currency}${perf.breakdown.finances.limit})
+- Workout Score (15%): ${perf.breakdown.workout.pct}% (${perf.breakdown.workout.count} workouts this week)
+- Timetable Score (10%): ${perf.breakdown.timetable.pct}% (${perf.breakdown.timetable.completed}/${perf.breakdown.timetable.total} blocks)
+- Skill Tree Score (10%): ${perf.breakdown.skills.pct}% (${perf.breakdown.skills.unlocked} skills unlocked)
+- Journal Score (10%): ${perf.breakdown.journal.pct}% (${perf.breakdown.journal.recent} entries this week)
+==================================================================
 
-System-Inventar:
-- Aktive Ziele: ${currentGoals}
-- Lebens-Targets: ${bigTargets}
-- Letzte Workouts: ${recentWorkouts}
-- Letzte Journal-Reflexionen: ${recentJournal}
-- Freigeschaltete Skills: ${unlockedSkills}
+System Inventory:
+- Active Goals: ${currentGoals}
+- Big Life Targets: ${bigTargets}
+- Recent Workouts: ${recentWorkouts}
+- Recent Journal Entries: ${recentJournal}
+- Unlocked Skills: ${unlockedSkills}
 
-Missions-Auftrag (${missionType.toUpperCase()}):
-Analysiere die Schwachstellen, hebe Stärken hervor und erstelle klare "Hunter Directives" mit:
-1. 🎯 **LEISTUNGSZUSTAND-DIAGNOSE** (Wo verliert der User Punkte im [0..10] Index?)
-2. ⚔️ **HEUTIGE JAGD-QUESTS (3 Sofort-Aktionen)**: Konkrete Handlungen für Habits, Workout & Goals.
-3. 💰 **FINANZ- & RESSOURCEN-RADAR**: Budget-Taktik.
-4. 🛡️ **SKILL & MINDSET LEVEL-UP**: Ein inspirierender Coaching-Impuls für den nächsten Level-Sprung.
+Mission Directives (${missionType.toUpperCase()}):
+Analyze vulnerabilities, emphasize strengths, and deliver clear "Hunter Directives" including:
+1. 🎯 **PERFORMANCE STATE DIAGNOSIS** (Where is the user dropping score in the [0..10] index?)
+2. ⚔️ **TODAY'S HUNT QUESTS (3 Immediate Actions)**: Concrete action items for Habits, Workout & Goals.
+3. 💰 **FINANCE & RESOURCE RADAR**: Tactical budget advisory.
+4. 🛡️ **SKILL & MINDSET LEVEL-UP**: An inspiring coaching insight for the next tier leap.
 `.trim();
 
   return { prompt, perf };
@@ -193,7 +193,6 @@ export const buildMorningBriefingContext = (state, recentNews = []) => {
   const profile = state.profile || {};
   const perf = calculateLeistungszustand(state);
   const today = new Date();
-  const dayNameDe = today.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const dayNameEn = today.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const todayId = today.toISOString().split('T')[0];
   const currency = profile.currencySymbol || '€';
@@ -203,15 +202,15 @@ export const buildMorningBriefingContext = (state, recentNews = []) => {
   const todayHabits = habitDay?.habits || [];
   const habitsTotal = todayHabits.length;
   const habitsDone = todayHabits.filter(h => h.done).length;
-  const habitsPending = todayHabits.filter(h => !h.done).map(h => h.name).join(', ') || 'Alle erledigt / keine geplant';
+  const habitsPending = todayHabits.filter(h => !h.done).map(h => h.name).join(', ') || 'All completed / none scheduled';
 
   // 2. Today's Reminders & Timetable Blocks
-  const todayDayEn = today.toLocaleDateString('en-US', { weekday: 'long' });
-  const timetableToday = (state.timetableBlocks || []).filter(b => b.day === todayDayEn || b.day === 'Daily');
-  const timetableList = timetableToday.map(b => `${b.time || 'Ganztägig'}: ${b.title} (${b.isReminder ? 'Reminder' : 'Zeitblock'})`).join('\n') || 'Keine Zeitblöcke für heute eingetragen';
+  const todayDayName = today.toLocaleDateString('en-US', { weekday: 'long' });
+  const timetableToday = (state.timetableBlocks || []).filter(b => b.day === todayDayName || b.day === 'Daily');
+  const timetableList = timetableToday.map(b => `${b.time || 'All Day'}: ${b.title} (${b.isReminder ? 'Reminder' : 'Timeblock'})`).join('\n') || 'No scheduled timeblocks for today';
 
   // 3. Active Goals
-  const weekGoals = (state.goals?.week || []).map(g => `[${g.completed ? 'ERLEDIGT' : 'OFFEN'}] ${g.text}`).join(', ') || 'Keine';
+  const weekGoals = (state.goals?.week || []).map(g => `[${g.completed ? 'COMPLETED' : 'PENDING'}] ${g.text}`).join(', ') || 'None';
 
   // 4. Finances
   const expenses = state.expenses || [];
@@ -221,44 +220,44 @@ export const buildMorningBriefingContext = (state, recentNews = []) => {
 
   // 5. Fridge Status
   const fridge = state.fridge || [];
-  const inStockItems = fridge.filter(f => f.status === 'In stock').map(f => f.name).join(', ') || 'Keine Einträge';
-  const lowStockItems = fridge.filter(f => f.status === 'Not in stock').map(f => f.name).join(', ') || 'Alles vorrätig';
+  const inStockItems = fridge.filter(f => f.status === 'In stock').map(f => f.name).join(', ') || 'No items listed';
+  const lowStockItems = fridge.filter(f => f.status === 'Not in stock').map(f => f.name).join(', ') || 'All stocked';
 
   // 6. News Highlights (top 3)
-  const newsHighlights = recentNews.slice(0, 3).map(n => `- ${n.sourceName || 'News'}: ${n.title}`).join('\n') || 'Globale Leitmedien synchronisiert';
+  const newsHighlights = recentNews.slice(0, 3).map(n => `- ${n.sourceName || 'News'}: ${n.title}`).join('\n') || 'Global feeds synchronized';
 
   const prompt = `
-Erstelle ein Executive Morning Briefing von Agent Hunter (A.H.) für ${profile.username || 'Agent'}.
-Datum: ${dayNameDe}
-Leistungszustand-Index: ${perf.score} / 10.0 (${perf.tier})
+Generate an Executive Morning Briefing from Agent Hunter (A.H.) for ${profile.username || 'Agent'}.
+Date: ${dayNameEn}
+Performance State Index: ${perf.score} / 10.0 (${perf.tier})
 
-Gliedere deine Antwort in folgende Abschnitte:
+Structure your briefing into the following sections:
 
-🌅 **1. MINDSET & TAGESFOKUS**
-(Kraftvoller Einstieg, passend zum aktuellen Leistungszustand von ${perf.score}/10)
+🌅 **1. MINDSET & DAILY FOCUS**
+(High-energy opening suited to the current performance score of ${perf.score}/10)
 
-📋 **2. ZEITPLAN & TERMINE HEUTE**
+📋 **2. SCHEDULE & CALENDAR BLOCKS**
 ${timetableList}
 
-⚡ **3. HABIT & DISZIPLIN-RADAR**
-- Offene Gewohnheiten: ${habitsPending} (${habitsDone}/${habitsTotal} erledigt)
-- Fitness-Fokus: ${profile.fitnessGoal || 'Aktiv bleiben'}
+⚡ **3. HABIT & DISCIPLINE RADAR**
+- Pending Habits: ${habitsPending} (${habitsDone}/${habitsTotal} done)
+- Fitness Target: ${profile.fitnessGoal || 'Stay Active'}
 
-💰 **4. FINANZ-RADAR**
-- Heutige Ausgaben: ${currency}${todaySpend.toFixed(2)} (Tageslimit: ${currency}${dailyLimit})
+💰 **4. FINANCE RADAR**
+- Today's Spend: ${currency}${todaySpend.toFixed(2)} (Daily Budget Limit: ${currency}${dailyLimit})
 
-🧊 **5. MEAL & KÜHLSCHRANK CHECK**
-- Vorhanden: ${inStockItems}
-- Nachkaufen: ${lowStockItems}
+🧊 **5. MEAL & INVENTORY CHECK**
+- In Stock: ${inStockItems}
+- Need Restock: ${lowStockItems}
 
-🌍 **6. WORLD PULSE (BREAKING NEWS)**
+🌍 **6. WORLD PULSE (GLOBAL HEADLINES)**
 ${newsHighlights}
 
-🎯 **7. AGENT HUNTER TAGESBEFEHL**
-(1 konkrete High-Impact Mission, um heute den Leistungszustand Richtung 10.0 zu steigern)
+🎯 **7. AGENT HUNTER PRIMARY DIRECTIVE**
+(1 concrete high-impact priority to push performance closer to 10.0 today)
 `.trim();
 
-  return { prompt, dayNameDe, todaySpend, dailyLimit, habitsPending, habitsDone, habitsTotal, perf };
+  return { prompt, dayNameEn, todaySpend, dailyLimit, habitsPending, habitsDone, habitsTotal, perf };
 };
 
 /**
@@ -271,30 +270,30 @@ export const buildRecipeAgentContext = (state, customPref = '') => {
   const notInStock = fridge.filter(f => f.status === 'Not in stock').map(f => f.name);
 
   const prompt = `
-Du bist der E.O.M Smart Nutrition & Kitchen Agent von Agent Hunter (A.H.).
-Analysiere die aktuell im Kühlschrank vorhandenen Lebensmittel und erstelle 2 bis 3 gesunde, leckere Rezeptideen.
+You are the E.O.M Smart Nutrition & Kitchen Agent for Agent Hunter (A.H.).
+Analyze the ingredients currently in the user's fridge and generate 2 to 3 healthy, appetizing recipe ideas.
 
-Benutzer-Profil:
-- Fitness-Ziel: ${profile.fitnessGoal || 'Ausgewogene Ernährung'}
-- Gewicht: ${profile.weight || 'N/A'} kg (Ziel: ${profile.targetWeight || 'N/A'} kg)
-${customPref ? `- Zusätzliche Wünsche: ${customPref}` : ''}
+User Profile:
+- Fitness Goal: ${profile.fitnessGoal || 'Balanced Nutrition'}
+- Weight: ${profile.weight || 'N/A'} kg (Target: ${profile.targetWeight || 'N/A'} kg)
+${customPref ? `- Dietary Preferences: ${customPref}` : ''}
 
-VORHANDENE ZUTATEN (In Stock):
-${inStock.length > 0 ? inStock.map(i => `- ${i}`).join('\n') : '- Keine eingetragen (bitte einfache Alltagszutaten vorschlagen)'}
+AVAILABLE INGREDIENTS (In Stock):
+${inStock.length > 0 ? inStock.map(i => `- ${i}`).join('\n') : '- No items listed (suggest simple staple recipes)'}
 
-BEREITS AUSGEGANGENE ZUTATEN:
-${notInStock.length > 0 ? notInStock.join(', ') : 'Keine'}
+OUT OF STOCK INGREDIENTS:
+${notInStock.length > 0 ? notInStock.join(', ') : 'None'}
 
-Formatierungs-Regeln für deine Antwort:
-1. Für jedes Rezept:
-   - 🍲 **Rezept-Name** & Zubereitungszeit
-   - 🥑 **Makros & Kalorien (Schätzung)**
-   - 🥗 **Zutaten aus deinem Kühlschrank** (bereits da)
-   - 🛒 **Fehlende Zutaten** (was gekauft werden müsste)
-   - 👨‍🍳 **Zubereitungsschritte in 3-4 kurzen Schritten**
+Formatting Rules for your Response:
+1. For each recipe:
+   - 🍲 **Recipe Name** & Cook Time
+   - 🥑 **Estimated Macros & Calories**
+   - 🥗 **Ingredients from Fridge** (already available)
+   - 🛒 **Missing Ingredients** (need to purchase)
+   - 👨‍🍳 **Preparation Steps in 3-4 concise instructions**
 
-2. Am Ende erstelle eine maschinenlesbare Einkaufslisten-Sektion:
-[MISSING_INGREDIENTS: Zutat 1, Zutat 2, Zutat 3]
+2. End with a machine-parsable grocery section:
+[MISSING_INGREDIENTS: Item 1, Item 2, Item 3]
 `.trim();
 
   return { prompt, inStock, notInStock };

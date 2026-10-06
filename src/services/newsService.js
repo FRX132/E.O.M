@@ -1,6 +1,6 @@
 // Preset RSS Feeds for instant access with 10 Top Global Media Powerhouses
 export const DEFAULT_NEWS_FEEDS = [
-  // 1. NACHRICHTENAGENTUREN (Der Fakten-Goldstandard)
+  // 1. NEWS AGENCIES (The Verified Fact Standard)
   {
     id: 'reuters',
     name: 'Reuters',
@@ -8,9 +8,9 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'World',
     language: 'en',
     tier: 'agencies',
-    tierLabel: 'Fakten-Goldstandard',
+    tierLabel: 'Fact Standard',
     country: 'UK / Global',
-    description: 'Weltweit wichtigste Quelle für neutrale Echtzeit-Nachrichten, Finanzen und Geopolitik.',
+    description: 'Premier global source for verified real-time news, financial data, and geopolitics.',
     enabled: true,
     icon: '⚖️'
   },
@@ -21,9 +21,9 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'World',
     language: 'en',
     tier: 'agencies',
-    tierLabel: 'Fakten-Goldstandard',
+    tierLabel: 'Fact Standard',
     country: 'USA / Global',
-    description: 'Führende unabhängige Nachrichtenagentur für strikt faktenbasierte, unkommentierte Erstberichterstattung.',
+    description: 'Leading independent news agency for strictly fact-based, non-partisan reporting.',
     enabled: true,
     icon: '📜'
   },
@@ -34,14 +34,14 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'World',
     language: 'en',
     tier: 'agencies',
-    tierLabel: 'Fakten-Goldstandard',
-    country: 'Frankreich / Global',
-    description: 'Besonders stark in Europa, Nahost und weltweit führend bei zertifizierten Faktenchecks.',
+    tierLabel: 'Fact Standard',
+    country: 'France / Global',
+    description: 'Global benchmark for investigative facts, international coverage, and fact-checking.',
     enabled: true,
     icon: '🛡️'
   },
 
-  // 2. GLOBALE REICHWEITEN- & BREAKING-NEWS-GIGANTEN
+  // 2. GLOBAL REACH & BREAKING NEWS POWERHOUSES
   {
     id: 'bbc',
     name: 'BBC News',
@@ -49,9 +49,9 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'World',
     language: 'en',
     tier: 'giants',
-    tierLabel: 'Leitmedien-Gigant',
+    tierLabel: 'Global Media',
     country: 'UK / Global',
-    description: 'Reichweitenstärkste Plattform mit über 800 Mio. Visits und weltweiter Spitzenplatz in Vertrauensindizes.',
+    description: 'Widely trusted broadcaster with world-class international reporting and analysis.',
     enabled: true,
     icon: '🌍'
   },
@@ -62,9 +62,9 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'World',
     language: 'en',
     tier: 'giants',
-    tierLabel: 'Leitmedien-Gigant',
+    tierLabel: 'Global Media',
     country: 'USA / Global',
-    description: 'Globaler Maßstab für investigativen Qualitätsjournalismus, visuelle Datenanalysen und Dossiers.',
+    description: 'Global standard for deep investigative journalism, visual data analyses, and culture.',
     enabled: true,
     icon: '🏛️'
   },
@@ -75,9 +75,9 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'World',
     language: 'en',
     tier: 'giants',
-    tierLabel: 'Leitmedien-Gigant',
+    tierLabel: 'Global Media',
     country: 'USA / Global',
-    description: 'Schnellster weltweiter Anbieter für Breaking News und Live-Berichterstattung bei Großereignissen.',
+    description: 'Fast global provider for breaking news, geopolitics, and live coverage.',
     enabled: true,
     icon: '🔴'
   },
@@ -88,14 +88,14 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'World',
     language: 'en',
     tier: 'giants',
-    tierLabel: 'Leitmedien-Gigant',
+    tierLabel: 'Global Media',
     country: 'UK / Global',
-    description: 'Frei zugänglicher Qualitätsjournalismus mit Fokus auf Umwelt, Gesellschaft und internationale Politik.',
+    description: 'Independent quality journalism focusing on environment, society, and world affairs.',
     enabled: true,
     icon: '🌿'
   },
 
-  // 3. GEOPOLITIK, WIRTSCHAFT & PERSPEKTIVENVIELFALT
+  // 3. GEOPOLITICS, MARKETS & MULTI-PERSPECTIVE
   {
     id: 'bloomberg',
     name: 'Bloomberg',
@@ -103,9 +103,9 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'Finance',
     language: 'en',
     tier: 'geopolitics',
-    tierLabel: 'Wirtschaft & Geopolitik',
+    tierLabel: 'Markets & Policy',
     country: 'USA / Global',
-    description: 'Zentrale Adresse für globale Märkte, Lieferketten, Technologie und datengestützte Wirtschaftspolitik.',
+    description: 'Definitive source for global capital markets, trade dynamics, and economic policy.',
     enabled: true,
     icon: '📊'
   },
@@ -116,9 +116,9 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'Finance',
     language: 'en',
     tier: 'geopolitics',
-    tierLabel: 'Wirtschaft & Geopolitik',
+    tierLabel: 'Markets & Policy',
     country: 'UK / Global',
-    description: 'Unverzichtbare Analysen an der Schnittstelle von Handel, Weltwirtschaft und internationaler Diplomatie.',
+    description: 'Essential economic intelligence at the intersection of business, diplomacy, and trade.',
     enabled: true,
     icon: '📈'
   },
@@ -129,14 +129,14 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'World',
     language: 'en',
     tier: 'geopolitics',
-    tierLabel: 'Perspektivenvielfalt',
-    country: 'Katar / Globaler Süden',
-    description: 'Wichtigste globale Stimme für Berichterstattung aus dem Nahen Osten und Perspektiven des Globalen Südens.',
+    tierLabel: 'Global South & Middle East',
+    country: 'Qatar / Global South',
+    description: 'Key international voice for reporting from the Middle East and developing markets.',
     enabled: true,
     icon: '🧭'
   },
 
-  // 4. DEUTSCHSPRACHIGE QUALITÄTSMEDIEN & TECH
+  // 4. TECH, SCIENCE & REGIONAL LEADERS
   {
     id: 'tagesschau',
     name: 'Tagesschau',
@@ -144,9 +144,9 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'World',
     language: 'de',
     tier: 'national',
-    tierLabel: 'Öffentlich-Rechtlich (DE)',
-    country: 'Deutschland',
-    description: 'Führende deutsche Redaktion für verlässliche Nachrichten aus Politik, Wirtschaft und Kultur.',
+    tierLabel: 'Public Broadcaster (DE)',
+    country: 'Germany',
+    description: 'Leading German editorial team for reliable news across politics, economy, and society.',
     enabled: true,
     icon: '🌐'
   },
@@ -157,9 +157,9 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'World',
     language: 'de',
     tier: 'national',
-    tierLabel: 'Investigativ (DE)',
-    country: 'Deutschland',
-    description: 'Traditionsreiches deutsches Nachrichtenmagazin mit Fokus auf Recherche und Hintergrundberichte.',
+    tierLabel: 'Investigative (DE)',
+    country: 'Germany',
+    description: 'Renowned European news magazine with investigative depth and background dossiers.',
     enabled: true,
     icon: '📰'
   },
@@ -171,8 +171,8 @@ export const DEFAULT_NEWS_FEEDS = [
     language: 'de',
     tier: 'tech',
     tierLabel: 'Tech & IT (DE)',
-    country: 'Deutschland',
-    description: 'Deutsche Leitquelle für IT, Software, Hardware und IT-Sicherheit.',
+    country: 'Germany',
+    description: 'Premier European IT source for developer ecosystems, cybersecurity, and hardware.',
     enabled: true,
     icon: '💻'
   },
@@ -183,9 +183,9 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'Tech',
     language: 'de',
     tier: 'tech',
-    tierLabel: 'Tech & Gaming (DE)',
-    country: 'Deutschland',
-    description: 'Nachrichten für IT-Profis, Entwickler und Gamer.',
+    tierLabel: 'Tech & Dev (DE)',
+    country: 'Germany',
+    description: 'News and analysis for software engineers, IT leaders, and hardware enthusiasts.',
     enabled: true,
     icon: '⚡'
   },
@@ -196,9 +196,9 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'Finance',
     language: 'de',
     tier: 'finance',
-    tierLabel: 'FinTech & Krypto (DE)',
-    country: 'Deutschland',
-    description: 'Das führende deutschsprachige Medium für Bitcoin, Krypto und dezentrale Finanztechnologien.',
+    tierLabel: 'FinTech & Web3 (DE)',
+    country: 'Germany',
+    description: 'Leading publication covering Bitcoin, crypto assets, and decentralized finance.',
     enabled: true,
     icon: '₿'
   },
@@ -209,9 +209,9 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'Tech',
     language: 'en',
     tier: 'tech',
-    tierLabel: 'Tech & Kultur (US)',
+    tierLabel: 'Tech & Culture',
     country: 'USA',
-    description: 'Popkultur, Gadgets, KI und Zukunftstechnologien.',
+    description: 'Tech culture, consumer hardware, AI breakthroughs, and future trends.',
     enabled: true,
     icon: '⚡'
   },
@@ -224,7 +224,7 @@ export const DEFAULT_NEWS_FEEDS = [
     tier: 'tech',
     tierLabel: 'Future Tech',
     country: 'USA',
-    description: 'Visionäre Tech-Reportagen und wissenschaftliche Durchbrüche.',
+    description: 'Visionary tech essays, scientific discoveries, and deep digital culture.',
     enabled: true,
     icon: '🔌'
   },
@@ -237,7 +237,7 @@ export const DEFAULT_NEWS_FEEDS = [
     tier: 'tech',
     tierLabel: 'Startups & VC',
     country: 'USA',
-    description: 'Startup-Finanzierungsrunden, Tech-Trends und Venture Capital.',
+    description: 'Venture capital funding, unicorn startups, and bleeding-edge tech products.',
     enabled: true,
     icon: '🚀'
   },
@@ -248,9 +248,9 @@ export const DEFAULT_NEWS_FEEDS = [
     category: 'Science',
     language: 'en',
     tier: 'science',
-    tierLabel: 'Raumfahrt & Science',
+    tierLabel: 'Space & Science',
     country: 'USA',
-    description: 'Aktuelle Missionen, Weltraumforschung und astronomische Entdeckungen.',
+    description: 'Official mission updates, deep-space imagery, and astronomical discoveries.',
     enabled: true,
     icon: '🚀'
   },
@@ -263,30 +263,30 @@ export const DEFAULT_NEWS_FEEDS = [
     tier: 'tech',
     tierLabel: 'Deep Tech & Science',
     country: 'USA',
-    description: 'Fundierter Journalismus für Technikexperten und Wissenschaftler.',
+    description: 'Authoritative analysis for technologists, developers, and scientists.',
     enabled: true,
     icon: '🔬'
   }
 ];
 
 export const SOURCE_TIERS = [
-  { id: 'all', label: 'All Sources', deLabel: 'Alle Quellen', icon: '🌐' },
-  { id: 'agencies', label: 'News Agencies', deLabel: '⚖️ Fakten-Agenturen', icon: '⚖️', description: 'Reuters, Associated Press, AFP' },
-  { id: 'giants', label: 'Global Giants', deLabel: '🌍 Reichweiten-Giganten', icon: '🌍', description: 'BBC, NYT, CNN, Guardian' },
-  { id: 'geopolitics', label: 'Geopolitics & Markets', deLabel: '📊 Geopolitik & Märkte', icon: '📊', description: 'Bloomberg, Financial Times, Al Jazeera' },
-  { id: 'national', label: 'German Media', deLabel: '🇩🇪 Leitmedien DE', icon: '🇩🇪', description: 'Tagesschau, Spiegel' },
-  { id: 'tech', label: 'Tech & Startups', deLabel: '💻 Tech & Innovation', icon: '💻', description: 'Heise, Verge, Wired, TC, Ars' }
+  { id: 'all', label: 'All Sources', icon: '🌐' },
+  { id: 'agencies', label: 'News Agencies', icon: '⚖️', description: 'Reuters, Associated Press, AFP' },
+  { id: 'giants', label: 'Global Giants', icon: '🌍', description: 'BBC, NYT, CNN, Guardian' },
+  { id: 'geopolitics', label: 'Geopolitics & Markets', icon: '📊', description: 'Bloomberg, Financial Times, Al Jazeera' },
+  { id: 'national', label: 'German Media', icon: '🇩🇪', description: 'Tagesschau, Spiegel, Heise' },
+  { id: 'tech', label: 'Tech & Startups', icon: '💻', description: 'Heise, Verge, Wired, TC, Ars' }
 ];
 
 export const NEWS_CATEGORIES = [
-  { id: 'all', label: 'All Stories', icon: '🔥', deLabel: 'Alle News' },
-  { id: 'World', label: 'World & Politics', icon: '🌍', deLabel: 'Weltgeschehen & Geopolitik' },
-  { id: 'Finance', label: 'Finance & Markets', icon: '📈', deLabel: 'Finanzen & Weltwirtschaft' },
-  { id: 'Tech', label: 'Tech & AI', icon: '💻', deLabel: 'Technologie & KI' },
-  { id: 'Science', label: 'Science & Space', icon: '🚀', deLabel: 'Wissenschaft & Raumfahrt' },
-  { id: 'Productivity', label: 'Life & Mindset', icon: '🧠', deLabel: 'Produktivität & Mindset' },
-  { id: 'Gaming', label: 'Gaming & Culture', icon: '🎮', deLabel: 'Gaming & Kultur' },
-  { id: 'bookmarks', label: 'Bookmarks', icon: '⭐', deLabel: 'Gespeichert' }
+  { id: 'all', label: 'All Stories', icon: '🔥' },
+  { id: 'World', label: 'World & Politics', icon: '🌍' },
+  { id: 'Finance', label: 'Finance & Markets', icon: '📈' },
+  { id: 'Tech', label: 'Tech & AI', icon: '💻' },
+  { id: 'Science', label: 'Science & Space', icon: '🚀' },
+  { id: 'Productivity', label: 'Life & Mindset', icon: '🧠' },
+  { id: 'Gaming', label: 'Gaming & Culture', icon: '🎮' },
+  { id: 'bookmarks', label: 'Bookmarks', icon: '⭐' }
 ];
 
 // Fallback high-quality curated stories covering all 10 Global Leaders
@@ -442,7 +442,7 @@ const CURATED_STORIES = [
     content: 'Al Jazeera English delivers in-depth field reporting on how non-aligned nations are co-investing in shared regional supply chains, creating resilient economic corridors independent of traditional Western and Eastern blocs.',
     source: 'Al Jazeera English',
     tier: 'geopolitics',
-    country: 'Katar / Globaler Süden',
+    country: 'Qatar / Global South',
     category: 'World',
     language: 'en',
     url: 'https://aljazeera.com',
@@ -453,18 +453,18 @@ const CURATED_STORIES = [
   },
   {
     id: 'curated-tagesschau',
-    title: 'Tagesschau: Europäische Union beschließt neue Richtlinien für Energieautarkie und Netzsicherheit',
-    description: 'Die EU-Mitgliedsstaaten vereinbaren gemeinsame Mindeststandards für kritische Infrastrukturen und investieren gezielt in paneuropäische Stromtrassen.',
-    content: 'In Brüssel haben sich die Energieminister der EU auf ein umfassendes Gesetzespaket verständigt. Ziel ist es, die Abhängigkeit von einzelnen Energieimporteuren dauerhaft zu beenden und den Anteil erneuerbarer Energien im europäischen Verbundnetz bis 2030 auf über 60 Prozent zu steigern.',
+    title: 'Tagesschau: European Union Adopts New Directives for Energy Grid Security and Decoupling',
+    description: 'EU member states establish joint resilience standards for critical energy infrastructure and deploy strategic investments into pan-European transmission lines.',
+    content: 'In Brussels, EU energy ministers finalized a comprehensive legislative package designed to permanently diversify import dependencies while accelerating renewable energy integration across the European synchronous grid to over 60 percent by 2030.',
     source: 'Tagesschau',
     tier: 'national',
-    country: 'Deutschland',
+    country: 'Germany',
     category: 'World',
-    language: 'de',
+    language: 'en',
     url: 'https://tagesschau.de',
     imageUrl: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=60',
     pubDate: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-    author: 'ARD-Studio Brüssel',
+    author: 'European Bureau',
     readTime: '4 min'
   }
 ];
@@ -769,9 +769,9 @@ export const generateLocalSummary = (title, content = '') => {
     return {
       tldr: title,
       takeaways: [
-        'Aktuelle Meldung aus den Leitmedien.',
-        'Klicken Sie auf den Original-Artikel für umfassende Details.',
-        'Über den E.O.M Reader können Sie sich den Beitrag vorlesen lassen.'
+        'Breaking report from verified news sources.',
+        'Click the original article link for in-depth coverage.',
+        'Use the E.O.M Reader to listen via text-to-speech.'
       ],
       sentiment: 'Neutral',
       sentimentScore: 0
@@ -782,8 +782,8 @@ export const generateLocalSummary = (title, content = '') => {
   const sentences = content.replace(/([.?!])\s*(?=[A-ZÄÖÜ])/g, "$1|").split("|").map(s => s.trim()).filter(s => s.length > 20);
 
   // Positive & negative keyword lists for sentiment analysis
-  const positiveWords = ['breakthrough', 'success', 'erfolg', 'wachstum', 'gewinn', 'rekord', 'fortschritt', 'innovation', 'positiv', 'steigen', 'surge', 'rally', 'revolution', 'bullish'];
-  const negativeWords = ['crisis', 'krise', 'verlust', 'einbruch', 'crash', 'risiko', 'gefahr', 'sinken', 'abfall', 'problem', 'warnung', 'scam', 'inflation', 'bearish', 'drop'];
+  const positiveWords = ['breakthrough', 'success', 'growth', 'gain', 'record', 'progress', 'innovation', 'positive', 'surge', 'rally', 'revolution', 'bullish', 'expansion'];
+  const negativeWords = ['crisis', 'loss', 'crash', 'risk', 'danger', 'drop', 'problem', 'warning', 'scam', 'inflation', 'bearish', 'decline'];
 
   const lower = content.toLowerCase();
   let posCount = 0;
@@ -792,8 +792,8 @@ export const generateLocalSummary = (title, content = '') => {
   negativeWords.forEach(w => { if (lower.includes(w)) negCount++; });
 
   let sentiment = 'Neutral';
-  if (posCount > negCount) sentiment = 'Bullish / Positiv ✨';
-  else if (negCount > posCount) sentiment = 'Bearish / Vorsicht ⚠️';
+  if (posCount > negCount) sentiment = 'Bullish / Positive ✨';
+  else if (negCount > posCount) sentiment = 'Bearish / Caution ⚠️';
 
   // Extract top 2-3 most informative sentences for TL;DR
   const tldr = sentences.slice(0, 2).join(' ') || title;
@@ -808,8 +808,8 @@ export const generateLocalSummary = (title, content = '') => {
     }
   } else {
     takeaways.push(sentences[0] || title);
-    takeaways.push(`Kategorie: Informationsquelle analysiert.`);
-    takeaways.push('Vollständiger Text im Quellverweis verfügbar.');
+    takeaways.push('Category: Analyzed intelligence source.');
+    takeaways.push('Full text available via source reference.');
   }
 
   return {

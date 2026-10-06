@@ -1204,7 +1204,7 @@ export default function ProfileSettings() {
                   </div>
 
                   <div className="form-group" style={{ maxWidth: '400px', marginBottom: '20px' }}>
-                    <label className="form-label">Sync Passphrase / Passwort (E2EE)</label>
+                    <label className="form-label">Sync Passphrase / Password (E2EE)</label>
                     <input
                       type="password"
                       className="notion-input"
