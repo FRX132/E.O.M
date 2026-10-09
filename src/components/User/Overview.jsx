@@ -45,9 +45,9 @@ export default function Overview({ navigate }) {
   }, []);
 
   const settings = overviewSettings || {
-    visibleWidgets: { clock: true, calendar: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true, reminders: true, news: true },
-    widgetTitles: { clock: "Clock", calendar: "Calendar", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats", reminders: "Daily Reminders", news: "Breaking News" },
-    visibleStatsBars: { expenses: true, goals: true, habits: true, fridge: true, targets: true, library: true, cinema: true, quests: true }
+    visibleWidgets: { clock: true, calendar: true, timetable: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true, reminders: true, news: true },
+    widgetTitles: { clock: "Clock", calendar: "Calendar", timetable: "Today's Timetable", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats", reminders: "Daily Reminders", news: "Breaking News" },
+    visibleStatsBars: { expenses: true, goals: true, habits: true, timetable: true, fridge: true, targets: true, library: true, cinema: true, quests: true }
   };
 
   const [time, setTime] = useState(new Date());
@@ -161,6 +161,103 @@ export default function Overview({ navigate }) {
     setHabitsDays(updatedDays);
   };
 
+  // Get today's weekday name in en-US
+  const todayDayName = useMemo(() => {
+    const formatter = new Intl.DateTimeFormat('en-US', { weekday: 'long' });
+    return formatter.format(new Date());
+  }, []);
+
+  const uniqueHabits = useMemo(() => customHabitTemplates, [customHabitTemplates]);
+
+  // Translate weekday to date string
+  const getLocalDateOfWeekday = (targetDay) => {
+    if (targetDay === 'Daily') {
+      const today = new Date();
+      const ye = today.getFullYear();
+      const mo = String(today.getMonth() + 1).padStart(2, '0');
+      const da = String(today.getDate()).padStart(2, '0');
+      return `${ye}-${mo}-${da}`;
+    }
+    const weekdaysOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const targetIdx = weekdaysOrder.indexOf(targetDay);
+    if (targetIdx === -1) return null;
+    const now = new Date();
+    const currentIdx = now.getDay();
+    const diff = targetIdx - currentIdx;
+    const targetDate = new Date(now);
+    targetDate.setDate(now.getDate() + diff);
+    const ye = targetDate.getFullYear();
+    const mo = String(targetDate.getMonth() + 1).padStart(2, '0');
+    const da = String(targetDate.getDate()).padStart(2, '0');
+    return `${ye}-${mo}-${da}`;
+  };
+
+  // Today's Timetable Blocks (all blocks for current day or Daily, sorted chronologically)
+  const todayTimetableBlocks = useMemo(() => {
+    return (timetableBlocks || [])
+      .filter(b => b.day === todayDayName || b.day === 'Daily')
+      .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+  }, [timetableBlocks, todayDayName]);
+
+  // Check if a timetable block is completed
+  const isBlockCompleted = (block) => {
+    if (block.habitId) {
+      const dateStr = getLocalDateOfWeekday(block.day);
+      if (!dateStr) return false;
+      const dayRecord = habitsDays.find(d => d.id === dateStr);
+      return !!dayRecord?.habits?.find(h => h.id === block.habitId)?.done;
+    }
+    return !!block.completed;
+  };
+
+  const completedTodayBlocks = todayTimetableBlocks.filter(b => isBlockCompleted(b)).length;
+  const timetableProgress = todayTimetableBlocks.length > 0
+    ? Math.round((completedTodayBlocks / todayTimetableBlocks.length) * 100)
+    : 0;
+
+  // Toggle habit done state from overview card
+  const toggleHabitInOverview = (block) => {
+    const dateStr = getLocalDateOfWeekday(block.day);
+    if (!dateStr) return;
+
+    const dayRecord = habitsDays.find(d => d.id === dateStr);
+    if (!dayRecord) return;
+
+    const habit = dayRecord.habits.find(h => h.id === block.habitId);
+    if (!habit) return;
+
+    // Toggle XP
+    const points = habit.done ? -50 : 50;
+    addXP(points);
+
+    // Update habits in store
+    const updatedDays = habitsDays.map(day => {
+      if (day.id !== dateStr) return day;
+      return {
+        ...day,
+        habits: day.habits.map(h => h.id === block.habitId ? { ...h, done: !h.done } : h)
+      };
+    });
+    setHabitsDays(updatedDays);
+  };
+
+  // Toggle custom reminder or block done state from overview card
+  const toggleReminderInOverview = (block) => {
+    const points = block.completed ? -10 : 10;
+    addXP(points);
+    const updated = timetableBlocks.map(b => b.id === block.id ? { ...b, completed: !b.completed } : b);
+    setTimetableBlocks(updated);
+  };
+
+  const handleToggleBlockInOverview = (block, e) => {
+    if (e) e.stopPropagation();
+    if (block.habitId) {
+      toggleHabitInOverview(block);
+    } else {
+      toggleReminderInOverview(block);
+    }
+  };
+
   // Calculate monthly expenses
   const monthlyTotal = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
 
@@ -180,6 +277,7 @@ export default function Overview({ navigate }) {
     (settings.visibleStatsBars?.expenses !== false) && { label: 'Expense Tracker', pct: expenseProg, color: 'var(--blue-text)' },
     (settings.visibleStatsBars?.goals !== false) && { label: 'Goal Planner', pct: goalProg, color: 'var(--red-text)' },
     (settings.visibleStatsBars?.habits !== false) && { label: 'Habit Tracker', pct: habitProgress, color: 'var(--purple-text)', explicitDisplay: `${habitXpEarned} / ${habitXpMax} XP` },
+    (settings.visibleStatsBars?.timetable !== false && todayTimetableBlocks.length > 0) && { label: "Today's Timetable", pct: timetableProgress, color: '#14b8a6', explicitDisplay: `${completedTodayBlocks} / ${todayTimetableBlocks.length}` },
     (settings.visibleStatsBars?.fridge !== false) && { label: 'Fridge Stock', pct: fridgeProg, color: 'var(--green-text)' },
     (settings.visibleStatsBars?.targets !== false) && { label: 'Big Targets', pct: targetProg, color: 'var(--orange-text)' },
     (settings.visibleStatsBars?.library !== false) && { label: 'Library', pct: bookProg, color: '#3182ce' },
@@ -348,86 +446,13 @@ export default function Overview({ navigate }) {
     );
   };
 
-  // Get today's weekday name in en-US
-  const todayDayName = useMemo(() => {
-    const formatter = new Intl.DateTimeFormat('en-US', { weekday: 'long' });
-    return formatter.format(new Date());
-  }, []);
-
   // Filter today's reminders (supports specific weekday or Daily)
   const todayReminders = useMemo(() => {
     return timetableBlocks.filter(b => (b.day === todayDayName || b.day === 'Daily') && b.isReminder);
   }, [timetableBlocks, todayDayName]);
 
-  // Translate weekday to date string
-  const getLocalDateOfWeekday = (targetDay) => {
-    if (targetDay === 'Daily') {
-      const today = new Date();
-      const ye = today.getFullYear();
-      const mo = String(today.getMonth() + 1).padStart(2, '0');
-      const da = String(today.getDate()).padStart(2, '0');
-      return `${ye}-${mo}-${da}`;
-    }
-    const weekdaysOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const targetIdx = weekdaysOrder.indexOf(targetDay);
-    if (targetIdx === -1) return null;
-    const now = new Date();
-    const currentIdx = now.getDay();
-    const diff = targetIdx - currentIdx;
-    const targetDate = new Date(now);
-    targetDate.setDate(now.getDate() + diff);
-    const ye = targetDate.getFullYear();
-    const mo = String(targetDate.getMonth() + 1).padStart(2, '0');
-    const da = String(targetDate.getDate()).padStart(2, '0');
-    return `${ye}-${mo}-${da}`;
-  };
-
-  // Toggle habit done state from overview card
-  const toggleHabitInOverview = (block) => {
-    const dateStr = getLocalDateOfWeekday(block.day);
-    if (!dateStr) return;
-
-    const dayRecord = habitsDays.find(d => d.id === dateStr);
-    if (!dayRecord) return;
-
-    const habit = dayRecord.habits.find(h => h.id === block.habitId);
-    if (!habit) return;
-
-    // Toggle XP
-    const points = habit.done ? -50 : 50;
-    addXP(points);
-
-    // Update habits in store
-    const updatedDays = habitsDays.map(day => {
-      if (day.id !== dateStr) return day;
-      return {
-        ...day,
-        habits: day.habits.map(h => h.id === block.habitId ? { ...h, done: !h.done } : h)
-      };
-    });
-    setHabitsDays(updatedDays);
-  };
-
-  // Toggle custom reminder done state from overview card
-  const toggleReminderInOverview = (block) => {
-    const points = block.completed ? -10 : 10;
-    addXP(points);
-    const updated = timetableBlocks.map(b => b.id === block.id ? { ...b, completed: !b.completed } : b);
-    setTimetableBlocks(updated);
-  };
-
   // Helper to get completion status of a reminder
-  const getReminderCompletion = (block) => {
-    if (block.habitId) {
-      const dateStr = getLocalDateOfWeekday(block.day);
-      if (!dateStr) return false;
-      const dayRecord = habitsDays.find(d => d.id === dateStr);
-      if (!dayRecord) return false;
-      const habit = dayRecord.habits.find(h => h.id === block.habitId);
-      return habit ? habit.done : false;
-    }
-    return !!block.completed;
-  };
+  const getReminderCompletion = (block) => isBlockCompleted(block);
 
   // Add quick reminder for today from widget input
   const handleAddQuickReminder = (e) => {
@@ -672,6 +697,117 @@ export default function Overview({ navigate }) {
               </ul>
             </div>
             <button className="card-action" onClick={() => navigate('/habits')}>Open Habit Tracker</button>
+          </div>
+        )}
+
+        {settings.visibleWidgets?.timetable !== false && (
+          <div className="overview-card timetable-card">
+            <div className="card-header" style={{ justifyContent: 'space-between', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span className="card-icon" style={{ color: '#14b8a6' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-calendar3" viewBox="0 0 16 16">
+                    <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
+                    <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                  </svg>
+                </span>
+                <div>
+                  <h3 style={{ margin: 0 }}>{settings.widgetTitles?.timetable || "Today's Timetable"}</h3>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    {todayDayName} • {completedTodayBlocks} of {todayTimetableBlocks.length} completed
+                  </div>
+                </div>
+              </div>
+              <div style={{
+                background: 'rgba(20, 184, 166, 0.12)',
+                border: '1px solid rgba(20, 184, 166, 0.3)',
+                borderRadius: '8px',
+                padding: '4px 10px',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                color: '#14b8a6'
+              }}>
+                {todayTimetableBlocks.length > 0 ? `${timetableProgress}%` : todayDayName}
+              </div>
+            </div>
+
+            <div className="timetable-widget-content">
+              {todayTimetableBlocks.length > 0 && (
+                <div className="timetable-progress-bar-bg">
+                  <div className="timetable-progress-bar-fill" style={{ width: `${timetableProgress}%` }}></div>
+                </div>
+              )}
+
+              <ul className="timetable-overview-list">
+                {todayTimetableBlocks.map(block => {
+                  const isDone = isBlockCompleted(block);
+                  const linkedHabitName = block.habitId ? uniqueHabits.find(h => h.id === block.habitId)?.name || 'Linked Habit' : null;
+                  const colorClass = block.color ? `color-${block.color}` : 'color-teal';
+
+                  return (
+                    <li
+                      key={block.id}
+                      className={`timetable-overview-item ${colorClass} ${isDone ? 'is-completed' : ''}`}
+                      onClick={() => navigate('/timetable')}
+                      title={block.notes ? `${block.title}\n${block.notes}` : block.title}
+                    >
+                      <input
+                        type="checkbox"
+                        className="timetable-overview-checkbox"
+                        checked={isDone}
+                        onClick={(e) => handleToggleBlockInOverview(block, e)}
+                        onChange={() => {}}
+                      />
+                      <div className="timetable-overview-time-badge">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" viewBox="0 0 16 16" style={{ opacity: 0.7 }}>
+                          <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
+                          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                        </svg>
+                        <span>{block.startTime || 'All Day'}{block.endTime ? ` - ${block.endTime}` : ''}</span>
+                      </div>
+                      <div className="timetable-overview-info">
+                        <span className="timetable-overview-title">{block.title}</span>
+                        {linkedHabitName && (
+                          <span className="timetable-overview-habit-tag">
+                            ⭐ {linkedHabitName}
+                          </span>
+                        )}
+                        {block.notes && (
+                          <span className="timetable-overview-notes">{block.notes}</span>
+                        )}
+                      </div>
+                      {block.url && (
+                        <a
+                          href={block.url.startsWith('http') ? block.url : `https://${block.url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="timetable-overview-link"
+                          onClick={(e) => e.stopPropagation()}
+                          title="Open Link"
+                        >
+                          ↗
+                        </a>
+                      )}
+                    </li>
+                  );
+                })}
+                {todayTimetableBlocks.length === 0 && (
+                  <div className="timetable-empty-overview">
+                    <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      No time blocks scheduled for today ({todayDayName}).
+                    </p>
+                    <button
+                      className="mac-btn mac-btn-add"
+                      style={{ fontSize: '0.78rem', padding: '5px 12px' }}
+                      onClick={() => navigate('/timetable')}
+                    >
+                      + Schedule {todayDayName}
+                    </button>
+                  </div>
+                )}
+              </ul>
+            </div>
+
+            <button className="card-action" onClick={() => navigate('/timetable')}>Open Timetable</button>
           </div>
         )}
 
@@ -1029,6 +1165,7 @@ export default function Overview({ navigate }) {
                   { key: 'clock', label: 'Clock Widget', defaultTitle: 'Clock' },
                   { key: 'calendar', label: 'Calendar Widget', defaultTitle: 'Calendar' },
                   { key: 'sync', label: 'Stats Widget', defaultTitle: 'Stats' },
+                  { key: 'timetable', label: "Today's Timetable Card", defaultTitle: "Today's Timetable" },
                   { key: 'habits', label: 'Daily Habits Card', defaultTitle: 'Daily Habits' },
                   { key: 'finances', label: 'Finances & Wallet Card', defaultTitle: 'Finances & Wallet' },
                   { key: 'goals', label: 'Active Goals Card', defaultTitle: 'Active Goals' },
@@ -1098,6 +1235,7 @@ export default function Overview({ navigate }) {
                   { key: 'expenses', label: 'Expense Tracker' },
                   { key: 'goals', label: 'Goal Planner' },
                   { key: 'habits', label: 'Habit Tracker' },
+                  { key: 'timetable', label: "Today's Timetable" },
                   { key: 'fridge', label: 'Fridge Stock' },
                   { key: 'targets', label: 'Big Targets' },
                   { key: 'library', label: 'Library' },
@@ -1164,9 +1302,9 @@ export default function Overview({ navigate }) {
                   if (confirm("Reset overview customization to defaults?")) {
                     setOverviewSettings({
                       layout: 0,
-                      visibleWidgets: { clock: true, calendar: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true, reminders: true },
-                      widgetTitles: { clock: "Clock", calendar: "Calendar", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats", reminders: "Daily Reminders" },
-                      visibleStatsBars: { expenses: true, goals: true, habits: true, fridge: true, targets: true, library: true, cinema: true, quests: true }
+                      visibleWidgets: { clock: true, calendar: true, timetable: true, habits: true, finances: true, goals: true, fridge: true, objective: true, rule: true, sync: true, reminders: true, news: true },
+                      widgetTitles: { clock: "Clock", calendar: "Calendar", timetable: "Today's Timetable", habits: "Daily Habits", finances: "Finances & Wallet", goals: "Active Goals", fridge: "Fridge Status", objective: "Primary Objective", rule: "Daily Rule", sync: "Stats", reminders: "Daily Reminders", news: "Breaking News" },
+                      visibleStatsBars: { expenses: true, goals: true, habits: true, timetable: true, fridge: true, targets: true, library: true, cinema: true, quests: true }
                     });
                   }
                 }}

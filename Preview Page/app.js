@@ -366,8 +366,8 @@ function openDownloadModal(platform) {
                 <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px;">
                     Prebuilt <code>.IPA</code> binary for manual sideloading (e.g. via AltStore / TrollStore).
                 </p>
-                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.2/E.O.M.ipa" class="modal-secondary-btn" download>
-                    📥 Download E.O.M.ipa (V2.0.2)
+                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.3/E.O.M.ipa" class="modal-secondary-btn" download>
+                    📥 Download E.O.M.ipa (V2.0.3)
                 </a>
             </div>
         `;
@@ -397,8 +397,8 @@ function openDownloadModal(platform) {
                 <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px;">
                     Install the standalone Android application package.
                 </p>
-                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.2/E.O.M.apk" class="modal-secondary-btn" download>
-                    📥 Download E.O.M.apk (V2.0.2)
+                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.3/E.O.M.apk" class="modal-secondary-btn" download>
+                    📥 Download E.O.M.apk (V2.0.3)
                 </a>
             </div>
         `;
@@ -413,8 +413,8 @@ function openDownloadModal(platform) {
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
                     Download the prebuilt native desktop application for <strong>Windows 10 / 11</strong>.
                 </p>
-                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.2/E.O.M-Setup-2.0.2.exe" class="modal-download-btn" download>
-                    📥 Download E.O.M Setup 2.0.2.exe
+                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.3/E.O.M-Setup-2.0.3.exe" class="modal-download-btn" download>
+                    📥 Download E.O.M Setup 2.0.3.exe
                 </a>
             </div>
 
@@ -438,8 +438,8 @@ function openDownloadModal(platform) {
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
                     Download the native desktop disk image for <strong>Apple Silicon & Intel Macs</strong>.
                 </p>
-                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.2/E.O.M-2.0.2.dmg" class="modal-download-btn" download>
-                    📥 Download E.O.M-2.0.2.dmg
+                <a href="https://github.com/FRX132/E.O.M/releases/download/v2.0.3/E.O.M-2.0.3.dmg" class="modal-download-btn" download>
+                    📥 Download E.O.M-2.0.3.dmg
                 </a>
             </div>
 
