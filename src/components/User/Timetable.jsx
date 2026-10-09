@@ -1,5 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useStore } from '../../store';
+import { parseICSContent } from '../../services/calendarImport';
+import { playCyberClick, playTimerAlarm } from '../../services/soundService';
+import { sendLocalNotification, requestNotificationPermission } from '../../services/notificationService';
 
 const ClockIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-clock" viewBox="0 0 16 16">
@@ -96,6 +99,87 @@ export default function Timetable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBlock, setEditingBlock] = useState(null); // null means adding a new block
   const [modalTab, setModalTab] = useState('event'); // 'event' or 'reminder'
+
+  // ICS Import state
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [icsRawText, setIcsRawText] = useState('');
+  const [importStatus, setImportStatus] = useState('');
+
+  // Active Time Tracker / Stopwatch on block
+  const [activeTrackingBlockId, setActiveTrackingBlockId] = useState(null);
+  const [trackingSeconds, setTrackingSeconds] = useState(0);
+
+  useEffect(() => {
+    let interval = null;
+    if (activeTrackingBlockId) {
+      interval = setInterval(() => {
+        setTrackingSeconds(s => s + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [activeTrackingBlockId]);
+
+  const handleToggleTimer = (block, e) => {
+    e.stopPropagation();
+    playCyberClick();
+    if (activeTrackingBlockId === block.id) {
+      // Stop tracking
+      const minutesSpent = Math.max(1, Math.round(trackingSeconds / 60));
+      addXP(minutesSpent * 2); // +2 XP per minute of focus!
+      alert(`⏱️ Focus session ended for "${block.title}"!\nDuration: ${minutesSpent} min (+${minutesSpent * 2} XP)`);
+      setActiveTrackingBlockId(null);
+      setTrackingSeconds(0);
+    } else {
+      // Start tracking
+      setActiveTrackingBlockId(block.id);
+      setTrackingSeconds(0);
+      requestNotificationPermission();
+    }
+  };
+
+  const formatStopwatch = (totalSec) => {
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  };
+
+  // Import ICS
+  const handleImportICSFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const parsed = parseICSContent(text);
+      if (parsed.length === 0) {
+        setImportStatus('⚠️ No valid events found in this file.');
+      } else {
+        setTimetableBlocks([...timetableBlocks, ...parsed]);
+        setImportStatus(`🎉 Successfully imported ${parsed.length} events!`);
+        setTimeout(() => {
+          setIsImportModalOpen(false);
+          setImportStatus('');
+        }, 1200);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleImportICSText = () => {
+    if (!icsRawText.trim()) return;
+    const parsed = parseICSContent(icsRawText);
+    if (parsed.length === 0) {
+      setImportStatus('⚠️ Could not parse iCalendar text.');
+    } else {
+      setTimetableBlocks([...timetableBlocks, ...parsed]);
+      setImportStatus(`🎉 Successfully imported ${parsed.length} events!`);
+      setTimeout(() => {
+        setIsImportModalOpen(false);
+        setIcsRawText('');
+        setImportStatus('');
+      }, 1200);
+    }
+  };
 
   // Form inputs
   const [title, setTitle] = useState('');
@@ -377,9 +461,14 @@ export default function Timetable() {
             <p className="premium-subtitle">Plan your days, structure your week, and schedule habits</p>
           </div>
         </div>
-        <button className="mac-btn mac-btn-add" onClick={() => handleOpenAdd()}>
-          + Add Time Block
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button className="mac-btn mac-btn-cancel" onClick={() => setIsImportModalOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            📥 Import .ics / iCal
+          </button>
+          <button className="mac-btn mac-btn-add" onClick={() => handleOpenAdd()}>
+            + Add Time Block
+          </button>
+        </div>
       </div>
 
       <div className="timetable-grid">
@@ -458,13 +547,35 @@ export default function Timetable() {
                         </div>
                       ) : null}
 
-                      <div className="timetable-block-footer">
-                        <button className="timetable-block-action-btn edit" onClick={(e) => handleOpenEdit(block, e)} title="Edit Block">
-                          ✏️
+                      <div className="timetable-block-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <button
+                          className="timetable-block-action-btn"
+                          onClick={(e) => handleToggleTimer(block, e)}
+                          title="Focus Stopwatch (+XP)"
+                          style={{
+                            width: 'auto',
+                            padding: '2px 8px',
+                            borderRadius: '6px',
+                            background: activeTrackingBlockId === block.id ? '#22c55e' : 'rgba(255,255,255,0.06)',
+                            color: activeTrackingBlockId === block.id ? '#000' : 'var(--text-muted)',
+                            fontWeight: 700,
+                            fontSize: '0.7rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <span>{activeTrackingBlockId === block.id ? '⏹️' : '⏱️'}</span>
+                          <span>{activeTrackingBlockId === block.id ? formatStopwatch(trackingSeconds) : 'Focus'}</span>
                         </button>
-                        <button className="timetable-block-action-btn delete" onClick={(e) => handleDelete(block, e)} title="Delete Block">
-                          🗑️
-                        </button>
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                          <button className="timetable-block-action-btn edit" onClick={(e) => handleOpenEdit(block, e)} title="Edit Block">
+                            ✏️
+                          </button>
+                          <button className="timetable-block-action-btn delete" onClick={(e) => handleDelete(block, e)} title="Delete Block">
+                            🗑️
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );
@@ -835,6 +946,67 @@ export default function Timetable() {
                   Cancel
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ICS / iCal Import Modal */}
+      {isImportModalOpen && (
+        <div className="mac-modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(10px)', zIndex: 10000, padding: '20px' }} onClick={() => setIsImportModalOpen(false)}>
+          <div className="mac-modal" style={{ width: '520px', maxWidth: '92vw', background: 'var(--bg-card)', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-lg)', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-card-alt)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '1.2rem' }}>📥</span>
+                <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-main)', fontWeight: 700 }}>Import Calendar (.ics)</h3>
+              </div>
+              <button onClick={() => setIsImportModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '20px' }}>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                Import events directly from <strong>Google Calendar</strong>, <strong>Apple Calendar</strong> or <strong>Outlook</strong> into your weekly timetable:
+              </p>
+
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Option 1: Upload .ics file</label>
+                <input
+                  type="file"
+                  accept=".ics,text/calendar"
+                  onChange={handleImportICSFile}
+                  style={{
+                    background: 'var(--bg-card-alt)',
+                    border: '1px dashed var(--border-color)',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    width: '100%',
+                    color: 'var(--text-main)',
+                    fontSize: '0.82rem'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Option 2: Paste iCal text</label>
+                <textarea
+                  className="mac-input"
+                  placeholder="BEGIN:VCALENDAR... BEGIN:VEVENT..."
+                  value={icsRawText}
+                  onChange={e => setIcsRawText(e.target.value)}
+                  style={{ width: '100%', height: '110px', resize: 'vertical', fontSize: '0.8rem', fontFamily: 'monospace', background: 'var(--bg-card-alt)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '10px', color: 'var(--text-main)' }}
+                />
+              </div>
+
+              {importStatus && (
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: importStatus.startsWith('🎉') ? 'var(--green-text)' : 'var(--red-text)' }}>
+                  {importStatus}
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', padding: '14px 20px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-card-alt)' }}>
+              <button className="mac-btn mac-btn-cancel" onClick={() => setIsImportModalOpen(false)}>Cancel</button>
+              <button className="mac-btn mac-btn-add" onClick={handleImportICSText} disabled={!icsRawText.trim()}>Parse & Import</button>
             </div>
           </div>
         </div>

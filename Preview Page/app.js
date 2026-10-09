@@ -1,19 +1,99 @@
-// --- Theme Switcher Logic ---
-let activeTheme = 'eom';
+// --- Theme Switcher Logic (4 Themes) ---
+const THEMES = [
+  { id: 'eom', name: 'Obsidian Gold', opacity: '0.04', color: '#d48f48' },
+  { id: 'matrix', name: 'Matrix Green', opacity: '0.12', color: '#00ff66' },
+  { id: 'cyber', name: 'Cyber Neon', opacity: '0.08', color: '#06b6d4' },
+  { id: 'slate', name: 'Slate Dark', opacity: '0.03', color: '#a855f7' }
+];
+let themeIndex = 0;
+let activeTheme = THEMES[0].id;
+
 function toggleTheme() {
-    const canvasEl = document.getElementById('matrix-canvas');
+    themeIndex = (themeIndex + 1) % THEMES.length;
+    const current = THEMES[themeIndex];
+    activeTheme = current.id;
+
+    document.body.className = `theme-${current.id}`;
     const themeName = document.getElementById('theme-name');
-    if (activeTheme === 'eom') {
-        document.body.classList.remove('theme-eom');
-        activeTheme = 'matrix';
-        if (themeName) themeName.innerText = 'Matrix Green';
-        if (canvasEl) canvasEl.style.opacity = '0.12';
+    if (themeName) themeName.innerText = current.name;
+
+    const canvasEl = document.getElementById('matrix-canvas');
+    if (canvasEl) canvasEl.style.opacity = current.opacity;
+}
+
+// --- Simulator Presets ---
+function loadSimulatorPreset(preset) {
+    document.querySelectorAll('.simulator-preset-btn').forEach(btn => btn.classList.remove('active'));
+    const clickedBtn = document.getElementById(`preset-${preset}`);
+    if (clickedBtn) clickedBtn.classList.add('active');
+
+    const habitList = document.querySelector('.habit-list-interactive');
+    if (!habitList) return;
+
+    if (preset === 'biohacker') {
+        currentXP = 28500;
+        rank = 'F';
+        habitList.innerHTML = `
+            <div class="habit-item-interactive" onclick="toggleHabitLive(this, 250)">
+                <input type="checkbox"> <span>🧊 3m Cold Shower & Breathwork (+250 XP)</span>
+            </div>
+            <div class="habit-item-interactive" onclick="toggleHabitLive(this, 350)">
+                <input type="checkbox"> <span>🏃‍♂️ 5km Morning Zone 2 Run (+350 XP)</span>
+            </div>
+            <div class="habit-item-interactive" onclick="toggleHabitLive(this, 200)">
+                <input type="checkbox"> <span>🥗 Clean Nutrition & Macro Audit (+200 XP)</span>
+            </div>
+        `;
+    } else if (preset === 'trader') {
+        currentXP = 42000;
+        rank = 'C';
+        habitList.innerHTML = `
+            <div class="habit-item-interactive" onclick="toggleHabitLive(this, 300)">
+                <input type="checkbox"> <span>📈 Pre-Market Heatmap & Watchlist (+300 XP)</span>
+            </div>
+            <div class="habit-item-interactive" onclick="toggleHabitLive(this, 400)">
+                <input type="checkbox"> <span>🛡️ Strict Risk Management Execution (+400 XP)</span>
+            </div>
+            <div class="habit-item-interactive" onclick="toggleHabitLive(this, 250)">
+                <input type="checkbox"> <span>📝 Trade Journal & Post-Session Review (+250 XP)</span>
+            </div>
+        `;
+    } else if (preset === 'scholar') {
+        currentXP = 68000;
+        rank = 'B';
+        habitList.innerHTML = `
+            <div class="habit-item-interactive" onclick="toggleHabitLive(this, 500)">
+                <input type="checkbox"> <span>⏱️ 90m Monastic Deep Work Block (+500 XP)</span>
+            </div>
+            <div class="habit-item-interactive" onclick="toggleHabitLive(this, 300)">
+                <input type="checkbox"> <span>📚 Read 25 Pages Primary Literature (+300 XP)</span>
+            </div>
+            <div class="habit-item-interactive" onclick="toggleHabitLive(this, 200)">
+                <input type="checkbox"> <span>🧠 Active Recall & Mind Palace Reps (+200 XP)</span>
+            </div>
+        `;
     } else {
-        document.body.classList.add('theme-eom');
-        activeTheme = 'eom';
-        if (themeName) themeName.innerText = 'Obsidian Gold';
-        if (canvasEl) canvasEl.style.opacity = '0.04';
+        currentXP = 7000;
+        rank = 'Z';
+        habitList.innerHTML = `
+            <div class="habit-item-interactive" onclick="toggleHabitLive(this, 150)">
+                <input type="checkbox"> <span>🧘 10m Mindful Meditation (+150 XP)</span>
+            </div>
+            <div class="habit-item-interactive" onclick="toggleHabitLive(this, 200)">
+                <input type="checkbox"> <span>📚 Read 10 Pages Non-Fiction (+200 XP)</span>
+            </div>
+            <div class="habit-item-interactive" onclick="toggleHabitLive(this, 100)">
+                <input type="checkbox"> <span>💧 Hydration: 2L Clean Water (+100 XP)</span>
+            </div>
+        `;
     }
+
+    const xpCurrentEl = document.getElementById('xp-current');
+    if (xpCurrentEl) xpCurrentEl.innerText = currentXP.toLocaleString();
+    const rankBadgeEl = document.getElementById('rank-badge');
+    if (rankBadgeEl) rankBadgeEl.innerText = rank;
+    const barEl = document.getElementById('xp-progress-bar');
+    if (barEl) barEl.style.width = `${Math.min(100, Math.round((currentXP / maxXp) * 100))}%`;
 }
 
 // --- 1. Matrix Digital Rain Canvas Animation ---

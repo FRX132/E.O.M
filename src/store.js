@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { DEFAULT_NEWS_FEEDS } from './services/newsService';
+import { playXPChime, playLevelUpSound } from './services/soundService';
+import { calculateRank } from './constants';
 
 // Migration Logic: Safely fetch legacy data if it exists.
 const migrateLegacyData = (key, defaultVal) => {
@@ -519,8 +521,24 @@ export const useStore = create(
       addXP: (amount) => set((state) => {
         const amt = Number(amount) || 0;
         const currentXP = state.profile?.xp || 0;
+        const newXP = Math.max(0, currentXP + amt);
+
+        if (amt > 0) {
+          try {
+            const oldRank = calculateRank(currentXP).currentRank.rank;
+            const newRank = calculateRank(newXP).currentRank.rank;
+            if (oldRank !== newRank) {
+              playLevelUpSound();
+            } else {
+              playXPChime();
+            }
+          } catch (e) {
+            console.debug('XP sound error:', e);
+          }
+        }
+
         return {
-          profile: { ...state.profile, xp: Math.max(0, currentXP + amt) }
+          profile: { ...state.profile, xp: newXP }
         };
       }),
 

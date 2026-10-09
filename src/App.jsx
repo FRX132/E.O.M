@@ -31,6 +31,7 @@ import Timetable from './components/User/Timetable';
 import PasswordManager from './components/Agency/PasswordManager';
 import NewsHub from './components/Agency/NewsHub';
 import LoadingScreen from './components/UI/LoadingScreen';
+import CommandPalette from './components/Functions/CommandPalette';
 import { SKILL_DEF } from './constants';
 import './components/Styles/Timetable.css';
 
@@ -204,6 +205,7 @@ function App() {
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 900);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [openFolders, setOpenFolders] = useState({
     'Finance & Goals': true,
     'Health & Fitness': false,
@@ -215,6 +217,18 @@ function App() {
   const toggleFolder = (title) => {
     setOpenFolders(prev => ({ ...prev, [title]: !prev[title] }));
   };
+
+  // Global Cmd+K / Ctrl+K listener for Command Palette
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Connect tonGlobal Storage
   const profile = useStore((state) => state.profile);
@@ -481,6 +495,34 @@ function App() {
           </div>
         </div>
 
+        {/* Global Command Palette Trigger */}
+        <button
+          className="command-trigger-btn"
+          onClick={() => setIsCommandPaletteOpen(true)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: '100%',
+            padding: '7px 12px',
+            background: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '8px',
+            color: 'var(--text-muted)',
+            fontSize: '0.8rem',
+            cursor: 'pointer',
+            marginBottom: '14px',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--text-main)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+        >
+          <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>⚡</span> Search & Actions...
+          </span>
+          <kbd style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid var(--border-light)', borderRadius: '4px', padding: '1px 5px', fontSize: '0.7rem', color: 'var(--text-main)', fontFamily: 'monospace' }}>⌘K</kbd>
+        </button>
+
         <div className="nav-menu">
           <div className="nav-label">My Account</div>
           {navItemsAccount.map(item => (
@@ -577,6 +619,11 @@ function App() {
           </Routes>
         </div>
       </div>
+
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+      />
 
       <ProfileModal
         isOpen={isProfileModalOpen}

@@ -19,6 +19,11 @@ const ALL_WIDGET_CONFIGS = [
   { key: 'timetable', label: "Today's Timetable", defaultTitle: "Today's Timetable", icon: '📅', color: '#14b8a6' },
   { key: 'habits', label: 'Daily Habits', defaultTitle: 'Daily Habits', icon: '✨', color: '#a855f7' },
   { key: 'pomodoro', label: 'Focus Pomodoro Timer', defaultTitle: 'Focus Timer', icon: '⏱️', color: '#ef4444' },
+  { key: 'skills_radar', label: 'Life Balance Radar', defaultTitle: 'Life Balance Radar', icon: '🕸️', color: '#6366f1' },
+  { key: 'trophies', label: 'Achievements & Badges', defaultTitle: 'RPG Trophies', icon: '🏅', color: '#f59e0b' },
+  { key: 'runway', label: 'FIRE & Financial Runway', defaultTitle: 'Financial Freedom (FIRE)', icon: '🔥', color: '#10b981' },
+  { key: 'crypto_ticker', label: 'Live Crypto Tickers', defaultTitle: 'Live Markets', icon: '⚡', color: '#06b6d4' },
+  { key: 'ai_briefing', label: 'Weekly AI Intel Brief', defaultTitle: 'Weekly Intel Brief', icon: '🤖', color: '#a855f7' },
   { key: 'notes', label: 'Quick Scratchpad', defaultTitle: 'Quick Notes', icon: '📝', color: '#eab308' },
   { key: 'finances', label: 'Finances & Wallet', defaultTitle: 'Finances & Wallet', icon: '💳', color: '#3b82f6' },
   { key: 'goals', label: 'Active Goals', defaultTitle: 'Active Goals', icon: '🎯', color: '#ef4444' },
@@ -37,14 +42,15 @@ const ALL_WIDGET_CONFIGS = [
 // Presets
 const DASHBOARD_PRESETS = [
   { id: 'all', label: '🌟 All-in-One', desc: 'Complete view with all enabled widgets' },
-  { id: 'focus', label: '🎯 Deep Work', desc: 'Focus on schedule, timer, notes and key goals', widgets: ['timetable', 'pomodoro', 'notes', 'goals', 'habits', 'quicklinks', 'objective'] },
-  { id: 'health', label: '🧘 Health & Routine', desc: 'Habits, workout, fridge nutrition and reflection', widgets: ['timetable', 'habits', 'workout', 'fridge', 'mood', 'rule'] },
-  { id: 'finance', label: '📊 Finance & Markets', desc: 'Net worth, expenses breakdown, markets and breaking news', widgets: ['finances', 'trading', 'news', 'goals', 'quicklinks'] },
+  { id: 'focus', label: '🎯 Deep Work', desc: 'Focus on schedule, timer, notes and key goals', widgets: ['timetable', 'pomodoro', 'skills_radar', 'notes', 'goals', 'habits', 'quicklinks', 'objective'] },
+  { id: 'health', label: '🧘 Health & Routine', desc: 'Habits, workout, fridge nutrition and reflection', widgets: ['timetable', 'habits', 'skills_radar', 'trophies', 'workout', 'fridge', 'mood', 'rule'] },
+  { id: 'finance', label: '📊 Finance & Markets', desc: 'Net worth, expenses breakdown, markets and breaking news', widgets: ['finances', 'runway', 'crypto_ticker', 'trading', 'news', 'goals', 'quicklinks'] },
   { id: 'minimal', label: '⚡ Minimalist', desc: 'Clean, distraction-free view with essentials', widgets: ['timetable', 'habits', 'notes', 'objective'] }
 ];
 
 const DEFAULT_ORDER = [
-  'timetable', 'habits', 'pomodoro', 'notes', 'finances', 'goals',
+  'timetable', 'habits', 'pomodoro', 'skills_radar', 'notes', 'finances', 'goals',
+  'runway', 'crypto_ticker', 'trophies', 'ai_briefing',
   'fridge', 'quicklinks', 'workout', 'trading', 'media', 'mood',
   'reminders', 'news', 'objective', 'rule'
 ];
@@ -102,7 +108,8 @@ export default function Overview({ navigate }) {
   const settings = useMemo(() => {
     const defaultVisible = {
       clock: true, calendar: true, sync: true, timetable: true, habits: true,
-      pomodoro: true, notes: true, finances: true, goals: true, fridge: true,
+      pomodoro: true, skills_radar: true, trophies: true, runway: true, crypto_ticker: true,
+      ai_briefing: true, notes: true, finances: true, goals: true, fridge: true,
       quicklinks: true, workout: true, trading: true, media: true, mood: true,
       reminders: false, news: true, objective: true, rule: true
     };
@@ -1095,6 +1102,211 @@ export default function Overview({ navigate }) {
             </div>
           </div>
         );
+
+      case 'skills_radar': {
+        const radarDimensions = [
+          { label: 'Health', value: Math.min(100, Math.max(20, habitProgress || 20)) },
+          { label: 'Wealth', value: Math.min(100, Math.max(15, Math.round((netWorth / 5000) * 100))) },
+          { label: 'Mind', value: Math.min(100, Math.max(20, (books.length * 20) + 15)) },
+          { label: 'Focus', value: Math.min(100, Math.max(25, timetableProgress || 20)) },
+          { label: 'Fitness', value: Math.min(100, Math.max(20, (workouts.length * 15) + 20)) },
+          { label: 'Agency', value: Math.min(100, Math.max(20, Math.round(((profile.xp || 0) / 10000) * 100))) }
+        ];
+
+        const cx = 130;
+        const cy = 130;
+        const maxR = 85;
+
+        const getCoord = (value, idx, total = 6) => {
+          const angle = (Math.PI * 2 / total) * idx - Math.PI / 2;
+          const r = (value / 100) * maxR;
+          return {
+            x: cx + r * Math.cos(angle),
+            y: cy + r * Math.sin(angle)
+          };
+        };
+
+        const polygonPoints = radarDimensions
+          .map((d, i) => {
+            const { x, y } = getCoord(d.value, i);
+            return `${x},${y}`;
+          })
+          .join(' ');
+
+        return (
+          <div key={widgetKey} className={cardClass}>
+            <div className="card-header">
+              <span className="card-icon" style={{ color: '#6366f1' }}>🕸️</span>
+              <h3>{settings.widgetTitles?.skills_radar || "Life Balance Radar"}</h3>
+            </div>
+            <div className="card-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <svg viewBox="0 0 260 260" className="radar-svg">
+                {[0.25, 0.5, 0.75, 1].map((scale, sIdx) => {
+                  const pts = Array.from({ length: 6 }).map((_, i) => {
+                    const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
+                    const r = maxR * scale;
+                    return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
+                  }).join(' ');
+                  return <polygon key={sIdx} points={pts} className="radar-web-circle" />;
+                })}
+
+                {Array.from({ length: 6 }).map((_, i) => {
+                  const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
+                  const x2 = cx + maxR * Math.cos(angle);
+                  const y2 = cy + maxR * Math.sin(angle);
+                  return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} className="radar-axis-line" />;
+                })}
+
+                <polygon points={polygonPoints} className="radar-data-polygon" />
+
+                {radarDimensions.map((d, i) => {
+                  const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
+                  const labelR = maxR + 18;
+                  const lx = cx + labelR * Math.cos(angle);
+                  const ly = cy + labelR * Math.sin(angle) + 4;
+                  return (
+                    <text key={i} x={lx} y={ly} className="radar-label-text">
+                      {d.label}
+                    </text>
+                  );
+                })}
+              </svg>
+            </div>
+            <button className="card-action" onClick={() => navigate('/skills')}>Explore Skill Tree ➔</button>
+          </div>
+        );
+      }
+
+      case 'trophies': {
+        const trophiesList = [
+          { id: 'streak', title: '7-Day Streak', desc: 'Maintain 7 days habit discipline', icon: '🔥', unlocked: true },
+          { id: 'xp', title: 'Master Operator', desc: 'Accumulate 10k+ XP', icon: '⚡', unlocked: (profile.xp || 0) >= 10000 },
+          { id: 'finance', title: 'Financial Titan', desc: 'Reach 5k net assets', icon: '💎', unlocked: netWorth >= 5000 },
+          { id: 'focus', title: 'Deep Worker', desc: 'Complete 3+ timetable blocks', icon: '🎯', unlocked: completedTodayBlocks >= 1 },
+          { id: 'books', title: 'Knowledge Sage', desc: 'Track 3+ books in Library', icon: '📚', unlocked: books.length >= 1 },
+          { id: 'iron', title: 'Iron Biomechanics', desc: 'Log 5+ workout sessions', icon: '🏋️', unlocked: workouts.length >= 1 }
+        ];
+
+        return (
+          <div key={widgetKey} className={cardClass}>
+            <div className="card-header">
+              <span className="card-icon" style={{ color: '#f59e0b' }}>🏅</span>
+              <h3>{settings.widgetTitles?.trophies || "RPG Trophies & Badges"}</h3>
+            </div>
+            <div className="card-content">
+              <div className="trophies-grid">
+                {trophiesList.map(t => (
+                  <div key={t.id} className={`trophy-card ${t.unlocked ? 'unlocked' : 'locked'}`} title={t.desc}>
+                    <div className="trophy-icon">{t.unlocked ? t.icon : '🔒'}</div>
+                    <div className="trophy-title">{t.title}</div>
+                    <div className="trophy-desc">{t.unlocked ? 'Unlocked' : t.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button className="card-action" onClick={() => navigate('/skills')}>View Achievements ➔</button>
+          </div>
+        );
+      }
+
+      case 'runway': {
+        const monthlyBurn = monthlyTotal || 1;
+        const runwayMonths = (netWorth / monthlyBurn).toFixed(1);
+        const fireProgress = Math.min(100, Math.max(0, Math.round((netWorth / (monthlyBurn * 12 * 25 || 1)) * 100)));
+
+        return (
+          <div key={widgetKey} className={cardClass}>
+            <div className="card-header">
+              <span className="card-icon" style={{ color: '#10b981' }}>🔥</span>
+              <h3>{settings.widgetTitles?.runway || "FIRE & Financial Runway"}</h3>
+            </div>
+            <div className="card-content">
+              <div className="runway-metrics-row">
+                <div className="runway-metric-box">
+                  <div className="runway-metric-val" style={{ color: 'var(--green-text)' }}>
+                    {formatMoney(netWorth)}
+                  </div>
+                  <div className="runway-metric-lbl">Net Worth</div>
+                </div>
+                <div className="runway-metric-box">
+                  <div className="runway-metric-val" style={{ color: '#06b6d4' }}>
+                    {runwayMonths} Mo
+                  </div>
+                  <div className="runway-metric-lbl">Runway Left</div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, marginBottom: '4px', color: 'var(--text-muted)' }}>
+                <span>FIRE Progress (25x Rule)</span>
+                <span style={{ color: 'var(--green-text)' }}>{fireProgress}%</span>
+              </div>
+              <div className="runway-bar-container">
+                <div className="runway-bar-fill" style={{ width: `${fireProgress}%` }} />
+              </div>
+            </div>
+            <button className="card-action" onClick={() => navigate('/expenses')}>View Balance Sheet ➔</button>
+          </div>
+        );
+      }
+
+      case 'crypto_ticker': {
+        const cryptoItems = [
+          { symbol: 'BTC', name: 'Bitcoin', price: '$94,420', change: '+2.4%', up: true },
+          { symbol: 'ETH', name: 'Ethereum', price: '$2,780', change: '+1.8%', up: true },
+          { symbol: 'SOL', name: 'Solana', price: '$178.50', change: '+5.1%', up: true },
+          { symbol: 'EUR/USD', name: 'Forex', price: '1.0842', change: '-0.2%', up: false }
+        ];
+
+        return (
+          <div key={widgetKey} className={cardClass}>
+            <div className="card-header">
+              <span className="card-icon" style={{ color: '#06b6d4' }}>⚡</span>
+              <h3>{settings.widgetTitles?.crypto_ticker || "Live Market Tickers"}</h3>
+            </div>
+            <div className="card-content">
+              <div className="crypto-ticker-grid">
+                {cryptoItems.map(c => (
+                  <div key={c.symbol} className="crypto-ticker-card" onClick={() => navigate('/trading')} style={{ cursor: 'pointer' }}>
+                    <div>
+                      <div className="crypto-symbol">{c.symbol}</div>
+                      <div className="crypto-name">{c.name}</div>
+                    </div>
+                    <div>
+                      <div className="crypto-price">{c.price}</div>
+                      <div className="crypto-change" style={{ color: c.up ? 'var(--green-text)' : 'var(--red-text)' }}>
+                        {c.change}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button className="card-action" onClick={() => navigate('/trading')}>Launch Trading Terminal ➔</button>
+          </div>
+        );
+      }
+
+      case 'ai_briefing': {
+        return (
+          <div key={widgetKey} className={cardClass}>
+            <div className="card-header">
+              <span className="card-icon" style={{ color: '#a855f7' }}>🤖</span>
+              <h3>{settings.widgetTitles?.ai_briefing || "Weekly AI Intel Brief"}</h3>
+            </div>
+            <div className="card-content">
+              <div className="ai-brief-box">
+                <div className="ai-brief-status">
+                  <span>⚡</span> Operator Status: Optimal
+                </div>
+                <div className="ai-brief-text">
+                  Habit completion is at <strong>{habitProgress}%</strong> today with <strong>{completedTodayBlocks} timeblocks</strong> executed. Financial runway is healthy. Maintain morning deep work blocks for maximum neuro-efficiency.
+                </div>
+              </div>
+            </div>
+            <button className="card-action" onClick={() => navigate('/ai')}>Consult Agent Hunter ➔</button>
+          </div>
+        );
+      }
 
       default:
         return null;

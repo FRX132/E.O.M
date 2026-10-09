@@ -188,6 +188,20 @@
             <div class="section-header-center">
                 <h2>Interactive Workspace Simulator</h2>
                 <p>Interact directly with the live OS modules below. Check habits, modify ledger rows, tap muscle zones, and send AI routing prompts.</p>
+                <div class="simulator-presets-bar" style="display: flex; justify-content: center; gap: 8px; margin-top: 16px; flex-wrap: wrap;">
+                    <button class="simulator-preset-btn active" id="preset-default" onclick="loadSimulatorPreset('default')" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: var(--text-main); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        🌟 Standard Profile
+                    </button>
+                    <button class="simulator-preset-btn" id="preset-biohacker" onclick="loadSimulatorPreset('biohacker')" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: var(--text-main); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        🧘 Biohacker & Athlete
+                    </button>
+                    <button class="simulator-preset-btn" id="preset-trader" onclick="loadSimulatorPreset('trader')" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: var(--text-main); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        📈 Crypto Trader & Nomad
+                    </button>
+                    <button class="simulator-preset-btn" id="preset-scholar" onclick="loadSimulatorPreset('scholar')" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: var(--text-main); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        🎯 Deep Work Scholar
+                    </button>
+                </div>
             </div>
 
             <div class="mockup-window">

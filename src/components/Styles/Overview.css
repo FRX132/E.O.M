@@ -2296,4 +2296,234 @@
   border-color: var(--primary);
 }
 
+/* --- New Widgets CSS --- */
+
+/* 1. Radar Skill Hexagon Chart */
+.radar-chart-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.radar-svg {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  overflow: visible;
+}
+
+.radar-web-circle {
+  fill: none;
+  stroke: var(--border-light);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+
+.radar-axis-line {
+  stroke: var(--border-color);
+  stroke-width: 1;
+}
+
+.radar-data-polygon {
+  fill: rgba(99, 102, 241, 0.25);
+  stroke: #6366f1;
+  stroke-width: 2;
+  transition: all 0.5s ease;
+  filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.4));
+}
+
+.radar-label-text {
+  font-size: 0.68rem;
+  font-weight: 700;
+  fill: var(--text-muted);
+  text-anchor: middle;
+}
+
+/* 2. Trophies & Badges Widget */
+.trophies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.trophy-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 12px 8px;
+  border-radius: 10px;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-light);
+  transition: all 0.2s ease;
+}
+
+.trophy-card.unlocked {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, rgba(0, 0, 0, 0) 100%);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.1);
+}
+
+.trophy-card.locked {
+  opacity: 0.5;
+  filter: grayscale(0.8);
+}
+
+.trophy-card:hover {
+  transform: translateY(-2px);
+}
+
+.trophy-icon {
+  font-size: 1.6rem;
+  margin-bottom: 4px;
+}
+
+.trophy-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.trophy-desc {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+/* 3. FIRE Runway Widget */
+.runway-metrics-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.runway-metric-box {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+
+.runway-metric-val {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.runway-metric-lbl {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.runway-bar-container {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  height: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  margin-bottom: 8px;
+}
+
+.runway-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #06b6d4);
+  border-radius: 8px;
+  transition: width 0.6s ease;
+}
+
+/* 4. Live Crypto & Currency Ticker Widget */
+.crypto-ticker-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.crypto-ticker-card {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.2s;
+}
+
+.crypto-ticker-card:hover {
+  border-color: #06b6d4;
+}
+
+.crypto-symbol {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.crypto-name {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.crypto-price {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+  text-align: right;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.crypto-change {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+/* 5. Weekly AI Intel Briefing Widget */
+.ai-brief-box {
+  background: var(--bg-card-alt);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 10px;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-brief-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: #a855f7;
+}
+
+.ai-brief-status {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #a855f7;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-brief-text {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--text-main);
+}
+
+
 
