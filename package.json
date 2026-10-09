@@ -11,6 +11,7 @@
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
     "prebuild": "node scripts/update-version.js",
     "build": "vite build",
+    "postbuild": "node scripts/prepare-preview.js",
     "electron:build": "npm run build && electron-builder",
     "electron:build:mac": "npm run build && electron-builder --mac",
     "electron:build:win": "npm run build && electron-builder --win --x64",

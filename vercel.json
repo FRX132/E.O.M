@@ -1,0 +1,92 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/validate.php",
+      "destination": "/api/validate"
+    },
+    {
+      "source": "/app/assets/(.*)",
+      "destination": "/assets/$1"
+    },
+    {
+      "source": "/app/sw.js",
+      "destination": "/sw.js"
+    },
+    {
+      "source": "/app/workbox-(.*)",
+      "destination": "/workbox-$1"
+    },
+    {
+      "source": "/app/manifest.webmanifest",
+      "destination": "/manifest.webmanifest"
+    },
+    {
+      "source": "/app/pwa-(.*)",
+      "destination": "/pwa-$1"
+    },
+    {
+      "source": "/app/favicon.(.*)",
+      "destination": "/favicon.$1"
+    },
+    {
+      "source": "/app/icons.svg",
+      "destination": "/icons.svg"
+    },
+    {
+      "source": "/app/apple-touch-icon.png",
+      "destination": "/apple-touch-icon.png"
+    },
+    {
+      "source": "/app",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/app/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/",
+      "destination": "/preview/index.html"
+    },
+    {
+      "source": "/preview",
+      "destination": "/preview/index.html"
+    },
+    {
+      "source": "/preview/",
+      "destination": "/preview/index.html"
+    },
+    {
+      "source": "/Documentary.html",
+      "destination": "/preview/Documentary.html"
+    },
+    {
+      "source": "/documentary",
+      "destination": "/preview/Documentary.html"
+    },
+    {
+      "source": "/style.css",
+      "destination": "/preview/style.css"
+    },
+    {
+      "source": "/styles.css",
+      "destination": "/preview/styles.css"
+    },
+    {
+      "source": "/app.js",
+      "destination": "/preview/app.js"
+    },
+    {
+      "source": "/script.js",
+      "destination": "/preview/script.js"
+    }
+  ]
+}

@@ -321,7 +321,7 @@ function openDownloadModal(platform) {
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
                     Runs locally in any modern browser with full offline persistence and zero latency.
                 </p>
-                <a href="https://eom-app-eta.vercel.app" target="_blank" class="modal-download-btn">
+                <a href="/app" class="modal-download-btn">
                     Launch Web App Instantly ➔
                 </a>
             </div>
@@ -352,7 +352,7 @@ function openDownloadModal(platform) {
                     <div>3. Scroll down and tap <strong>"Add to Home Screen"</strong>.</div>
                     <div>4. Tap <strong>"Add"</strong> in the top right. Done! 🎉</div>
                 </div>
-                <a href="https://eom-app-eta.vercel.app" target="_blank" class="modal-download-btn">
+                <a href="/app" class="modal-download-btn">
                     🚀 Launch Web App in Safari ➔
                 </a>
             </div>
@@ -383,7 +383,7 @@ function openDownloadModal(platform) {
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
                     Open in Chrome and install directly with full offline and standalone capabilities.
                 </p>
-                <a href="https://eom-app-eta.vercel.app" target="_blank" class="modal-download-btn">
+                <a href="/app" class="modal-download-btn">
                     Open Web App on Android ➔
                 </a>
             </div>
@@ -422,7 +422,7 @@ function openDownloadModal(platform) {
                 <div class="modal-option-header">
                     <strong style="color: #fff; font-size: 0.95rem;">🌐 Web App / Browser Version</strong>
                 </div>
-                <a href="https://eom-app-eta.vercel.app" target="_blank" class="modal-secondary-btn">
+                <a href="/app" class="modal-secondary-btn">
                     Launch in Browser ➔
                 </a>
             </div>
@@ -447,7 +447,7 @@ function openDownloadModal(platform) {
                 <div class="modal-option-header">
                     <strong style="color: #fff; font-size: 0.95rem;">🌐 Web App / Browser Version</strong>
                 </div>
-                <a href="https://eom-app-eta.vercel.app" target="_blank" class="modal-secondary-btn">
+                <a href="/app" class="modal-secondary-btn">
                     Launch in Browser ➔
                 </a>
             </div>

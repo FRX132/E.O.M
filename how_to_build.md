@@ -105,7 +105,11 @@ In Android Studio, click **Run ➔ Run 'app'** (<kbd>Shift + F10</kbd>) or build
 
 ## 🌐 5. Web & PWA Deployment (Vercel)
 
-E.O.M is pre-configured with Vercel configuration (`Preview Page/vercel.json` and root routing):
+E.O.M is pre-configured with multi-tier Vercel routing (`vercel.json`):
+- **`/` (Root)** ➔ Serves the interactive **Preview & Showcase Landing Page** (Simulator, Features, Tech Matrix, Documentation).
+- **`/app` (or `/app/*`)** ➔ Serves the **E.O.M Life Planner OS** (React PWA SPA with local-first IndexedDB).
+- **`/Documentary.html`** ➔ Serves the full Interactive Architecture & System Documentation.
+- **`/api/validate`** ➔ Vercel Serverless Function handling simulator override requests.
 
 ```bash
 # Push updates to GitHub (triggers automated Vercel CI/CD)
@@ -114,7 +118,7 @@ git commit -m "Deploy update"
 git push origin main
 ```
 
-Users visiting your live URL (or PWA shortcut on their home screen) will automatically receive updated files without losing local storage.
+Users visiting your root domain will see the showcase page first, and clicking **Launch App** opens the OS at `/app`. PWA shortcuts on home screens will launch directly into the app.
 
 ---
 
