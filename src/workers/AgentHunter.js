@@ -46,7 +46,7 @@ self.addEventListener('message', async (event) => {
             const prompt = `Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n### Instruction:\n${systemContext}${text}\n\n### Response:\n`;
 
             let output = await generator(prompt, {
-                max_new_tokens: 180,
+                max_new_tokens: 300,
                 temperature: 0.7,
                 do_sample: true,
             });

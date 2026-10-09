@@ -149,3 +149,51 @@ export const EXERCISE_DATABASE = {
   ]
 };
 
+// Home / Dashboard Layout Constants
+export const ALL_WIDGET_CONFIGS = [
+  { key: 'timetable', label: "Today's Timetable", defaultTitle: "Today's Timetable", icon: '📅', color: '#14b8a6' },
+  { key: 'habits', label: 'Daily Habits', defaultTitle: 'Daily Habits', icon: '✨', color: '#a855f7' },
+  { key: 'pomodoro', label: 'Focus Pomodoro Timer', defaultTitle: 'Focus Timer', icon: '⏱️', color: '#ef4444' },
+  { key: 'skills_radar', label: 'Life Balance Radar', defaultTitle: 'Life Balance Radar', icon: '🕸️', color: '#6366f1' },
+  { key: 'trophies', label: 'Achievements & Badges', defaultTitle: 'RPG Trophies', icon: '🏅', color: '#f59e0b' },
+  { key: 'runway', label: 'FIRE & Financial Runway', defaultTitle: 'Financial Freedom (FIRE)', icon: '🔥', color: '#10b981' },
+  { key: 'crypto_ticker', label: 'Live Crypto Tickers', defaultTitle: 'Live Markets', icon: '⚡', color: '#06b6d4' },
+  { key: 'ai_briefing', label: 'Weekly AI Intel Brief', defaultTitle: 'Weekly Intel Brief', icon: '🤖', color: '#a855f7' },
+  { key: 'notes', label: 'Quick Scratchpad', defaultTitle: 'Quick Notes', icon: '📝', color: '#eab308' },
+  { key: 'finances', label: 'Finances & Wallet', defaultTitle: 'Finances & Wallet', icon: '💳', color: '#3b82f6' },
+  { key: 'goals', label: 'Active Goals', defaultTitle: 'Active Goals', icon: '🎯', color: '#ef4444' },
+  { key: 'fridge', label: 'Fridge Status', defaultTitle: 'Fridge Status', icon: '🥗', color: '#10b981' },
+  { key: 'quicklinks', label: 'Launchpad / Quick Links', defaultTitle: 'Quick Links', icon: '⚡', color: '#06b6d4' },
+  { key: 'workout', label: 'Next Workout', defaultTitle: 'Sport & Workout', icon: '🏋️', color: '#f97316' },
+  { key: 'trading', label: 'Market Watchlist', defaultTitle: 'Crypto & Markets', icon: '📈', color: '#10b981' },
+  { key: 'media', label: 'Media Tracker', defaultTitle: 'Books & Cinema', icon: '🎬', color: '#8b5cf6' },
+  { key: 'mood', label: 'Daily Reflection & Mood', defaultTitle: 'Daily Mood', icon: '🧠', color: '#ec4899' },
+  { key: 'reminders', label: 'Daily Reminders', defaultTitle: 'Daily Reminders', icon: '🔔', color: '#6366f1' },
+  { key: 'news', label: 'Breaking News', defaultTitle: 'Breaking News', icon: '📰', color: '#3b82f6' },
+  { key: 'objective', label: 'Primary Objective', defaultTitle: 'Primary Objective', icon: '🏆', color: '#f59e0b' },
+  { key: 'rule', label: 'Daily Life Rule', defaultTitle: 'Daily Rule', icon: '📜', color: '#8b5cf6' }
+];
+
+export const DASHBOARD_PRESETS = [
+  { id: 'all', label: '🌟 All-in-One', desc: 'Complete view with all enabled widgets' },
+  { id: 'focus', label: '🎯 Deep Work', desc: 'Focus on schedule, timer, notes and key goals', widgets: ['timetable', 'pomodoro', 'skills_radar', 'notes', 'goals', 'habits', 'quicklinks', 'objective'] },
+  { id: 'health', label: '🧘 Health & Routine', desc: 'Habits, workout, fridge nutrition and reflection', widgets: ['timetable', 'habits', 'skills_radar', 'trophies', 'workout', 'fridge', 'mood', 'rule'] },
+  { id: 'finance', label: '📊 Finance & Markets', desc: 'Net worth, expenses breakdown, markets and breaking news', widgets: ['finances', 'runway', 'crypto_ticker', 'trading', 'news', 'goals', 'quicklinks'] },
+  { id: 'minimal', label: '⚡ Minimalist', desc: 'Clean, distraction-free view with essentials', widgets: ['timetable', 'habits', 'notes', 'objective'] }
+];
+
+export const DEFAULT_ORDER = [
+  'timetable', 'habits', 'pomodoro', 'skills_radar', 'notes', 'finances', 'goals',
+  'runway', 'crypto_ticker', 'trophies', 'ai_briefing',
+  'fridge', 'quicklinks', 'workout', 'trading', 'media', 'mood',
+  'reminders', 'news', 'objective', 'rule'
+];
+
+export const LAYOUT_THEMES = [
+  { id: 0, label: 'Default Cyber', desc: 'Clean, modern cyber HUD with subtle borders' },
+  { id: 1, label: 'Minimal Clean', desc: 'Ultra-light borders, high contrast and breathability' },
+  { id: 2, label: 'Glassmorphism', desc: 'Frosted acrylic panels with glass refraction' },
+  { id: 3, label: 'Neo-Brutalism', desc: 'Bold dark outlines, vivid contrasts & sharp geometry' }
+];
+
+

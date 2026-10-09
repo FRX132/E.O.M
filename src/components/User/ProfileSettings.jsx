@@ -1,6 +1,9 @@
 // Imports 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useStore } from '../../store';
+import { ALL_WIDGET_CONFIGS, DASHBOARD_PRESETS, DEFAULT_ORDER, LAYOUT_THEMES } from '../../constants';
+import '../Styles/Overview.css';
 
 const SettingsIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
@@ -54,9 +57,107 @@ export default function ProfileSettings() {
   const accentColor = useStore(state => state.accentColor);
   const setAccentColor = useStore(state => state.setAccentColor);
   const applyDesignPreset = useStore(state => state.applyDesignPreset);
+  const overviewSettings = useStore(state => state.overviewSettings) || {};
+  const setOverviewSettings = useStore(state => state.setOverviewSettings);
 
   const [saveStatus, setSaveStatus] = useState('');
-  const [activeTab, setActiveTab] = useState('profile');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabFromUrl || 'profile');
+  const [layoutSubTab, setLayoutSubTab] = useState('widgets');
+
+  useEffect(() => {
+    if (tabFromUrl && ['profile', 'appearance', 'layout', 'sync', 'system'].includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    setSearchParams({ tab: tabId });
+  };
+
+  const defaultVisible = useMemo(() => ({
+    clock: true, calendar: true, sync: true, timetable: true, habits: true,
+    pomodoro: true, skills_radar: true, trophies: true, runway: true,
+    crypto_ticker: true, ai_briefing: true, notes: true, finances: true,
+    goals: true, fridge: true, quicklinks: true, workout: true, trading: true,
+    media: true, mood: true, reminders: false, news: true, objective: true, rule: true
+  }), []);
+
+  const defaultTitles = useMemo(() => {
+    const titles = {};
+    ALL_WIDGET_CONFIGS.forEach(w => { titles[w.key] = w.defaultTitle; });
+    return titles;
+  }, []);
+
+  const homeSettings = useMemo(() => ({
+    layout: overviewSettings?.layout ?? 0,
+    heroStyle: overviewSettings?.heroStyle ?? 'standard',
+    accentColor: overviewSettings?.accentColor ?? 'default',
+    gridColumns: overviewSettings?.gridColumns ?? 'auto',
+    statsViewMode: overviewSettings?.statsViewMode ?? 'bars',
+    activePreset: overviewSettings?.activePreset ?? 'all',
+    isPrivacyMode: !!overviewSettings?.isPrivacyMode,
+    widgetOrder: overviewSettings?.widgetOrder ?? DEFAULT_ORDER,
+    widgetSizes: overviewSettings?.widgetSizes ?? {},
+    visibleWidgets: { ...defaultVisible, ...(overviewSettings?.visibleWidgets || {}) },
+    widgetTitles: { ...defaultTitles, ...(overviewSettings?.widgetTitles || {}) },
+    visibleStatsBars: overviewSettings?.visibleStatsBars ?? {
+      expenses: true, goals: true, habits: true, timetable: true, fridge: true, targets: true, library: true, cinema: true, quests: true
+    }
+  }), [overviewSettings, defaultVisible, defaultTitles]);
+
+  const handleMoveWidget = (index, direction) => {
+    const currentOrder = [...homeSettings.widgetOrder];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= currentOrder.length) return;
+    const temp = currentOrder[index];
+    currentOrder[index] = currentOrder[targetIndex];
+    currentOrder[targetIndex] = temp;
+    setOverviewSettings({ ...homeSettings, widgetOrder: currentOrder });
+  };
+
+  const handleSetWidgetSize = (widgetKey, size) => {
+    const updatedSizes = { ...(homeSettings.widgetSizes || {}), [widgetKey]: size };
+    setOverviewSettings({ ...homeSettings, widgetSizes: updatedSizes });
+  };
+
+  const handleApplyPreset = (preset) => {
+    let newVisible = {};
+    if (preset.id === 'all') {
+      ALL_WIDGET_CONFIGS.forEach(w => { newVisible[w.key] = true; });
+    } else {
+      ALL_WIDGET_CONFIGS.forEach(w => { newVisible[w.key] = false; });
+      (preset.widgets || []).forEach(k => { newVisible[k] = true; });
+      newVisible.clock = true;
+      newVisible.calendar = true;
+      newVisible.sync = true;
+    }
+    setOverviewSettings({
+      ...homeSettings,
+      activePreset: preset.id,
+      visibleWidgets: newVisible
+    });
+  };
+
+  const handleResetHomeSettings = () => {
+    if (confirm("Reset Home Dashboard layout to defaults?")) {
+      setOverviewSettings({
+        layout: 0,
+        heroStyle: 'standard',
+        accentColor: 'default',
+        gridColumns: 'auto',
+        activePreset: 'all',
+        isPrivacyMode: false,
+        widgetOrder: DEFAULT_ORDER,
+        widgetSizes: {},
+        visibleWidgets: defaultVisible,
+        widgetTitles: defaultTitles,
+        visibleStatsBars: { expenses: true, goals: true, habits: true, timetable: true, fridge: true, targets: true, library: true, cinema: true, quests: true }
+      });
+    }
+  };
 
   const [syncCode, setSyncCode] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
@@ -413,6 +514,7 @@ export default function ProfileSettings() {
             {[
               { id: 'profile', label: '👤 Profile & Metrics' },
               { id: 'appearance', label: '🎨 Style & Aesthetics' },
+              { id: 'layout', label: '📐 Layout & Home' },
               { id: 'sync', label: '🔄 Backup & Sync' },
               { id: 'system', label: '⚙️ System Actions' }
             ].map(tab => (
@@ -420,7 +522,7 @@ export default function ProfileSettings() {
                 key={tab.id}
                 type="button"
                 className={`settings-tab-btn ${activeTab === tab.id ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
               >
                 {tab.label}
               </button>
@@ -1077,6 +1179,414 @@ export default function ProfileSettings() {
                   {saveStatus && <span style={{ color: 'var(--green-text)', fontSize: '0.85rem', fontWeight: 600 }}>✓ {saveStatus}</span>}
                 </div>
               </>
+            )}
+
+            {activeTab === 'layout' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                {/* Header & Actions */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--border-color)', paddingBottom: '20px' }}>
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span>📐</span> Home Dashboard & Layout Studio
+                    </h3>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      Konfiguriere Widgets, Reihenfolge, Themes, Spaltenanzahl und Telemetrie-Balken für deinen Home-Screen.
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      className="mac-btn mac-btn-cancel"
+                      onClick={handleResetHomeSettings}
+                      title="Auf Standardeinstellungen zurücksetzen"
+                      style={{ fontSize: '0.78rem', padding: '6px 12px' }}
+                    >
+                      ↺ Reset
+                    </button>
+                    <button
+                      type="button"
+                      className={`mac-btn ${homeSettings.isPrivacyMode ? 'mac-btn-add' : 'mac-btn-cancel'}`}
+                      onClick={() => setOverviewSettings({ ...homeSettings, isPrivacyMode: !homeSettings.isPrivacyMode })}
+                      style={{ fontSize: '0.78rem', padding: '6px 12px' }}
+                    >
+                      {homeSettings.isPrivacyMode ? '🔒 Privacy: Aktiv' : '👁️ Privacy: Inaktiv'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Presets Bar */}
+                <div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+                    Schnell-Profile (Presets)
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {DASHBOARD_PRESETS.map(preset => (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => handleApplyPreset(preset)}
+                        className={`preset-tab-btn ${homeSettings.activePreset === preset.id ? 'active' : ''}`}
+                        title={preset.desc}
+                        style={{ padding: '8px 14px', borderRadius: '8px', fontSize: '0.82rem' }}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sub Tabs */}
+                <div style={{ display: 'flex', gap: '10px', borderBottom: '1px solid var(--border-light)', paddingBottom: '12px' }}>
+                  <button
+                    type="button"
+                    className={`mac-btn ${layoutSubTab === 'widgets' ? 'mac-btn-add' : 'mac-btn-cancel'}`}
+                    style={{ padding: '6px 16px', fontSize: '0.82rem' }}
+                    onClick={() => setLayoutSubTab('widgets')}
+                  >
+                    🧩 Widgets & Reihenfolge
+                  </button>
+                  <button
+                    type="button"
+                    className={`mac-btn ${layoutSubTab === 'design' ? 'mac-btn-add' : 'mac-btn-cancel'}`}
+                    style={{ padding: '6px 16px', fontSize: '0.82rem' }}
+                    onClick={() => setLayoutSubTab('design')}
+                  >
+                    🎨 Design, Themes & Spalten
+                  </button>
+                  <button
+                    type="button"
+                    className={`mac-btn ${layoutSubTab === 'stats' ? 'mac-btn-add' : 'mac-btn-cancel'}`}
+                    style={{ padding: '6px 16px', fontSize: '0.82rem' }}
+                    onClick={() => setLayoutSubTab('stats')}
+                  >
+                    📊 Stats Bars & HUD Modus
+                  </button>
+                </div>
+
+                {/* SUB TAB 1: WIDGETS & ORDER */}
+                {layoutSubTab === 'widgets' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>
+                      Verschiebe Widgets mit den Pfeilen nach oben/unten, aktiviere/deaktiviere sie, benenne sie um oder passe die Breite an (1x Kompakt / 2x Breit / Full):
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '550px', overflowY: 'auto', paddingRight: '6px' }}>
+                      {homeSettings.widgetOrder.map((key, index) => {
+                        const config = ALL_WIDGET_CONFIGS.find(w => w.key === key) || { label: key, defaultTitle: key, icon: '📦' };
+                        const currentSize = homeSettings.widgetSizes?.[key] || 'normal';
+                        const isVisible = homeSettings.visibleWidgets?.[key] !== false;
+
+                        return (
+                          <div key={key} className="reorder-item-row" style={{ background: isVisible ? 'var(--bg-card-alt)' : 'rgba(255,255,255,0.01)', opacity: isVisible ? 1 : 0.6 }}>
+                            <div className="reorder-arrows">
+                              <button
+                                type="button"
+                                className="reorder-arrow-btn"
+                                disabled={index === 0}
+                                onClick={() => handleMoveWidget(index, -1)}
+                                title="Nach oben"
+                              >
+                                ▲
+                              </button>
+                              <button
+                                type="button"
+                                className="reorder-arrow-btn"
+                                disabled={index === homeSettings.widgetOrder.length - 1}
+                                onClick={() => handleMoveWidget(index, 1)}
+                                title="Nach unten"
+                              >
+                                ▼
+                              </button>
+                            </div>
+
+                            <label className="mac-switch" style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', flexShrink: 0 }}>
+                              <input
+                                type="checkbox"
+                                checked={isVisible}
+                                onChange={(e) => {
+                                  const newVis = { ...homeSettings.visibleWidgets, [key]: e.target.checked };
+                                  setOverviewSettings({ ...homeSettings, visibleWidgets: newVis });
+                                }}
+                                style={{ opacity: 0, width: 0, height: 0 }}
+                              />
+                              <span className="mac-slider" style={{
+                                position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0,
+                                backgroundColor: isVisible ? 'var(--primary)' : '#444',
+                                borderRadius: '34px', transition: '0.3s'
+                              }}>
+                                <span style={{
+                                  position: 'absolute', height: '14px', width: '14px', left: '3px', bottom: '3px',
+                                  backgroundColor: 'white', borderRadius: '50%', transition: '0.3s',
+                                  transform: isVisible ? 'translateX(16px)' : 'translateX(0)'
+                                }}></span>
+                              </span>
+                            </label>
+
+                            <span style={{ fontSize: '1.25rem', lineHeight: 1 }}>{config.icon}</span>
+
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>{config.label}</div>
+                              <input
+                                className="mac-input"
+                                style={{ borderBottom: '1px solid var(--border-light)', padding: '2px 0', fontSize: '0.85rem', color: 'var(--text-main)', width: '100%', background: 'transparent', borderTop: 'none', borderLeft: 'none', borderRight: 'none', outline: 'none' }}
+                                value={homeSettings.widgetTitles?.[key] ?? config.defaultTitle}
+                                onChange={(e) => {
+                                  const newTitles = { ...homeSettings.widgetTitles, [key]: e.target.value };
+                                  setOverviewSettings({ ...homeSettings, widgetTitles: newTitles });
+                                }}
+                                placeholder={config.defaultTitle}
+                                disabled={!isVisible}
+                              />
+                            </div>
+
+                            <div className="size-pill-group">
+                              <button
+                                type="button"
+                                className={`size-pill-btn ${currentSize === 'normal' ? 'active' : ''}`}
+                                onClick={() => handleSetWidgetSize(key, 'normal')}
+                                title="1 Spalte (Kompakt)"
+                              >
+                                1x
+                              </button>
+                              <button
+                                type="button"
+                                className={`size-pill-btn ${currentSize === 'wide' ? 'active' : ''}`}
+                                onClick={() => handleSetWidgetSize(key, 'wide')}
+                                title="2 Spalten (Breit)"
+                              >
+                                2x
+                              </button>
+                              <button
+                                type="button"
+                                className={`size-pill-btn ${currentSize === 'full' ? 'active' : ''}`}
+                                onClick={() => handleSetWidgetSize(key, 'full')}
+                                title="Volle Zeilenbreite"
+                              >
+                                Full
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* SUB TAB 2: DESIGN & GEOMETRY */}
+                {layoutSubTab === 'design' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+                    {/* Layout Themes */}
+                    <div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '10px' }}>
+                        Home Interface Theme
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                        {LAYOUT_THEMES.map(themeItem => (
+                          <div
+                            key={themeItem.id}
+                            onClick={() => setOverviewSettings({ ...homeSettings, layout: themeItem.id })}
+                            style={{
+                              background: homeSettings.layout === themeItem.id ? 'rgba(var(--primary-rgb), 0.15)' : 'var(--bg-card-alt)',
+                              border: homeSettings.layout === themeItem.id ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+                              borderRadius: '10px', padding: '14px', cursor: 'pointer', transition: 'all 0.2s'
+                            }}
+                          >
+                            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)', marginBottom: '4px' }}>
+                              {themeItem.label}
+                            </div>
+                            <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                              {themeItem.desc}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Hero Style */}
+                    <div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '10px' }}>
+                        Hero Banner Darstellung
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                        {[
+                          { id: 'standard', label: '🖼️ Full Banner', desc: 'Cover, Avatar, User-Status' },
+                          { id: 'compact', label: '⚡ Compact Slim', desc: 'Minimalistischer Kopfbereich' },
+                          { id: 'hidden', label: '🚫 Hidden', desc: 'Maximaler Platz für Widgets' }
+                        ].map(h => (
+                          <div
+                            key={h.id}
+                            onClick={() => setOverviewSettings({ ...homeSettings, heroStyle: h.id })}
+                            style={{
+                              background: homeSettings.heroStyle === h.id ? 'rgba(var(--primary-rgb), 0.15)' : 'var(--bg-card-alt)',
+                              border: homeSettings.heroStyle === h.id ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+                              borderRadius: '10px', padding: '12px', cursor: 'pointer', textAlign: 'center'
+                            }}
+                          >
+                            <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-main)' }}>{h.label}</div>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px' }}>{h.desc}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Accent Color */}
+                    <div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '10px' }}>
+                        Dashboard Akzentfarbe
+                      </div>
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        {[
+                          { id: 'default', label: 'Default', color: '#3b82f6' },
+                          { id: 'teal', label: 'Cyber Teal', color: '#14b8a6' },
+                          { id: 'cyan', label: 'Electric Cyan', color: '#06b6d4' },
+                          { id: 'purple', label: 'Neon Purple', color: '#a855f7' },
+                          { id: 'green', label: 'Emerald', color: '#10b981' },
+                          { id: 'orange', label: 'Sunset Orange', color: '#f97316' },
+                          { id: 'red', label: 'Crimson', color: '#ef4444' },
+                          { id: 'gold', label: 'Imperial Gold', color: '#eab308' }
+                        ].map(c => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => setOverviewSettings({ ...homeSettings, accentColor: c.id })}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: '6px',
+                              background: homeSettings.accentColor === c.id ? 'rgba(255,255,255,0.1)' : 'var(--bg-card-alt)',
+                              border: homeSettings.accentColor === c.id ? `2px solid ${c.color}` : '1px solid var(--border-light)',
+                              padding: '6px 12px', borderRadius: '20px', cursor: 'pointer', color: 'var(--text-main)', fontSize: '0.78rem', fontWeight: 600
+                            }}
+                          >
+                            <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: c.color }}></span>
+                            {c.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Grid Columns */}
+                    <div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '10px' }}>
+                        Grid Spaltenanzahl
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                        {[
+                          { id: 'auto', label: '📱 Responsive Auto' },
+                          { id: '2', label: '2 Spalten Grid' },
+                          { id: '3', label: '3 Spalten Grid' }
+                        ].map(g => (
+                          <button
+                            key={g.id}
+                            type="button"
+                            onClick={() => setOverviewSettings({ ...homeSettings, gridColumns: g.id })}
+                            style={{
+                              background: homeSettings.gridColumns === g.id ? 'rgba(var(--primary-rgb), 0.15)' : 'var(--bg-card-alt)',
+                              border: homeSettings.gridColumns === g.id ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+                              padding: '10px', borderRadius: '8px', cursor: 'pointer', color: 'var(--text-main)', fontSize: '0.82rem', fontWeight: 700
+                            }}
+                          >
+                            {g.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* SUB TAB 3: STATS & OBJECTIVES */}
+                {layoutSubTab === 'stats' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, marginBottom: '8px' }}>
+                        Stats Bar Widget-Fenster Modus
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+                        {[
+                          { id: 'bars', label: '📊 Balken (Bars)', desc: 'Klassische Progress-Balken' },
+                          { id: 'rings', label: '⭕ Ringe (Rings)', desc: 'Apple-Style Aktivitätsringe' },
+                          { id: 'pills', label: '🏷️ HUD Pills', desc: 'Ultra-kompakte Einzeilen-Leiste' },
+                          { id: 'tiles', label: '🎛️ KPI Tiles', desc: 'Große Kennzahlen-Kacheln' }
+                        ].map(mode => (
+                          <button
+                            key={mode.id}
+                            type="button"
+                            onClick={() => setOverviewSettings({ ...homeSettings, statsViewMode: mode.id })}
+                            style={{
+                              background: homeSettings.statsViewMode === mode.id ? 'rgba(var(--primary-rgb), 0.15)' : 'var(--bg-card-alt)',
+                              border: homeSettings.statsViewMode === mode.id ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+                              padding: '10px 8px', borderRadius: '8px', cursor: 'pointer', color: 'var(--text-main)', fontSize: '0.8rem', fontWeight: 700,
+                              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', textAlign: 'center'
+                            }}
+                          >
+                            <span>{mode.label}</span>
+                            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>{mode.desc}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, marginBottom: '10px' }}>
+                        Sichtbare Stats / Fortschrittsbalken
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '10px' }}>
+                        {[
+                          { key: 'expenses', label: 'Expense Tracker' },
+                          { key: 'goals', label: 'Goal Planner' },
+                          { key: 'habits', label: 'Habit Tracker' },
+                          { key: 'timetable', label: "Today's Timetable" },
+                          { key: 'fridge', label: 'Fridge Stock' },
+                          { key: 'targets', label: 'Big Targets' },
+                          { key: 'library', label: 'Library' },
+                          { key: 'cinema', label: 'Cinema' },
+                          { key: 'quests', label: 'Active Quests' }
+                        ].map(bar => (
+                          <div key={bar.key} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg-card-alt)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                            <label className="mac-switch" style={{ position: 'relative', display: 'inline-block', width: '34px', height: '18px', flexShrink: 0 }}>
+                              <input
+                                type="checkbox"
+                                checked={homeSettings.visibleStatsBars?.[bar.key] !== false}
+                                onChange={(e) => {
+                                  const newVisibleBars = { ...homeSettings.visibleStatsBars, [bar.key]: e.target.checked };
+                                  setOverviewSettings({ ...homeSettings, visibleStatsBars: newVisibleBars });
+                                }}
+                                style={{ opacity: 0, width: 0, height: 0 }}
+                              />
+                              <span className="mac-slider" style={{
+                                position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0,
+                                backgroundColor: homeSettings.visibleStatsBars?.[bar.key] !== false ? 'var(--primary)' : '#444',
+                                borderRadius: '34px', transition: '0.3s'
+                              }}>
+                                <span style={{
+                                  position: 'absolute', height: '12px', width: '12px', left: '3px', bottom: '3px',
+                                  backgroundColor: 'white', borderRadius: '50%', transition: '0.3s',
+                                  transform: homeSettings.visibleStatsBars?.[bar.key] !== false ? 'translateX(16px)' : 'translateX(0)'
+                                }}></span>
+                              </span>
+                            </label>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-main)', fontWeight: 500 }}>{bar.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, marginBottom: '6px' }}>
+                        Primary Objective Content
+                      </div>
+                      <div className="mac-input-group" style={{ margin: '0', background: 'var(--bg-card-alt)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '10px' }}>
+                        <textarea
+                          className="mac-input"
+                          placeholder="Trage dein primäres Lebensziel oder Hauptmission ein..."
+                          style={{ resize: 'vertical', minHeight: '70px', width: '100%', border: 'none', background: 'transparent', color: 'var(--text-main)', outline: 'none', fontSize: '0.85rem' }}
+                          value={profile.goals || ''}
+                          onChange={(e) => setProfile({ goals: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
 
             {activeTab === 'sync' && (

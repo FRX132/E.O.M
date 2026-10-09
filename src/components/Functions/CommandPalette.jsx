@@ -29,9 +29,9 @@ export default function CommandPalette({ isOpen, onClose }) {
   const commands = useMemo(() => {
     const list = [
       // Quick Navigation
-      { category: 'Navigation', id: 'nav-overview', title: 'Dashboard Overview', subtitle: 'Main Command Center & Timetable', icon: '📊', shortcut: 'G O', action: () => navigate('/') },
+      { category: 'Navigation', id: 'nav-overview', title: 'Home', subtitle: 'Main Command Center & Timetable', icon: '🏠', shortcut: 'G H', action: () => navigate('/') },
       { category: 'Navigation', id: 'nav-timetable', title: 'Timetable & Routine', subtitle: 'Daily schedule & time blocks', icon: '📅', shortcut: 'G T', action: () => navigate('/timetable') },
-      { category: 'Navigation', id: 'nav-habits', title: 'Habit Tracker', subtitle: 'Daily discipline & streak system', icon: '✨', shortcut: 'G H', action: () => navigate('/habits') },
+      { category: 'Navigation', id: 'nav-habits', title: 'Habit Tracker', subtitle: 'Daily discipline & streak system', icon: '✨', shortcut: 'G D', action: () => navigate('/habits') },
       { category: 'Navigation', id: 'nav-sport', title: 'Sport & Workouts', subtitle: 'Biomechanics, logs & routines', icon: '🏋️', shortcut: 'G W', action: () => navigate('/sport') },
       { category: 'Navigation', id: 'nav-expenses', title: 'Finance & Wallet', subtitle: 'Budgeting, transactions & assets', icon: '💳', shortcut: 'G F', action: () => navigate('/expenses') },
       { category: 'Navigation', id: 'nav-trading', title: 'Trading Terminal', subtitle: 'Crypto, stocks & market watchlist', icon: '📈', shortcut: 'G M', action: () => navigate('/trading') },
@@ -56,6 +56,17 @@ export default function CommandPalette({ isOpen, onClose }) {
         shortcut: 'Cmd+P',
         action: () => {
           setOverviewSettings({ ...overviewSettings, isPrivacyMode: !overviewSettings?.isPrivacyMode });
+          playCyberClick();
+        }
+      },
+      {
+        category: 'Quick Actions',
+        id: 'act-home-layout',
+        title: 'Home Dashboard & Layout Studio',
+        subtitle: 'Configure widgets, columns, themes & HUD in Settings',
+        icon: '📐',
+        action: () => {
+          navigate('/settings?tab=layout');
           playCyberClick();
         }
       },

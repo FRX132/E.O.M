@@ -430,7 +430,7 @@ function App() {
   ];
 
   const navItemsAccount = [
-    { path: '/overview', label: 'Overview', icon: <HomeIcon /> },
+    { path: '/overview', label: 'Home', icon: <HomeIcon /> },
     { path: '/settings', label: 'Settings', icon: <SettingsIcon /> },
     { path: '/skills', label: 'Skill Tree', icon: <BeakerIcon /> },
     { path: '/timetable', label: 'Timetable', icon: <CalendarIcon /> },

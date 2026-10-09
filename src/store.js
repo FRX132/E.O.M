@@ -484,6 +484,7 @@ export const useStore = create(
       setTradingPlan: (plan) => set({ tradingPlan: plan }),
       setCanvasNodes: (updater) => set((state) => ({ canvasNodes: typeof updater === 'function' ? updater(state.canvasNodes) : updater })),
       setCanvasEdges: (updater) => set((state) => ({ canvasEdges: typeof updater === 'function' ? updater(state.canvasEdges) : updater })),
+      setAiKnowledgeBase: (updater) => set((state) => ({ aiKnowledgeBase: typeof updater === 'function' ? updater(state.aiKnowledgeBase) : updater })),
       addKnowledgeDocument: (doc) => set((state) => ({ aiKnowledgeBase: [...(state.aiKnowledgeBase || []), doc] })),
       deleteKnowledgeDocument: (id) => set((state) => ({ aiKnowledgeBase: (state.aiKnowledgeBase || []).filter(d => d.id !== id) })),
       setAutoBackupPath: (path) => set({ autoBackupPath: path }),
