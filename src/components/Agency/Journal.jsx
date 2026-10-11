@@ -13,10 +13,21 @@ const JournalIcon = () => (
 export default function Journal() {
   const journal = useStore(state => state.journal || []);
   const setJournal = useStore(state => state.setJournal);
+  const overviewSettings = useStore(state => state.overviewSettings);
+  const setOverviewSettings = useStore(state => state.setOverviewSettings);
+
+  const MOOD_OPTIONS = [
+    { emoji: '🔥', label: 'Unstoppable' },
+    { emoji: '😊', label: 'Great' },
+    { emoji: '⚡', label: 'Focused' },
+    { emoji: '😐', label: 'Neutral' },
+    { emoji: '😴', label: 'Tired' }
+  ];
 
   const [activeEntryId, setActiveEntryId] = useState(journal.length > 0 ? journal[0].id : null);
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ title: '', content: '' });
+  const [editForm, setEditForm] = useState({ title: '', content: '', mood: null });
+  const [moodFilter, setMoodFilter] = useState('All');
   const [viewMode, setViewMode] = useState(() => {
     return localStorage.getItem('journal_view_mode') || 'split';
   });
@@ -32,33 +43,56 @@ export default function Journal() {
 
   // Derived state
   const sortedJournal = [...journal].sort((a, b) => b.timestamp - a.timestamp);
-  const filteredJournal = sortedJournal.filter(e => 
-    e.title.toLowerCase().includes(search.toLowerCase()) || 
-    e.content.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredJournal = sortedJournal.filter(e => {
+    const matchesSearch =
+      e.title.toLowerCase().includes(search.toLowerCase()) || 
+      e.content.toLowerCase().includes(search.toLowerCase());
+    const matchesMood =
+      moodFilter === 'All' ||
+      e.mood?.label === moodFilter ||
+      e.mood?.emoji === moodFilter;
+    return matchesSearch && matchesMood;
+  });
 
   const handleCreateNew = () => {
+    const todayMood = overviewSettings?.todayMood || null;
     const newEntry = {
       id: Date.now(),
-      title: 'New Entry',
+      title: todayMood ? `Daily Log - ${new Date().toLocaleDateString()}` : 'New Entry',
       content: '',
+      mood: todayMood ? { emoji: todayMood.emoji, label: todayMood.label } : null,
       timestamp: Date.now(),
     };
     setJournal([newEntry, ...journal]);
     setActiveEntryId(newEntry.id);
-    setEditForm({ title: newEntry.title, content: newEntry.content });
+    setEditForm({ title: newEntry.title, content: newEntry.content, mood: newEntry.mood });
     setIsEditing(true);
   };
 
   const handleEdit = () => {
     if (!activeEntry) return;
-    setEditForm({ title: activeEntry.title, content: activeEntry.content });
+    setEditForm({ title: activeEntry.title, content: activeEntry.content, mood: activeEntry.mood || null });
     setIsEditing(true);
   };
 
   const handleSave = () => {
     if (!activeEntryId) return;
-    setJournal(journal.map(e => e.id === activeEntryId ? { ...e, title: editForm.title, content: editForm.content, timestamp: Date.now() } : e));
+    const updatedMood = editForm.mood || null;
+    setJournal(journal.map(e => e.id === activeEntryId ? {
+      ...e,
+      title: editForm.title,
+      content: editForm.content,
+      mood: updatedMood,
+      timestamp: Date.now()
+    } : e));
+
+    // If updated entry has a mood, sync to today's mood in overview
+    if (updatedMood) {
+      setOverviewSettings({
+        ...overviewSettings,
+        todayMood: { ...updatedMood, timestamp: Date.now() }
+      });
+    }
     setIsEditing(false);
   };
 
@@ -111,6 +145,46 @@ export default function Journal() {
               outline: 'none'
             }}
           />
+
+          {/* Mood Filter Row */}
+          <div style={{ display: 'flex', gap: '4px', overflowX: 'auto', padding: '2px 0' }}>
+            <button
+              type="button"
+              onClick={() => setMoodFilter('All')}
+              style={{
+                padding: '3px 8px',
+                borderRadius: '12px',
+                border: '1px solid var(--border-color)',
+                background: moodFilter === 'All' ? 'var(--primary)' : 'transparent',
+                color: moodFilter === 'All' ? '#fff' : 'var(--text-muted)',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              All
+            </button>
+            {MOOD_OPTIONS.map(m => (
+              <button
+                key={m.label}
+                type="button"
+                onClick={() => setMoodFilter(moodFilter === m.label ? 'All' : m.label)}
+                title={m.label}
+                style={{
+                  padding: '3px 8px',
+                  borderRadius: '12px',
+                  border: `1px solid ${moodFilter === m.label ? '#ec4899' : 'var(--border-color)'}`,
+                  background: moodFilter === m.label ? 'rgba(236, 72, 153, 0.25)' : 'transparent',
+                  color: moodFilter === m.label ? '#ec4899' : 'var(--text-muted)',
+                  fontSize: '0.75rem',
+                  cursor: 'pointer'
+                }}
+              >
+                {m.emoji}
+              </button>
+            ))}
+          </div>
+
           <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '4px' }}>
             {filteredJournal.map(entry => (
               <div 
@@ -128,11 +202,15 @@ export default function Journal() {
                   transition: 'all 0.2s ease'
                 }}
               >
-                <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {entry.title || 'Untitled'}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                  {entry.mood && <span title={entry.mood.label} style={{ fontSize: '0.95rem' }}>{entry.mood.emoji}</span>}
+                  <div style={{ fontWeight: 600, fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>
+                    {entry.title || 'Untitled'}
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  {formatDate(entry.timestamp)}
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between' }}>
+                  <span>{formatDate(entry.timestamp)}</span>
+                  {entry.mood && <span style={{ color: '#ec4899', fontWeight: 600 }}>{entry.mood.label}</span>}
                 </div>
               </div>
             ))}
@@ -202,6 +280,52 @@ export default function Journal() {
                     <button onClick={handleSave} className="pill green">Save</button>
                   </div>
                 </div>
+
+                {/* Mood Selector Row in Edit Mode */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700 }}>Mood:</span>
+                  {MOOD_OPTIONS.map(m => {
+                    const isSelected = editForm.mood?.label === m.label;
+                    return (
+                      <button
+                        key={m.label}
+                        type="button"
+                        onClick={() => setEditForm({ ...editForm, mood: isSelected ? null : m })}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          padding: '3px 10px',
+                          borderRadius: '14px',
+                          border: `1px solid ${isSelected ? '#ec4899' : 'var(--border-color)'}`,
+                          background: isSelected ? 'rgba(236, 72, 153, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                          color: isSelected ? '#ec4899' : 'var(--text-muted)',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <span>{m.emoji}</span>
+                        <span>{m.label}</span>
+                      </button>
+                    );
+                  })}
+                  {editForm.mood && (
+                    <button
+                      type="button"
+                      onClick={() => setEditForm({ ...editForm, mood: null })}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        fontSize: '0.72rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      ✕ Clear
+                    </button>
+                  )}
+                </div>
                 
                 <div className={`editor-split-workspace ${viewMode === 'split' ? 'split' : ''}`} style={{ flex: 1, display: 'flex', minHeight: 0, border: '1px solid var(--border-color)', borderRadius: '8px', overflow: 'hidden', background: 'var(--bg-input)' }}>
                   {(viewMode === 'edit' || viewMode === 'split') && (
@@ -237,8 +361,33 @@ export default function Journal() {
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
                   <div>
-                    <h2 style={{ fontSize: '1.8rem', fontWeight: 700, marginBottom: '8px' }}>{activeEntry.title}</h2>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{formatDate(activeEntry.timestamp)}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      {activeEntry.mood && (
+                        <span style={{ fontSize: '1.8rem' }} title={activeEntry.mood.label}>
+                          {activeEntry.mood.emoji}
+                        </span>
+                      )}
+                      <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>{activeEntry.title}</h2>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '6px' }}>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{formatDate(activeEntry.timestamp)}</span>
+                      {activeEntry.mood && (
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          padding: '2px 8px',
+                          borderRadius: '12px',
+                          background: 'rgba(236, 72, 153, 0.15)',
+                          border: '1px solid rgba(236, 72, 153, 0.3)',
+                          color: '#f472b6',
+                          fontSize: '0.72rem',
+                          fontWeight: 700
+                        }}>
+                          {activeEntry.mood.emoji} {activeEntry.mood.label} Mood
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button onClick={handleEdit} className="pill blue">Edit</button>

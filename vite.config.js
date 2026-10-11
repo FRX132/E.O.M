@@ -3,6 +3,11 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@vercel/analytics/next': '@vercel/analytics/react',
+    }
+  },
   plugins: [
     react(),
     VitePWA({

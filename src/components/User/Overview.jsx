@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../Styles/Overview.css';
 import { useStore } from '../../store';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { calculateRank, SKILL_DEF, ALL_WIDGET_CONFIGS, DASHBOARD_PRESETS, DEFAULT_ORDER, LAYOUT_THEMES } from '../../constants';
 import { LIFE_RULES } from '../../data/lifeRules';
 import { fetchAllNewsArticles } from '../../services/newsService';
+import RankRoadmapModal from './RankRoadmapModal';
+import LifeBalanceRadar from '../UI/LifeBalanceRadar';
 
 // Default Quick Links for Launchpad
 const DEFAULT_QUICK_LINKS = [
@@ -16,12 +18,12 @@ const DEFAULT_QUICK_LINKS = [
 
 export default function Overview({ navigate }) {
   const [isMounted, setIsMounted] = useState(false);
+  const [isRankModalOpen, setIsRankModalOpen] = useState(false);
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   // Store Selectors
-  const habits = useStore(state => state.habits) || [];
   const expenses = useStore(state => state.expenses) || [];
   const assets = useStore(state => state.assets) || [];
   const goals = useStore(state => state.goals) || { week: [], month: [], year: [] };
@@ -30,7 +32,6 @@ export default function Overview({ navigate }) {
   const books = useStore(state => state.books) || [];
   const movies = useStore(state => state.movies) || [];
   const workouts = useStore(state => state.workouts) || [];
-  const watchlist = useStore(state => state.watchlist) || [];
   const profile = useStore(state => state.profile) || { username: '', goals: '', heroImage: '' };
   const setProfile = useStore(state => state.setProfile);
   const currency = profile.currencySymbol || '€';
@@ -45,6 +46,8 @@ export default function Overview({ navigate }) {
   const customHabitTemplates = useStore(state => state.customHabitTemplates || []);
   const addXP = useStore(state => state.addXP);
   const updateQuestProgress = useStore(state => state.updateQuestProgress);
+  const journal = useStore(state => state.journal || []);
+  const setJournal = useStore(state => state.setJournal);
 
   // Local Component States
   const [newReminderTitle, setNewReminderTitle] = useState('');
@@ -56,10 +59,16 @@ export default function Overview({ navigate }) {
   const [newLinkIcon, setNewLinkIcon] = useState('🔗');
 
   // Pomodoro Local State
-  const [pomoMode, setPomoMode] = useState('focus'); // 'focus' (25m) | 'short' (5m) | 'long' (15m)
+  const [pomoMode, setPomoMode] = useState('focus'); // 'focus' (25m) | 'short' (5m) | 'long' (15m) | 'custom'
+  const [customPomoMinutes, setCustomPomoMinutes] = useState(45);
+  const [isEditingPomo, setIsEditingPomo] = useState(false);
   const [pomoSeconds, setPomoSeconds] = useState(25 * 60);
   const [pomoIsActive, setPomoIsActive] = useState(false);
   const [pomoSessions, setPomoSessions] = useState(0);
+
+  // Daily Mood Reflection State
+  const [moodReflection, setMoodReflection] = useState('');
+  const [isMoodReflectionSaved, setIsMoodReflectionSaved] = useState(false);
 
   // Default Overview Settings Merged
   const settings = useMemo(() => {
@@ -105,27 +114,79 @@ export default function Overview({ navigate }) {
       interval = setInterval(() => setPomoSeconds(s => s - 1), 1000);
     } else if (pomoSeconds === 0 && pomoIsActive) {
       setPomoIsActive(false);
-      if (pomoMode === 'focus') {
+      if (pomoMode === 'focus' || pomoMode === 'custom') {
         setPomoSessions(s => s + 1);
-        addXP(25);
-        alert('🎉 Focus Session Completed! +25 XP earned. Time for a break!');
+        const earnedXp = pomoMode === 'custom' ? Math.max(10, Math.round(customPomoMinutes * 1.0)) : 25;
+        addXP(earnedXp);
+        alert(`🎉 Focus Session Completed! +${earnedXp} XP earned. Time for a break!`);
         setPomoMode('short');
         setPomoSeconds(5 * 60);
       } else {
         alert('☕ Break finished! Ready to focus again?');
-        setPomoMode('focus');
-        setPomoSeconds(25 * 60);
+        if (pomoMode === 'custom') {
+          setPomoSeconds(customPomoMinutes * 60);
+        } else {
+          setPomoMode('focus');
+          setPomoSeconds(25 * 60);
+        }
       }
     }
     return () => clearInterval(interval);
-  }, [pomoIsActive, pomoSeconds, pomoMode, addXP]);
+  }, [pomoIsActive, pomoSeconds, pomoMode, customPomoMinutes, addXP]);
 
-  const setPomoDuration = (mode) => {
+  const setPomoDuration = (mode, customMins = customPomoMinutes) => {
     setPomoIsActive(false);
     setPomoMode(mode);
     if (mode === 'focus') setPomoSeconds(25 * 60);
     else if (mode === 'short') setPomoSeconds(5 * 60);
     else if (mode === 'long') setPomoSeconds(15 * 60);
+    else if (mode === 'custom') {
+      const validMins = Math.max(1, Math.min(360, Number(customMins) || 45));
+      setCustomPomoMinutes(validMins);
+      setPomoSeconds(validMins * 60);
+    }
+  };
+
+  // Daily Mood to Journal synchronization
+  const syncMoodToJournal = (selectedMood, note = '') => {
+    const now = Date.now();
+    const todayStr = new Date().toLocaleDateString();
+    const existingIndex = journal.findIndex(e => e.isDailyMood && new Date(e.timestamp).toLocaleDateString() === todayStr);
+
+    const title = `Daily Mood: ${selectedMood.emoji} ${selectedMood.label} (${todayStr})`;
+    const reflectionPart = note.trim()
+      ? `\n\n### Reflection\n${note.trim()}`
+      : '\n\n*Logged via Daily Mood widget.*';
+    const content = `# Daily Check-in: ${selectedMood.emoji} ${selectedMood.label}\n\n**Date:** ${todayStr}\n**State:** Feeling ${selectedMood.label} today.${reflectionPart}`;
+
+    if (existingIndex >= 0) {
+      const updated = [...journal];
+      updated[existingIndex] = {
+        ...updated[existingIndex],
+        title,
+        mood: selectedMood,
+        content,
+        timestamp: now
+      };
+      setJournal(updated);
+    } else {
+      const newEntry = {
+        id: now,
+        title,
+        mood: selectedMood,
+        isDailyMood: true,
+        content,
+        timestamp: now
+      };
+      setJournal([newEntry, ...journal]);
+    }
+  };
+
+  const handleSaveMoodReflection = () => {
+    const currentMood = settings.todayMood || { emoji: '😊', label: 'Great' };
+    syncMoodToJournal(currentMood, moodReflection);
+    setIsMoodReflectionSaved(true);
+    setTimeout(() => setIsMoodReflectionSaved(false), 2500);
   };
 
   // Clock & Calendar
@@ -641,16 +702,152 @@ export default function Overview({ navigate }) {
             </div>
             <div className="pomo-content">
               <div className="pomo-modes">
-                <button className={`pomo-mode-btn ${pomoMode === 'focus' ? 'active' : ''}`} onClick={() => setPomoDuration('focus')}>25m Focus</button>
-                <button className={`pomo-mode-btn ${pomoMode === 'short' ? 'active' : ''}`} onClick={() => setPomoDuration('short')}>5m Break</button>
-                <button className={`pomo-mode-btn ${pomoMode === 'long' ? 'active' : ''}`} onClick={() => setPomoDuration('long')}>15m Rest</button>
+                <button className={`pomo-mode-btn ${pomoMode === 'focus' ? 'active' : ''}`} onClick={() => { setIsEditingPomo(false); setPomoDuration('focus'); }}>25m Focus</button>
+                <button className={`pomo-mode-btn ${pomoMode === 'short' ? 'active' : ''}`} onClick={() => { setIsEditingPomo(false); setPomoDuration('short'); }}>5m Break</button>
+                <button className={`pomo-mode-btn ${pomoMode === 'long' ? 'active' : ''}`} onClick={() => { setIsEditingPomo(false); setPomoDuration('long'); }}>15m Rest</button>
+                <button
+                  className={`pomo-mode-btn ${pomoMode === 'custom' ? 'active' : ''}`}
+                  onClick={() => {
+                    setPomoDuration('custom', customPomoMinutes);
+                    setIsEditingPomo(true);
+                  }}
+                >
+                  ⚙️ {pomoMode === 'custom' ? `${customPomoMinutes}m Custom` : 'Custom'}
+                </button>
               </div>
-              <div className="pomo-timer-display">{mins}:{secs}</div>
+
+              {/* Custom minute entry & preset controls */}
+              {(pomoMode === 'custom' || isEditingPomo) && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'var(--bg-card-alt)',
+                  padding: '6px 10px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border-light)',
+                  margin: '2px 0'
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = Math.max(1, customPomoMinutes - 5);
+                      setCustomPomoMinutes(next);
+                      if (!pomoIsActive) setPomoSeconds(next * 60);
+                    }}
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-muted)',
+                      borderRadius: '4px',
+                      padding: '2px 6px',
+                      fontSize: '0.72rem',
+                      cursor: 'pointer'
+                    }}
+                    title="Subtract 5 minutes"
+                  >
+                    -5m
+                  </button>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                    <input
+                      type="number"
+                      min="1"
+                      max="360"
+                      value={customPomoMinutes}
+                      onChange={(e) => {
+                        const val = Math.max(1, Math.min(360, parseInt(e.target.value) || 1));
+                        setCustomPomoMinutes(val);
+                        if (!pomoIsActive) setPomoSeconds(val * 60);
+                      }}
+                      style={{
+                        width: '54px',
+                        padding: '3px 6px',
+                        textAlign: 'center',
+                        borderRadius: '4px',
+                        border: '1px solid var(--border-color)',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        color: 'var(--text-main)',
+                        fontSize: '0.82rem',
+                        fontWeight: '700',
+                        outline: 'none'
+                      }}
+                    />
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>min</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = Math.min(360, customPomoMinutes + 5);
+                      setCustomPomoMinutes(next);
+                      if (!pomoIsActive) setPomoSeconds(next * 60);
+                    }}
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-muted)',
+                      borderRadius: '4px',
+                      padding: '2px 6px',
+                      fontSize: '0.72rem',
+                      cursor: 'pointer'
+                    }}
+                    title="Add 5 minutes"
+                  >
+                    +5m
+                  </button>
+
+                  {/* Quick Preset Chips */}
+                  {[10, 30, 45, 60, 90].map((presetMins) => (
+                    <button
+                      key={presetMins}
+                      type="button"
+                      onClick={() => {
+                        setCustomPomoMinutes(presetMins);
+                        if (!pomoIsActive) setPomoSeconds(presetMins * 60);
+                      }}
+                      style={{
+                        padding: '2px 6px',
+                        fontSize: '0.68rem',
+                        borderRadius: '10px',
+                        border: `1px solid ${customPomoMinutes === presetMins ? '#ef4444' : 'var(--border-color)'}`,
+                        background: customPomoMinutes === presetMins ? 'rgba(239, 68, 68, 0.2)' : 'transparent',
+                        color: customPomoMinutes === presetMins ? '#ef4444' : 'var(--text-muted)',
+                        cursor: 'pointer',
+                        fontWeight: 600
+                      }}
+                    >
+                      {presetMins}m
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div
+                className="pomo-timer-display"
+                onClick={() => {
+                  if (!pomoIsActive) {
+                    setPomoMode('custom');
+                    setIsEditingPomo(true);
+                  }
+                }}
+                style={{ cursor: !pomoIsActive ? 'pointer' : 'default' }}
+                title={!pomoIsActive ? "Click to set custom duration" : undefined}
+              >
+                {mins}:{secs}
+              </div>
+
               <div className="pomo-controls">
                 <button className="pomo-main-btn" onClick={() => setPomoIsActive(!pomoIsActive)}>
                   {pomoIsActive ? '⏸ Pause' : '▶ Start Focus'}
                 </button>
-                <button className="pomo-reset-btn" onClick={() => setPomoDuration(pomoMode)} title="Reset Timer">↺</button>
+                <button
+                  className="pomo-reset-btn"
+                  onClick={() => setPomoDuration(pomoMode, customPomoMinutes)}
+                  title="Reset Timer"
+                >
+                  ↺
+                </button>
               </div>
             </div>
           </div>
@@ -934,7 +1131,27 @@ export default function Overview({ navigate }) {
                 <span className="card-icon" style={{ color: '#ec4899' }}>🧠</span>
                 <h3>{settings.widgetTitles?.mood || "Daily Mood"}</h3>
               </div>
-              {settings.todayMood && <span style={{ fontSize: '0.75rem', color: '#ec4899', fontWeight: 700 }}>+25 XP Logged</span>}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {settings.todayMood && <span style={{ fontSize: '0.75rem', color: '#ec4899', fontWeight: 700 }}>+25 XP Logged</span>}
+                <button
+                  type="button"
+                  onClick={() => navigate('/journal')}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    fontSize: '0.72rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                  title="Open in Journal"
+                >
+                  <span>📖</span>
+                  <span>Journal</span>
+                </button>
+              </div>
             </div>
             <div className="card-content">
               <div className="mood-emojis-row">
@@ -944,13 +1161,79 @@ export default function Overview({ navigate }) {
                     className={`mood-emoji-btn ${settings.todayMood?.label === m.label ? 'active' : ''}`}
                     onClick={() => {
                       addXP(25);
-                      setOverviewSettings({ ...settings, todayMood: { ...m, timestamp: Date.now() } });
+                      const newMood = { ...m, timestamp: Date.now() };
+                      setOverviewSettings({ ...settings, todayMood: newMood });
+                      syncMoodToJournal(newMood, moodReflection);
                     }}
                   >
                     <span style={{ fontSize: '1.4rem' }}>{m.emoji}</span>
                     <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600 }}>{m.label}</span>
                   </button>
                 ))}
+              </div>
+
+              {/* Connected Journal Reflection Note */}
+              <div style={{
+                marginTop: '10px',
+                paddingTop: '8px',
+                borderTop: '1px solid var(--border-light)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <input
+                    type="text"
+                    placeholder={settings.todayMood ? `Add reflection for ${settings.todayMood.emoji} to Journal...` : "Select mood & add journal reflection..."}
+                    value={moodReflection}
+                    onChange={(e) => setMoodReflection(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSaveMoodReflection();
+                      }
+                    }}
+                    style={{
+                      flex: 1,
+                      background: 'var(--bg-card-alt)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '6px',
+                      padding: '6px 10px',
+                      fontSize: '0.76rem',
+                      color: 'var(--text-main)',
+                      outline: 'none'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSaveMoodReflection}
+                    className="pill green"
+                    style={{ fontSize: '0.72rem', padding: '6px 10px', whiteSpace: 'nowrap' }}
+                  >
+                    {isMoodReflectionSaved ? '✓ Saved!' : 'Save Reflection'}
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                    {settings.todayMood ? `Logged: ${settings.todayMood.emoji} ${settings.todayMood.label}` : 'Select how you feel today'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/journal')}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#ec4899',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      padding: 0
+                    }}
+                  >
+                    Open in Journal ➔
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1044,35 +1327,6 @@ export default function Overview({ navigate }) {
         );
 
       case 'skills_radar': {
-        const radarDimensions = [
-          { label: 'Health', value: Math.min(100, Math.max(20, habitProgress || 20)) },
-          { label: 'Wealth', value: Math.min(100, Math.max(15, Math.round((netWorth / 5000) * 100))) },
-          { label: 'Mind', value: Math.min(100, Math.max(20, (books.length * 20) + 15)) },
-          { label: 'Focus', value: Math.min(100, Math.max(25, timetableProgress || 20)) },
-          { label: 'Fitness', value: Math.min(100, Math.max(20, (workouts.length * 15) + 20)) },
-          { label: 'Agency', value: Math.min(100, Math.max(20, Math.round(((profile.xp || 0) / 10000) * 100))) }
-        ];
-
-        const cx = 130;
-        const cy = 130;
-        const maxR = 85;
-
-        const getCoord = (value, idx, total = 6) => {
-          const angle = (Math.PI * 2 / total) * idx - Math.PI / 2;
-          const r = (value / 100) * maxR;
-          return {
-            x: cx + r * Math.cos(angle),
-            y: cy + r * Math.sin(angle)
-          };
-        };
-
-        const polygonPoints = radarDimensions
-          .map((d, i) => {
-            const { x, y } = getCoord(d.value, i);
-            return `${x},${y}`;
-          })
-          .join(' ');
-
         return (
           <div key={widgetKey} className={cardClass}>
             <div className="card-header">
@@ -1080,37 +1334,7 @@ export default function Overview({ navigate }) {
               <h3>{settings.widgetTitles?.skills_radar || "Life Balance Radar"}</h3>
             </div>
             <div className="card-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <svg viewBox="0 0 260 260" className="radar-svg">
-                {[0.25, 0.5, 0.75, 1].map((scale, sIdx) => {
-                  const pts = Array.from({ length: 6 }).map((_, i) => {
-                    const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
-                    const r = maxR * scale;
-                    return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
-                  }).join(' ');
-                  return <polygon key={sIdx} points={pts} className="radar-web-circle" />;
-                })}
-
-                {Array.from({ length: 6 }).map((_, i) => {
-                  const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
-                  const x2 = cx + maxR * Math.cos(angle);
-                  const y2 = cy + maxR * Math.sin(angle);
-                  return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} className="radar-axis-line" />;
-                })}
-
-                <polygon points={polygonPoints} className="radar-data-polygon" />
-
-                {radarDimensions.map((d, i) => {
-                  const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
-                  const labelR = maxR + 18;
-                  const lx = cx + labelR * Math.cos(angle);
-                  const ly = cy + labelR * Math.sin(angle) + 4;
-                  return (
-                    <text key={i} x={lx} y={ly} className="radar-label-text">
-                      {d.label}
-                    </text>
-                  );
-                })}
-              </svg>
+              <LifeBalanceRadar mode="overview" width={260} height={260} />
             </div>
             <button className="card-action" onClick={() => navigate('/skills')}>Explore Skill Tree ➔</button>
           </div>
@@ -1289,19 +1513,36 @@ export default function Overview({ navigate }) {
           </div>
 
           <div className="hero-stats">
-            <div className="rank-badge-container">
-              <div className="rank-label">CURRENT RANK</div>
-              <div className="rank-letter">{rankStats.currentRank.rank}</div>
+            <div
+              className="rank-badge-container"
+              onClick={() => setIsRankModalOpen(true)}
+              style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+              title="Click to view full Hunter Hierarchy & Perks"
+            >
+              <div className="rank-label">CURRENT RANK ❯</div>
+              <div className="rank-letter" style={{ color: rankStats.currentRank.color }}>
+                {rankStats.currentRank.rank}
+              </div>
+              <div style={{ fontSize: '0.7rem', fontWeight: 800, color: rankStats.currentRank.color, letterSpacing: '0.5px', textTransform: 'uppercase', marginTop: '2px' }}>
+                {rankStats.currentRank.title}
+              </div>
             </div>
-            <div className="xp-overview-container">
+            <div
+              className="xp-overview-container"
+              onClick={() => setIsRankModalOpen(true)}
+              style={{ cursor: 'pointer' }}
+              title="Click to view full Hunter Hierarchy & Perks"
+            >
               <div className="xp-text-row">
-                <span className="xp-label">XP STATUS</span>
+                <span className="xp-label">XP STATUS ({rankStats.currentRank.multiplier}x MULTIPLIER)</span>
                 <span className="xp-value-text">{profile.xp || 0} / {rankStats.nextRank ? rankStats.nextRank.minXp : 'MAX'}</span>
               </div>
               <div className="xp-bar-outer">
-                <div className="xp-bar-inner" style={{ width: `${rankStats.progress}%` }}></div>
+                <div className="xp-bar-inner" style={{ width: `${rankStats.progress}%`, background: rankStats.currentRank.color }}></div>
               </div>
-              <div className="next-rank-text">{rankStats.progress.toFixed(1)}% to RANK {rankStats.nextRank?.rank || 'MAX'}</div>
+              <div className="next-rank-text">
+                {rankStats.progress.toFixed(1)}% to RANK {rankStats.nextRank?.rank || 'MAX'} ({rankStats.nextRank?.title || 'Apex'}) ❯
+              </div>
             </div>
             <div className="hero-stat-item">
               <span className="stat-value">{dayOfYear}</span>
@@ -1565,6 +1806,11 @@ export default function Overview({ navigate }) {
           </div>
         );
       })()}
+
+      <RankRoadmapModal
+        isOpen={isRankModalOpen}
+        onClose={() => setIsRankModalOpen(false)}
+      />
     </div>
   );
 }

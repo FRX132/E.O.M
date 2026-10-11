@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../../store';
+import { calculateRank } from '../../services/rankingService';
+import RankRoadmapModal from './RankRoadmapModal';
 
 export default function ProfileModal({ isOpen, onClose }) {
   const profile = useStore(state => state.profile);
   const setProfile = useStore(state => state.setProfile);
+  const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
 
   if (!isOpen) return null;
+
+  const rankStats = calculateRank(profile.xp || 0);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,6 +31,45 @@ export default function ProfileModal({ isOpen, onClose }) {
 
         <div className="modal-body">
           <div className="metrics-grid">
+            {/* Rank Status Card */}
+            <div
+              className="input-group full"
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: `1px solid ${rankStats.currentRank.color}40`,
+                borderRadius: '10px',
+                padding: '12px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                marginBottom: '4px'
+              }}
+              onClick={() => setIsRoadmapOpen(true)}
+              title="Click to view Hunter Rank Roadmap"
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '1.6rem' }}>{rankStats.currentRank.badge}</span>
+                <div>
+                  <div style={{ fontSize: '0.68rem', fontWeight: 800, color: rankStats.currentRank.color, letterSpacing: '1px', textTransform: 'uppercase' }}>
+                    CURRENT RANK {rankStats.currentRank.rank}
+                  </div>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#fff' }}>
+                    {rankStats.currentRank.title} ({rankStats.currentRank.multiplier}x XP)
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="notion-btn"
+                style={{ fontSize: '0.72rem', padding: '4px 10px', borderRadius: '14px', border: `1px solid ${rankStats.currentRank.color}`, color: rankStats.currentRank.color, background: 'transparent' }}
+                onClick={(e) => { e.stopPropagation(); setIsRoadmapOpen(true); }}
+              >
+                Roadmap ❯
+              </button>
+            </div>
+
             {/* Main Info */}
             <div className="input-group full">
               <label>Display Name</label>
@@ -237,6 +281,11 @@ export default function ProfileModal({ isOpen, onClose }) {
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
+
+      <RankRoadmapModal
+        isOpen={isRoadmapOpen}
+        onClose={() => setIsRoadmapOpen(false)}
+      />
     </div>
   );
 }

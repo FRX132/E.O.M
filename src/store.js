@@ -291,6 +291,7 @@ const initialState = {
   designSettings: migrateLegacyData('os_design_settings', EMPTY_STATE.designSettings),
   financeSettings: migrateLegacyData('os_finance_settings', EMPTY_STATE.financeSettings),
   overviewSettings: migrateLegacyData('os_overview_settings', EMPTY_STATE.overviewSettings),
+  recentRankUp: null,
 };
 
 const shouldTemplateBeActiveOnDate = (template, dateStr) => {
@@ -522,14 +523,26 @@ export const useStore = create(
       addXP: (amount) => set((state) => {
         const amt = Number(amount) || 0;
         const currentXP = state.profile?.xp || 0;
-        const newXP = Math.max(0, currentXP + amt);
+
+        // Apply current rank multiplier for positive XP gains
+        const currentRankDetails = calculateRank(currentXP).currentRank;
+        const multiplier = currentRankDetails?.multiplier || 1.0;
+        const multipliedAmt = amt > 0 ? Math.round(amt * multiplier) : amt;
+        const newXP = Math.max(0, currentXP + multipliedAmt);
+
+        let rankUpEvent = null;
 
         if (amt > 0) {
           try {
-            const oldRank = calculateRank(currentXP).currentRank.rank;
-            const newRank = calculateRank(newXP).currentRank.rank;
-            if (oldRank !== newRank) {
+            const oldRank = calculateRank(currentXP).currentRank;
+            const newRank = calculateRank(newXP).currentRank;
+            if (oldRank.rank !== newRank.rank) {
               playLevelUpSound();
+              rankUpEvent = {
+                oldRank,
+                newRank,
+                timestamp: Date.now()
+              };
             } else {
               playXPChime();
             }
@@ -539,9 +552,16 @@ export const useStore = create(
         }
 
         return {
-          profile: { ...state.profile, xp: newXP }
+          profile: { ...state.profile, xp: newXP },
+          ...(rankUpEvent ? { recentRankUp: rankUpEvent } : {})
         };
       }),
+
+      setXP: (newXp) => set((state) => ({
+        profile: { ...state.profile, xp: Math.max(0, Number(newXp) || 0) }
+      })),
+
+      dismissRankUp: () => set({ recentRankUp: null }),
 
       startQuest: (skillId, duration) => set((state) => ({
         activeQuests: [...state.activeQuests, { skillId, progress: 0, total: duration }]

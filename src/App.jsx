@@ -32,7 +32,9 @@ import PasswordManager from './components/Agency/PasswordManager';
 import NewsHub from './components/Agency/NewsHub';
 import LoadingScreen from './components/UI/LoadingScreen';
 import CommandPalette from './components/Functions/CommandPalette';
+import RankUpCelebrationModal from './components/User/RankUpCelebrationModal';
 import { SKILL_DEF } from './constants';
+import { Analytics } from '@vercel/analytics/react';
 import './components/Styles/Timetable.css';
 
 // Icon for News Hub
@@ -630,6 +632,8 @@ function App() {
         onClose={() => setIsProfileModalOpen(false)}
       />
 
+      <RankUpCelebrationModal />
+
       {globalLoading && (
         <LoadingScreen
           mode="fullscreen"
@@ -640,6 +644,9 @@ function App() {
           onSwitchCloud={globalLoading.onSwitchCloud}
         />
       )}
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
     </div>
   );
 }
