@@ -57,7 +57,8 @@ export default function ProfileSettings() {
   const accentColor = useStore(state => state.accentColor);
   const setAccentColor = useStore(state => state.setAccentColor);
   const applyDesignPreset = useStore(state => state.applyDesignPreset);
-  const overviewSettings = useStore(state => state.overviewSettings) || {};
+  const rawOverviewSettings = useStore(state => state.overviewSettings);
+  const overviewSettings = useMemo(() => rawOverviewSettings || {}, [rawOverviewSettings]);
   const setOverviewSettings = useStore(state => state.setOverviewSettings);
 
   const [saveStatus, setSaveStatus] = useState('');

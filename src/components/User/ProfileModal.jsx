@@ -136,8 +136,27 @@ export default function ProfileModal({ isOpen, onClose }) {
           </div>
         </div>
 
-        <div className="modal-footer">
-          <button className="confirm-btn" onClick={onClose}>Done</button>
+        <div className="modal-footer" style={{ display: 'flex', gap: '10px', marginTop: '24px' }}>
+          <button
+            type="button"
+            className="notion-btn secondary"
+            style={{ flex: 1, padding: '12px', borderRadius: '12px', fontWeight: 700 }}
+            onClick={() => {
+              const state = useStore.getState();
+              const backupData = JSON.stringify(state, null, 2);
+              const blob = new Blob([backupData], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `EOM_Backup_${new Date().toISOString().split('T')[0]}.json`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+            title="Download offline JSON snapshot of all your local data"
+          >
+            💾 Export Backup (.json)
+          </button>
+          <button className="confirm-btn" style={{ flex: 1, marginTop: 0 }} onClick={onClose}>Done</button>
         </div>
       </div>
 

@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useStore } from '../../store';
 import { parseICSContent } from '../../services/calendarImport';
-import { playCyberClick, playTimerAlarm } from '../../services/soundService';
-import { sendLocalNotification, requestNotificationPermission } from '../../services/notificationService';
+import { playCyberClick } from '../../services/soundService';
+import { requestNotificationPermission } from '../../services/notificationService';
 
 const ClockIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-clock" viewBox="0 0 16 16">

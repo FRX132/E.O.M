@@ -7,6 +7,7 @@ import { LIFE_RULES } from '../../data/lifeRules';
 import { fetchAllNewsArticles } from '../../services/newsService';
 import RankRoadmapModal from './RankRoadmapModal';
 import LifeBalanceRadar from '../UI/LifeBalanceRadar';
+import { playTimerAlarm } from '../../services/soundService';
 
 // Default Quick Links for Launchpad
 const DEFAULT_QUICK_LINKS = [
@@ -114,6 +115,7 @@ export default function Overview({ navigate }) {
       interval = setInterval(() => setPomoSeconds(s => s - 1), 1000);
     } else if (pomoSeconds === 0 && pomoIsActive) {
       setPomoIsActive(false);
+      playTimerAlarm();
       if (pomoMode === 'focus' || pomoMode === 'custom') {
         setPomoSessions(s => s + 1);
         const earnedXp = pomoMode === 'custom' ? Math.max(10, Math.round(customPomoMinutes * 1.0)) : 25;

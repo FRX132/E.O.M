@@ -1,9 +1,16 @@
 import React, { useEffect } from 'react';
 import { useStore } from '../../store';
+import { playLevelUpSound } from '../../services/soundService';
 
 export default function RankUpCelebrationModal() {
   const recentRankUp = useStore((state) => state.recentRankUp);
   const dismissRankUp = useStore((state) => state.dismissRankUp);
+
+  useEffect(() => {
+    if (recentRankUp) {
+      playLevelUpSound();
+    }
+  }, [recentRankUp]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {

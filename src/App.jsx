@@ -6,33 +6,35 @@ import './App.css';
 import './components/Styles/Default.css';
 import './components/Styles/Templates_Interface.css';
 
-// Components
-import ExpenseTracker from './components/User/ExpenseTracker';
-import GoalPlanner from './components/Intelligence/GoalPlanner';
-import HabitTracker from './components/Health/HabitTracker';
-import FridgeStock from './components/Health/FridgeStock';
-import BigTargets from './components/User/BigTargets';
-import BookList from './components/Intelligence/BookList';
-import MovieList from './components/Agency/MovieList';
-import ProfileSettings from './components/User/ProfileSettings';
-import SkillTree from './components/User/SkillTree';
+// Core eagerly loaded components
 import Overview from './components/User/Overview';
-import SportHub from './components/Health/SportHub';
-import LanguageHub from './components/Agency/LanguageHub';
 import Auth from './components/User/Auth';
 import ProfileModal from './components/User/ProfileModal';
-import TripMode from './components/Agency/TripMode';
-import AIAssistant from './components/Functions/AIAssistant';
-import ProjectCanvas from './components/Functions/ProjectCanvas';
-import Journal from './components/Agency/Journal';
-import Editor from './components/Functions/Editor';
-import TradingTerminal from './components/User/TradingTerminal';
-import Timetable from './components/User/Timetable';
-import PasswordManager from './components/Agency/PasswordManager';
-import NewsHub from './components/Agency/NewsHub';
 import LoadingScreen from './components/UI/LoadingScreen';
 import CommandPalette from './components/Functions/CommandPalette';
 import RankUpCelebrationModal from './components/User/RankUpCelebrationModal';
+
+// Lazily loaded modules for optimal performance & small initial bundle
+const ExpenseTracker = React.lazy(() => import('./components/User/ExpenseTracker'));
+const GoalPlanner = React.lazy(() => import('./components/Intelligence/GoalPlanner'));
+const HabitTracker = React.lazy(() => import('./components/Health/HabitTracker'));
+const FridgeStock = React.lazy(() => import('./components/Health/FridgeStock'));
+const BigTargets = React.lazy(() => import('./components/User/BigTargets'));
+const BookList = React.lazy(() => import('./components/Intelligence/BookList'));
+const MovieList = React.lazy(() => import('./components/Agency/MovieList'));
+const ProfileSettings = React.lazy(() => import('./components/User/ProfileSettings'));
+const SkillTree = React.lazy(() => import('./components/User/SkillTree'));
+const SportHub = React.lazy(() => import('./components/Health/SportHub'));
+const LanguageHub = React.lazy(() => import('./components/Agency/LanguageHub'));
+const TripMode = React.lazy(() => import('./components/Agency/TripMode'));
+const AIAssistant = React.lazy(() => import('./components/Functions/AIAssistant'));
+const ProjectCanvas = React.lazy(() => import('./components/Functions/ProjectCanvas'));
+const Journal = React.lazy(() => import('./components/Agency/Journal'));
+const Editor = React.lazy(() => import('./components/Functions/Editor'));
+const TradingTerminal = React.lazy(() => import('./components/User/TradingTerminal'));
+const Timetable = React.lazy(() => import('./components/User/Timetable'));
+const PasswordManager = React.lazy(() => import('./components/Agency/PasswordManager'));
+const NewsHub = React.lazy(() => import('./components/Agency/NewsHub'));
 import { SKILL_DEF } from './constants';
 import { Analytics } from '@vercel/analytics/react';
 import './components/Styles/Timetable.css';
@@ -595,30 +597,37 @@ function App() {
 
 
         <div className="view-transition" style={{ paddingTop: '10px' }}>
-          <Routes>
-            <Route path="/" element={<Overview navigate={navigate} />} />
-            <Route path="/overview" element={<Overview navigate={navigate} />} />
-            <Route path="/settings" element={<ProfileSettings />} />
-            <Route path="/skills" element={<SkillTree />} />
-            <Route path="/expenses" element={<ExpenseTracker />} />
-            <Route path="/goals" element={<GoalPlanner />} />
-            <Route path="/habits" element={<HabitTracker />} />
-            <Route path="/fridge" element={<FridgeStock />} />
-            <Route path="/targets" element={<BigTargets />} />
-            <Route path="/sport" element={<SportHub />} />
-            <Route path="/languages" element={<LanguageHub />} />
-            <Route path="/news" element={<NewsHub navigate={navigate} />} />
-            <Route path="/books" element={<BookList />} />
-            <Route path="/movies" element={<MovieList />} />
-            <Route path="/trading" element={<TradingTerminal navigate={navigate} />} />
-            <Route path="/journal" element={<Journal />} />
-            <Route path="/trips" element={<TripMode />} />
-            <Route path="/passwords" element={<PasswordManager />} />
-            <Route path="/canvas" element={<ProjectCanvas />} />
-            <Route path="/editor" element={<Editor />} />
-            <Route path="/ai" element={<AIAssistant />} />
-            <Route path="/timetable" element={<Timetable />} />
-          </Routes>
+          <React.Suspense fallback={
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', color: 'var(--text-muted)', fontSize: '0.9rem', gap: '8px' }}>
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              <span>Loading module...</span>
+            </div>
+          }>
+            <Routes>
+              <Route path="/" element={<Overview navigate={navigate} />} />
+              <Route path="/overview" element={<Overview navigate={navigate} />} />
+              <Route path="/settings" element={<ProfileSettings />} />
+              <Route path="/skills" element={<SkillTree />} />
+              <Route path="/expenses" element={<ExpenseTracker />} />
+              <Route path="/goals" element={<GoalPlanner />} />
+              <Route path="/habits" element={<HabitTracker />} />
+              <Route path="/fridge" element={<FridgeStock />} />
+              <Route path="/targets" element={<BigTargets />} />
+              <Route path="/sport" element={<SportHub />} />
+              <Route path="/languages" element={<LanguageHub />} />
+              <Route path="/news" element={<NewsHub navigate={navigate} />} />
+              <Route path="/books" element={<BookList />} />
+              <Route path="/movies" element={<MovieList />} />
+              <Route path="/trading" element={<TradingTerminal navigate={navigate} />} />
+              <Route path="/journal" element={<Journal />} />
+              <Route path="/trips" element={<TripMode />} />
+              <Route path="/passwords" element={<PasswordManager />} />
+              <Route path="/canvas" element={<ProjectCanvas />} />
+              <Route path="/editor" element={<Editor />} />
+              <Route path="/ai" element={<AIAssistant />} />
+              <Route path="/timetable" element={<Timetable />} />
+            </Routes>
+          </React.Suspense>
         </div>
       </div>
 

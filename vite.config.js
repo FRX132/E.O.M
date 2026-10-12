@@ -50,6 +50,32 @@ export default defineConfig({
     })
   ],
   base: './',
+  build: {
+    chunkSizeWarningLimit: 1600,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('three') || id.includes('globe.gl') || id.includes('react-globe.gl')) {
+              return 'vendor-3d-globe';
+            }
+            if (id.includes('@xenova/transformers') || id.includes('onnxruntime-web')) {
+              return 'vendor-ai';
+            }
+            if (id.includes('@xyflow') || id.includes('dagre')) {
+              return 'vendor-flow';
+            }
+            if (id.includes('recharts') || id.includes('d3-')) {
+              return 'vendor-charts';
+            }
+            if (id.includes('react-bootstrap') || id.includes('bootstrap')) {
+              return 'vendor-bootstrap';
+            }
+          }
+        }
+      }
+    }
+  },
   server: {
     watch: {
       ignored: ['**/release/**', '**/dist/**', '**/build/**']

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store';
-import { playCyberClick, playSuccess, isSoundEnabled, setSoundEnabled } from '../../services/soundService';
+import { playCyberClick, isSoundEnabled, setSoundEnabled } from '../../services/soundService';
 import '../Styles/CommandPalette.css';
 
 export default function CommandPalette({ isOpen, onClose }) {
@@ -11,18 +11,19 @@ export default function CommandPalette({ isOpen, onClose }) {
   const inputRef = useRef(null);
   const listRef = useRef(null);
 
-  const overviewSettings = useStore(state => state.overviewSettings) || {};
+  const rawOverviewSettings = useStore(state => state.overviewSettings);
   const setOverviewSettings = useStore(state => state.setOverviewSettings);
-  const addXP = useStore(state => state.addXP);
-  const profile = useStore(state => state.profile) || {};
-  const setProfile = useStore(state => state.setProfile);
+  const overviewSettings = useMemo(() => rawOverviewSettings || {}, [rawOverviewSettings]);
 
   // Focus input on open
   useEffect(() => {
     if (isOpen) {
-      setQuery('');
-      setSelectedIndex(0);
-      setTimeout(() => inputRef.current?.focus(), 50);
+      const timer = setTimeout(() => {
+        setQuery('');
+        setSelectedIndex(0);
+        inputRef.current?.focus();
+      }, 30);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 

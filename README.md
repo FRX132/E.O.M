@@ -6,6 +6,9 @@
 
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Live%20Preview-black?style=flat&logo=vercel)](https://eom-preview.vercel.app)
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable-blue?style=flat&logo=pwa)](https://eom-preview.vercel.app)
+[![React 19](https://img.shields.io/badge/React-19-61dafb?style=flat&logo=react)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite-Bundler-646cff?style=flat&logo=vite)](https://vitejs.dev)
+[![Privacy: Local-First](https://img.shields.io/badge/Privacy-100%25%20Local--First-success?style=flat&logo=shield)](https://github.com/FRX132/E.O.M)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -67,10 +70,33 @@ High-fidelity fitness tracking featuring:
 - **Muscle Targeting**: Interactive body maps to select and log specific muscle group sessions.
 - **Smart Sync**: Automatically syncs body structure with your user profile gender.
 
-### 🛡️ Skill Tree & Dynamic Habits
-The RPG engine powering your daily progress:
-- **5 Progression Trees**: Level up in Health, Social, Career, Spirit, and Mental.
-- **Dynamic Habit Syncing**: Daily habits directly reward XP and advance your overall agent rank.
+### 🗡️ Hunter RPG Hierarchy & 11-Tier Progression Engine
+A complete Solo-Leveling / Hunter-inspired character ascension framework:
+- **11 Progression Tiers**: Scale from `Rank Z (Unawakened)` through `W`, `F`, `E`, `D`, `C`, `B`, `A`, `S`, `S+` up to `Rank EX (Omnipresent Sovereign)`.
+- **Dynamic XP Scaling Multipliers**: Each tier multiplies XP gained across daily habits, workout sessions, and quests (from **1.0x** up to **1.80x**).
+- **Interactive Rank Roadmap Modal**: Explore lore titles, required XP thresholds, active passive buffs, and your next ascension target.
+- **Ascension Celebration Experience**: Cinematic rank-up celebration modal triggered automatically upon passing XP thresholds with procedural Web Audio synthesizer fanfare.
+
+### 🌳 64-Skill Tree, Dagre Layout & Holistic Life Radar
+A cybernetic skill progression graph visualizing character mastery across the 5 dimensions of life:
+- **64 Handcrafted Nodes**: Structured across **Health** (Emerald), **Mental** (Cyan), **Spirit** (Purple), **Social** (Pink), and **Career** (Amber).
+- **Dagre Subgraph Directional Layout**: Orthogonal layout engine preventing branch overlap and node collisions across all sub-trees.
+- **Active Quest Drawer**: Track multi-day unlock commitments with daily +100 XP progress increments and 1-click mastery activation.
+- **Automated Core Habit Linkage**: Unlocking skills instantly provisions and schedules corresponding daily discipline habits.
+- **🕸️ Holistic Life Balance Radar**: 6-axis SVG radar visualization measuring branch balance and total mastery inside both the Skill Tree and the Overview Dashboard.
+
+### ⏱️ Custom Focus & Pomodoro Timer Engine
+A high-productivity focus timer tailored to deep work blocks:
+- **Custom Time Entry**: Specify any duration from 1 to 360 minutes directly via numeric input or click-to-edit display.
+- **Quick Adjustments & Preset Chips**: One-tap `-5m` / `+5m` fine-tuning plus rapid presets (`10m`, `30m`, `45m`, `60m`, `90m`).
+- **Dynamic XP & Procedural Audio**: Completing focus sessions rewards proportional XP and triggers an ambient Web Audio synthesizer alarm chime.
+
+### 🧠 Daily Mood & Journal Bidirectional Synchronization
+Seamless emotional telemetry linking the Overview Dashboard directly with the Markdown Journal:
+- **5-Tier Mood Check-In**: Log emotional state (`🔥 Unstoppable`, `😊 Great`, `⚡ Focused`, `😐 Neutral`, `😴 Tired`) for +25 XP.
+- **Inline Journal Reflection**: Type daily thoughts directly within the widget and save them straight to today's Journal entry.
+- **Full Mood Tagging in Journal**: Assign or clear mood tags on any entry, with color-coded badges and dedicated list filters.
+- **Two-Way Synchronization**: Updating mood in the Journal updates the Overview widget, and vice versa.
 
 ### 📅 Timetable & Big Targets
 - **Weekly Schedule Matrix**: Time-blocked weekly schedule with task status management.
@@ -156,12 +182,14 @@ E.O.M is a complete **Progressive Web App (PWA)** that can be installed instantl
 ---
 
 ## 🚀 Technical Stack
-- **Frontend Core**: React 19, Vite, React Router v7.
-- **State & Local Persistence**: Zustand with `localStorage` fallback and Cloud Sync URL loader.
-- **PWA & Offline**: `vite-plugin-pwa` with custom Service Worker caching.
-- **Desktop**: Electron 34 with cross-platform packaging.
-- **Mobile Container**: Capacitor iOS & Android.
+- **Frontend Core**: React 19, Vite, React Router v7 with route-level code-splitting (`React.lazy` & `Suspense`).
+- **State & Local Persistence**: Zustand with `localStorage` fallback, multi-device backup snapshots, and auto-backup directory streaming.
+- **PWA & Offline**: `vite-plugin-pwa` with custom Service Worker caching & standalone fullscreen mobile view.
+- **Desktop**: Electron 34 with cross-platform packaging for macOS (.dmg) & Windows (.exe).
+- **Mobile Container**: Capacitor iOS & Android with native storage sandboxing.
 - **AI & NLP**: `AgentHunter.js` Web Worker Engine (`@xenova/transformers` & ONNX runtime-web for zero-config offline intelligence).
+- **Audio Engine**: Procedural Cyberpunk Web Audio API Synthesizer (zero external audio file dependencies).
+- **Observability**: `@vercel/analytics` real-time privacy-compliant traffic telemetry.
 - **Styling**: Vanilla CSS Variables Design System with Google Fonts (`Inter`, `Outfit`, `JetBrains Mono`, `Roboto`, `Playfair Display`, `Cinzel`, `VT323`, `Share Tech Mono`).
 
 ---
