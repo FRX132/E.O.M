@@ -193,7 +193,7 @@ E.O.M is a complete **Progressive Web App (PWA)** that can be installed instantl
 ## 🛠️ Getting Started
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or higher)
+- [Node.js](https://nodejs.org/) (v20.19+, v22.12+, or higher)
 - [npm](https://www.npmjs.com/)
 
 ### Installation
