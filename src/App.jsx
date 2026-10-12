@@ -655,7 +655,7 @@ function App() {
       )}
 
       {/* Vercel Web Analytics */}
-      <Analytics />
+      <Analytics route={location.pathname} path={location.pathname} />
     </div>
   );
 }
