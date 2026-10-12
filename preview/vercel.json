@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/validate.php",
+      "destination": "/api/validate"
+    }
+  ]
+}
