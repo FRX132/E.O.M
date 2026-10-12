@@ -145,9 +145,7 @@ E.O.M is architected around a strict **Local-First & Zero-Knowledge Privacy Phil
   |---|---|---|
   | **macOS Desktop (Electron)** | `~/Library/Application Support/eom/Local Storage/leveldb/` | Chromium LevelDB Engine |
   | **Windows Desktop (Electron)** | `%APPDATA%\eom\Local Storage\leveldb\` | Chromium LevelDB Engine |
-  | **Web & PWA** | Sandboxed browser origin domain storage | HTML5 `localStorage` & `IndexedDB` |
-  | **iOS (iPhone/iPad)** | Sandboxed native App container | Capacitor Native WebKit Storage |
-  | **Android** | Sandboxed internal storage (`/data/data/com.eom.os/`) | Capacitor Android WebStorage / SQLite |
+  | **Web & Mobile PWA (iOS/Android)** | Sandboxed browser origin domain storage | HTML5 `localStorage` & `IndexedDB` |
 - **Credential & State Recovery**:
   1. **In-App Recovery**: Click *"Forgot Password"* on the Login screen and enter your Username to view your local backup password on screen.
   2. **Desktop DevTools**: Press <kbd>Cmd + Shift + I</kbd> (Mac) or <kbd>Ctrl + Shift + I</kbd> (Windows) in the Electron app ➔ open the **Application** tab ➔ select **Local Storage** ➔ inspect `os_profile`.
@@ -158,10 +156,9 @@ E.O.M is architected around a strict **Local-First & Zero-Knowledge Privacy Phil
 ## 🔄 Multi-Device Updates & Synchronization
 
 When code updates or new features are pushed, user data is **never overwritten or wiped**:
-- **Web & PWA**: Pushing to GitHub deploys to Vercel instantly. Service Worker reloads fresh assets while preserving browser `localStorage`.
+- **Web & Mobile PWA**: Pushing to GitHub deploys to Vercel instantly. Service Worker reloads fresh assets while preserving browser `localStorage`.
 - **macOS Desktop (.dmg)**: Running `npm run electron:build` creates an updated `.dmg`. Replacing the app in `/Applications` updates the binary while preserving `~/Library/Application Support/eom/`.
 - **Windows Desktop (.exe)**: Running `npm run electron:build:win` updates the binary while keeping `%APPDATA%\eom` intact.
-- **iOS & Android**: Running `npm run build && npx cap sync` transfers web bundle changes into native projects for Xcode and Android Studio builds.
 
 ---
 
@@ -186,7 +183,6 @@ E.O.M is a complete **Progressive Web App (PWA)** that can be installed instantl
 - **State & Local Persistence**: Zustand with `localStorage` fallback, multi-device backup snapshots, and auto-backup directory streaming.
 - **PWA & Offline**: `vite-plugin-pwa` with custom Service Worker caching & standalone fullscreen mobile view.
 - **Desktop**: Electron 34 with cross-platform packaging for macOS (.dmg) & Windows (.exe).
-- **Mobile Container**: Capacitor iOS & Android with native storage sandboxing.
 - **AI & NLP**: `AgentHunter.js` Web Worker Engine (`@xenova/transformers` & ONNX runtime-web for zero-config offline intelligence).
 - **Audio Engine**: Procedural Cyberpunk Web Audio API Synthesizer (zero external audio file dependencies).
 - **Observability**: `@vercel/analytics` real-time privacy-compliant traffic telemetry.
@@ -229,20 +225,6 @@ npm run preview
 - **Mac App (.dmg)**: `npm run electron:build`
 - **Windows Executable (.exe)**: `npm run electron:build:win`
 
-### Native iOS (Capacitor Xcode Project)
-```sh
-npm run build
-npx cap sync ios
-npx cap open ios
-```
-
-### Native Android (Capacitor Android Studio Project)
-```sh
-npm run build
-npx cap sync android
-npx cap open android
-```
-
 ---
 
 ## 📂 Project Structure
@@ -254,8 +236,6 @@ E.O.M/
 │   ├── Documentary.html     # Comprehensive system documentation & guides
 │   └── vercel.json          # Deployment & routing configuration
 ├── electron/                # Electron main process & desktop preload scripts
-├── ios/                     # Native Capacitor iOS container
-├── android/                 # Native Capacitor Android container
 ├── src/
 │   ├── components/
 │   │   ├── Agency/          # NewsHub, Journal, MovieList, PasswordManager, etc.

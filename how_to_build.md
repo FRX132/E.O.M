@@ -1,6 +1,6 @@
 # 📦 E.O.M OS — Multi-Platform Build & Distribution Guide
 
-This guide covers building, packaging, and updating **E.O.M Life Planner OS** across macOS (.dmg), Windows (.exe), iOS (Xcode), Android (Android Studio), and Web/PWA (Vercel).
+This guide covers building, packaging, and updating **E.O.M Life Planner OS** across macOS (.dmg), Windows (.exe), and Web/PWA (Vercel & Mobile PWA).
 
 ---
 
@@ -11,10 +11,9 @@ This guide covers building, packaging, and updating **E.O.M Life Planner OS** ac
 > E.O.M uses a strict **Local-First & Zero-Knowledge** architecture. Your profile credentials, habit streaks, workouts, transactions, and journal entries are physically decoupled from the executable binary and stored inside your system's sandboxed LevelDB / SQLite storage:
 > - **macOS**: `~/Library/Application Support/eom/Local Storage/leveldb/`
 > - **Windows**: `%APPDATA%\eom\Local Storage\leveldb\`
-> - **iOS & Android**: Sandboxed native App container
-> - **Web/PWA**: Browser origin `localStorage` & `IndexedDB`
+> - **Web/PWA (Desktop & Mobile)**: Browser origin `localStorage` & `IndexedDB`
 >
-> When you install a new `.dmg`, `.exe`, or iOS build, your existing data remains 100% intact!
+> When you install a new `.dmg`, `.exe`, or update the web deployment, your existing data remains 100% intact!
 
 ---
 
@@ -63,47 +62,17 @@ Run the `.exe` installer. It updates the executable while preserving your `%APPD
 
 ---
 
-## 📱 3. Native iOS Build (iPhone & iPad via Xcode)
+## 📱 3. Mobile Installation (iOS & Android via PWA)
 
-To deploy E.O.M to physical iOS devices or the iOS Simulator:
+E.O.M is fully equipped with an offline-first **Progressive Web App (PWA)** container:
+- **iPhone / iPad**: Open `https://<your-domain>/app` in Safari ➔ tap the **Share** button ➔ select **Add to Home Screen**.
+- **Android**: Open `https://<your-domain>/app` in Chrome ➔ tap **Install App** or **Add to Home screen**.
 
-```bash
-# 1. Build the production React bundle
-npm run build
-
-# 2. Sync web assets and plugins to the native Xcode workspace
-npx cap sync ios
-
-# 3. Open the project in Xcode
-npx cap open ios
-```
-
-### Inside Xcode:
-1. Select your development team in **Signing & Capabilities**.
-2. Select your connected iPhone or a Simulator from the device dropdown.
-3. Press <kbd>Cmd + R</kbd> (or click the Play button) to compile and launch.
-4. For distribution via TestFlight or the App Store, select **Product ➔ Archive**.
+The installed app runs in **standalone fullscreen mode** (no browser address bar), supports offline caching via the service worker, and securely saves all user data in local device storage.
 
 ---
 
-## 🤖 4. Native Android Build (Android Studio)
-
-```bash
-# 1. Build the production React bundle
-npm run build
-
-# 2. Sync web assets to the native Android project
-npx cap sync android
-
-# 3. Open in Android Studio
-npx cap open android
-```
-
-In Android Studio, click **Run ➔ Run 'app'** (<kbd>Shift + F10</kbd>) or build an APK / AAB via **Build ➔ Generate Signed Bundle / APK**.
-
----
-
-## 🌐 5. Web & PWA Deployment (Vercel)
+## 🌐 4. Web & PWA Deployment (Vercel)
 
 E.O.M is pre-configured with multi-tier Vercel routing (`vercel.json`):
 - **`/` (Root)** ➔ Serves the interactive **Preview & Showcase Landing Page** (Simulator, Features, Tech Matrix, Documentation).

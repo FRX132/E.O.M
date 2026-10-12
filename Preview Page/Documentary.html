@@ -6,7 +6,7 @@
     <title>E.O.M — System Documentation & Guides</title>
     <!-- SEO Meta Tags -->
     <meta name="description" content="Official documentation for E.O.M (Escape Of Matrix) Life Planner OS. Learn how to configure local LLMs, deploy to iPhone, optimize finance inputs, and use the MCP command router.">
-    <meta name="keywords" content="EOM Documentation, EOM Guide, Life Planner OS, Local AI, iOS Deployment, Capacitor Xcode, React Memoization">
+    <meta name="keywords" content="EOM Documentation, EOM Guide, Life Planner OS, Local AI, iOS Deployment, Mobile PWA, React Memoization">
     
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
@@ -71,7 +71,7 @@
                 <div class="docs-menu">
                     <div class="docs-menu-title">Deployment & Builds</div>
                     <a href="#desktop-build" class="docs-menu-item">🖥️ macOS (.dmg) & Desktop Builds</a>
-                    <a href="#ios-build" class="docs-menu-item">📱 Capacitor & iOS Xcode Guide</a>
+                    <a href="#mobile-pwa" class="docs-menu-item">📱 Mobile PWA Guide (iOS/Android)</a>
                     <a href="#troubleshoot" class="docs-menu-item">🛠️ Platform Troubleshooting</a>
                 </div>
             </aside>
@@ -95,7 +95,7 @@
                     <ul>
                         <li><strong>Vite + React:</strong> Handles responsive rendering, dynamic components, and reactive states.</li>
                         <li><strong>Zustand:</strong> Directs user state, transaction ledgers, workout logs, habit histories, and AI parameters.</li>
-                        <li><strong>Capacitor (iOS & Android):</strong> Transpiles and syncs front-end code directly into native mobile builds for iPhone and Android devices.</li>
+                        <li><strong>PWA (iOS & Android):</strong> Progressive Web App with offline service worker caching and standalone fullscreen display.</li>
                         <li><strong>Electron:</strong> Provides cross-platform desktop shells for macOS (.dmg) and Windows (.exe).</li>
                     </ul>
                 </section>
@@ -135,19 +135,9 @@
                                 <td>Chromium LevelDB Engine</td>
                             </tr>
                             <tr>
-                                <td><strong>Web Browser & PWA</strong></td>
-                                <td>Client-side Browser Sandbox (Domain Origin)</td>
+                                <td><strong>Web Browser & Mobile PWA (iOS & Android)</strong></td>
+                                <td>Client-side Sandboxed Storage (Domain Origin)</td>
                                 <td>HTML5 localStorage & IndexedDB</td>
-                            </tr>
-                            <tr>
-                                <td><strong>iOS (iPhone / iPad)</strong></td>
-                                <td>Sandboxed App Container Storage</td>
-                                <td>Capacitor Native Secure WebKit Storage</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Android</strong></td>
-                                <td>Sandboxed App Internal Storage (<code>/data/data/com.eom.os/</code>)</td>
-                                <td>Capacitor Android WebStorage & SQLite</td>
                             </tr>
                         </tbody>
                     </table>
@@ -398,7 +388,7 @@ npx cap open android</code></pre>
 
                     <h3>iPhone Input Typing Lag Fix</h3>
                     <p>
-                        In webview wrappers (like Capacitor on iOS), re-rendering huge lists on every single keystroke causes CPU spikes, making text input extremely laggy. E.O.M uses a multi-tier optimization strategy to prevent this:
+                        In mobile browser environments and standalone PWAs, re-rendering huge lists on every single keystroke causes CPU spikes, making text input extremely laggy. E.O.M uses a multi-tier optimization strategy to prevent this:
                     </p>
                     
                     <div class="docs-alert info">
@@ -511,27 +501,27 @@ npx cap open android</code></pre>
                     <p>Generates an NSIS setup executable for Windows 10 & 11.</p>
                 </section>
 
-                <!-- 12. IOS Xcode Guide -->
-                <section class="docs-section" id="ios-build">
-                    <h2>📱 Capacitor & iOS Xcode Guide</h2>
+                <!-- 12. MOBILE PWA GUIDE -->
+                <section class="docs-section" id="mobile-pwa">
+                    <h2>📱 Mobile PWA Installation Guide (iOS & Android)</h2>
                     <p>
-                        Deploying your React code to run native 1:1 on your iPhone or simulated Apple environment:
+                        Install E.O.M directly on your mobile device as an offline-first Progressive Web App with zero App Store compile friction:
                     </p>
 
-                    <h3>Step-by-Step Compile Workflow</h3>
-                    <p>1. Open your terminal in the workspace directory and build the production bundle:</p>
-                    <pre><code>npm run build</code></pre>
-                    <p>This creates static HTML, JS, and CSS resources inside the <code>dist/</code> directory.</p>
+                    <h3>iOS (iPhone & iPad Safari)</h3>
+                    <p>1. Open your E.O.M App URL (e.g. <code>https://&lt;your-domain&gt;/app</code>) in Safari.</p>
+                    <p>2. Tap the <strong>Share</strong> button (square with arrow pointing up).</p>
+                    <p>3. Select <strong>Add to Home Screen</strong> ("Zum Home-Bildschirm").</p>
+                    <p>4. Launch E.O.M directly from your home screen in standalone fullscreen mode.</p>
 
-                    <p>2. Copy the files into the Xcode native project:</p>
-                    <pre><code>npx cap sync ios</code></pre>
+                    <h3>Android (Google Chrome)</h3>
+                    <p>1. Open your E.O.M App URL in Chrome.</p>
+                    <p>2. Tap the 3-dots menu icon in the upper right corner.</p>
+                    <p>3. Select <strong>Install app</strong> or <strong>Add to Home screen</strong>.</p>
 
-                    <p>3. Launch Xcode and compile:</p>
-                    <pre><code>npx cap open ios</code></pre>
-
-                    <div class="docs-alert warning">
-                        <div class="docs-alert-title">⚠️ Bundle Sync Required</div>
-                        Always run <code>npm run build && npx cap sync ios</code> after modifying React components to update the native iOS project files.
+                    <div class="docs-alert info">
+                        <div class="docs-alert-title">💡 Offline & Local Storage Guarantee</div>
+                        The PWA uses a Service Worker to cache all application bundles and scripts. All user data is securely stored on your device's origin sandbox without remote exposure.
                     </div>
                 </section>
 
@@ -542,17 +532,17 @@ npx cap open android</code></pre>
                         Here are some common platform issues when building E.O.M:
                     </p>
 
-                    <h3>Electron API Blocks in Web and iOS</h3>
+                    <h3>Electron API Blocks in Web and Mobile</h3>
                     <p>
                         E.O.M contains desktop features like PDF backups that use <code>window.electronAPI</code>. 
-                        In Web browsers or iOS WebViews, this will throw an undefined error if not properly guarded:
+                        In Web browsers or Mobile PWAs, this will throw an undefined error if not properly guarded:
                     </p>
                     <pre><code>// Safe API execution pattern
 if (window.electronAPI) {
     window.electronAPI.backupData(payload);
 } else {
     console.log("Running in non-desktop client: Fallback to local storage export.");
-    // Web/Capacitor backup export logic
+    // Web/Mobile backup export logic
 }</code></pre>
                 </section>
             </main>
